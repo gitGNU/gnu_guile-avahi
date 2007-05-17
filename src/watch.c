@@ -26,18 +26,8 @@
 #include "watch.h"
 #include "common-smobs.h"
 #include "common-enums.h"
+#include "utils.h"
 
-
-struct AvahiGuilePoll
-{
-  AvahiPoll api;
-
-  /* Closures.  */
-  SCM new_watch;
-  SCM free_watch;
-  SCM new_timeout;
-  SCM free_timeout;
-};
 
 struct AvahiWatch
 {
@@ -95,9 +85,14 @@ watch_new (const AvahiPoll *api, int fd, AvahiWatchEvent events,
 }
 
 static void
-watch_update (AvahiWatch *watch, AvahiWatchEvent event)
+watch_update (AvahiWatch *watch, AvahiWatchEvent events)
 {
-  watch->events = event;
+  scm_call_4 (watch->guile_poll->update_watch_x,
+	      watch->watch_smob, scm_from_int (watch->fd),
+	      scm_from_avahi_watch_events (events),
+	      watch->stuff);
+
+  watch->events = events;
 }
 
 static AvahiWatchEvent
@@ -155,6 +150,12 @@ timeout_new (const AvahiPoll *api, const struct timeval *tv,
 static void
 timeout_update (AvahiTimeout *timeout, const struct timeval *tv)
 {
+  unsigned long usec;
+
+  usec = tv->tv_usec + (tv->tv_sec * 1000000UL);
+  scm_call_3 (timeout->guile_poll->update_timeout_x,
+	      timeout->timeout_smob, scm_from_ulong (usec),
+	      timeout->stuff);
   timeout->expiry = *tv;
 }
 
@@ -184,18 +185,10 @@ SCM_SMOB_APPLY (scm_tc16_avahi_watch, apply_avahi_watch,
   AvahiWatch *c_watch;
   AvahiWatchEvent c_events;
 
-  SCM_VALIDATE_LIST (2, events);
-
   c_watch = scm_to_avahi_watch (watch, 1, FUNC_NAME);
+  c_events = scm_to_avahi_watch_events (events, 2, FUNC_NAME);
   c_fd = c_watch->fd;
 
-  for (c_events = 0;
-       !scm_is_null (events);
-       events = SCM_CDR (events))
-    {
-      c_events |= scm_to_avahi_watch_event (SCM_CAR (events), 2,
-					    FUNC_NAME);
-    }
 
   c_watch->callback (c_watch, c_fd, c_events,
 		     c_watch->userdata);
@@ -223,8 +216,8 @@ SCM_SMOB_APPLY (scm_tc16_avahi_timeout, apply_avahi_timeout,
 /* Public API.  */
 
 AvahiGuilePoll *
-avahi_guile_poll_new (SCM new_watch, SCM free_watch,
-		      SCM new_timeout, SCM free_timeout)
+avahi_guile_poll_new (SCM new_watch, SCM update_watch_x, SCM free_watch,
+		      SCM new_timeout, SCM update_timeout_x, SCM free_timeout)
 {
   AvahiGuilePoll *guile_poll;
 
@@ -241,10 +234,12 @@ avahi_guile_poll_new (SCM new_watch, SCM free_watch,
 
   guile_poll->api.userdata = guile_poll;
 
-  guile_poll->new_watch = scm_gc_protect_object (new_watch);
-  guile_poll->free_watch = scm_gc_protect_object (free_watch);
-  guile_poll->new_timeout = scm_gc_protect_object (new_timeout);
-  guile_poll->free_timeout = scm_gc_protect_object (free_timeout);
+  guile_poll->new_watch = new_watch;
+  guile_poll->free_watch = free_watch;
+  guile_poll->update_watch_x = update_watch_x;
+  guile_poll->new_timeout = new_timeout;
+  guile_poll->free_timeout = free_timeout;
+  guile_poll->update_timeout_x = update_timeout_x;
 
   return (guile_poll);
 }
@@ -258,11 +253,6 @@ avahi_guile_poll_get (AvahiGuilePoll *guile_poll)
 void
 avahi_guile_poll_free (AvahiGuilePoll *guile_poll)
 {
-  scm_gc_unprotect_object (guile_poll->new_watch);
-  scm_gc_unprotect_object (guile_poll->free_watch);
-  scm_gc_unprotect_object (guile_poll->new_timeout);
-  scm_gc_unprotect_object (guile_poll->free_timeout);
-
   free (guile_poll);
 }
 

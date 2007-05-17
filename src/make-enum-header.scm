@@ -41,6 +41,7 @@
             (string-upcase (symbol->string %module)))
 
     (format port "#include \"config.h\"~%")
+    (format port "#include <libguile.h>~%")
     (format port "#include <avahi-common/watch.h>~%")
 
     (for-each (lambda (enum)

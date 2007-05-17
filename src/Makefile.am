@@ -32,7 +32,9 @@ CLEANFILES = $(BUILT_SOURCES)
 
 lib_LTLIBRARIES = libguile-avahi-v-0.la
 
-libguile_avahi_v_0_la_SOURCES = watch.c common.c client.c
+libguile_avahi_v_0_la_SOURCES = utils.c watch.c common.c client.c
+libguile_avahi_v_0_la_CFLAGS = $(AVAHI_CFLAGS)
+libguile_avahi_v_0_la_LIBADD = $(AVAHI_LIBS)
 
 AM_CPPFLAGS = -I$(builddir)
 

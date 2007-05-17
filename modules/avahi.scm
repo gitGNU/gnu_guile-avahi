@@ -18,6 +18,9 @@
 (define-module (avahi)
   :export (watch? timeout? poll? simple-poll? guile-poll?
 
+           make-guile-poll guile-poll
+           make-simple-poll simple-poll
+
            watch-event->string
            watch-event/in watch-event/out watch-event/err watch-event/hup))
 

@@ -17,7 +17,7 @@
 
 (define-module (avahi client)
   :use-module (avahi)
-  :export (client?
+  :export (client? make-client
 
            client-state->string
            client-state/s-registering client-state/s-running

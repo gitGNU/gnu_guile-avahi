@@ -2,6 +2,24 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-17 14:47:07 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-2
+
+    Summary:
+      More stuff, nothing working yet.
+    Revision:
+      guile-avahi--devo--0--patch-2
+
+
+    new files:
+     src/utils.c src/utils.h
+
+    modified files:
+     ChangeLog modules/avahi.scm modules/avahi/build/enums.scm
+     modules/avahi/client.scm src/Makefile.am src/client.c
+     src/common.c src/make-enum-header.scm src/make-smob-header.scm
+     src/watch.c src/watch.h
+
+
 2007-05-17 14:45:04 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-1
 
     Summary:

@@ -312,7 +312,7 @@
                   "AVAHI_CLIENT_"))
 
 (define %client-flags-enum
-  (make-enum-type 'client-flags "AvahiClientFlags"
+  (make-enum-type 'client-flag "AvahiClientFlags"
                   '(ignore-user-config no-fail)
                   #f
                   "AVAHI_CLIENT_"))

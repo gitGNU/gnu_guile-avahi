@@ -44,6 +44,7 @@
     (format port "#include <avahi-common/simple-watch.h>~%")
     (format port "#include <avahi-client/client.h>~%")
     (format port "#include <libguile.h>~%")
+    (format port "#include \"watch.h\"~%")
 
     (for-each (lambda (type)
                 (output-smob-type-declaration type port)
