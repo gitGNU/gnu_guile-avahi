@@ -2,6 +2,21 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-17 14:45:04 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-1
+
+    Summary:
+      SMOBs: Always initialize the whole SMOB double-cell.
+    Revision:
+      guile-avahi--devo--0--patch-1
+
+    * modules/avahi/build/smobs.scm (output-c->smob-converter): Use
+      `SCM_NEWSMOB3 ()' so that all components of the double-cell are
+      initialized.
+
+    modified files:
+     ChangeLog modules/avahi/build/smobs.scm
+
+
 2007-05-17 12:42:17 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	base-0
 
     Summary:

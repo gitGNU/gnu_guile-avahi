@@ -127,8 +127,9 @@
   (format port "static inline SCM~%~a (~a c_obj)~%{~%"
           (smob-type-from-c-function type)
           (smob-type-c-name type))
-  (format port "  SCM_RETURN_NEWSMOB (~a, (scm_t_bits) c_obj);~%"
+  (format port "  SCM_RETURN_NEWSMOB3 (~a, (scm_t_bits) c_obj, "
           (smob-type-tag type))
+  (format port "SCM_UNPACK (SCM_BOOL_F), SCM_UNPACK (SCM_BOOL_F));~%")
   (format port "}~%"))
 
 (define (output-smob->c-converter type port)
@@ -178,7 +179,7 @@
 
 (define %client-smob
   (make-smob-type "AvahiClient *" 'client
-                  "avahi_client_free"))
+                  "scm_avahi_client_free"))
 
 (define %avahi-client-smobs
   (list %client-smob))
