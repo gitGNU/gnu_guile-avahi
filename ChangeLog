@@ -2,6 +2,26 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-17 15:50:57 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-3
+
+    Summary:
+      Client running with simple-poll.
+    Revision:
+      guile-avahi--devo--0--patch-3
+
+    * src/common.c (iterate_args): New struct.
+      (do_iterate, do_loop, scm_avahi_iterate_simple_poll,
+      scm_avahi_run_simple_poll): New.
+    
+    * src/client.c (SCM_AVAHI_SET_CLIENT_CALLBACK): Take two args!
+      (client_trampoline): Fixed.
+      (scm_avahi_make_client): Call `SCM_AVAHI_SET_CLIENT_CALLBACK ()' before
+      `avahi_client_new ()'.
+
+    modified files:
+     ChangeLog modules/avahi.scm src/client.c src/common.c
+
+
 2007-05-17 14:47:07 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-2
 
     Summary:

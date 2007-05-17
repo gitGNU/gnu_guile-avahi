@@ -154,6 +154,99 @@ SCM_DEFINE (scm_avahi_simple_poll, "simple-poll",
 }
 #undef FUNC_NAME
 
+struct iterate_args
+{
+  AvahiSimplePoll *c_simple_poll;
+  int              c_sleep_time;
+};
+
+static void *
+do_iterate (void *data)
+{
+  int err;
+  struct iterate_args *args;
+
+  args = (struct iterate_args *) data;
+  err = avahi_simple_poll_iterate (args->c_simple_poll,
+				   args->c_sleep_time);
+
+  return ((void *) err);
+}
+
+static void *
+do_loop (void *data)
+{
+  int err;
+
+  err = avahi_simple_poll_loop ((AvahiSimplePoll *) data);
+
+  return ((void *) err);
+}
+
+SCM_DEFINE (scm_avahi_iterate_simple_poll, "iterate-simple-poll",
+	    1, 1, 0,
+	    (SCM simple_poll, SCM sleep_time),
+	    "Handle events registered by @var{simple-poll}.  If "
+	    "@var{sleep-time} is not specified, the function blocks "
+	    "until an I/O event occurs.  If @var{sleep-time} is specified, "
+	    "it is the maximum number of milliseconds of blocking.  Return "
+	    "@code{#f} is a quit request has been scheduled, @code{#t} "
+	    "otherwise.")
+#define FUNC_NAME s_scm_avahi_iterate_simple_poll
+{
+  int err, c_sleep_time;
+  AvahiSimplePoll *c_simple_poll;
+  struct iterate_args args;
+  SCM result;
+
+  c_simple_poll = scm_to_avahi_simple_poll (simple_poll, 1, FUNC_NAME);
+  if (sleep_time != SCM_UNDEFINED)
+    c_sleep_time = (int) scm_to_uint (sleep_time);
+  else
+    c_sleep_time = -1;
+
+  args.c_simple_poll = c_simple_poll;
+  args.c_sleep_time  = c_sleep_time;
+  err = (int) scm_without_guile (do_iterate, &args);
+
+  if (err == 0)
+    result = SCM_BOOL_T;
+  else if (err > 0)
+    result = SCM_BOOL_F;
+  else
+    abort ();
+
+  return (result);
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_run_simple_poll, "run-simple-poll",
+	    1, 0, 0,
+	    (SCM simple_poll),
+	    "Run the event loop of @var{simple-poll} until either an "
+	    "error occurs or a quit request is scheduled.  In the former "
+	    "case, an error is raised; in the latter, @code{#f} is "
+	    "returned.")
+#define FUNC_NAME s_scm_avahi_run_simple_poll
+{
+  int err;
+  AvahiSimplePoll *c_simple_poll;
+  SCM result;
+
+  c_simple_poll = scm_to_avahi_simple_poll (simple_poll, 1, FUNC_NAME);
+
+  err = (int) scm_without_guile (do_loop, c_simple_poll);
+  if (err == 0)
+    result = SCM_BOOL_T;
+  else if (err > 0)
+    result = SCM_BOOL_F;
+  else
+    abort ();
+
+  return (result);
+}
+#undef FUNC_NAME
+
 
 /* Initialization.  */
 void

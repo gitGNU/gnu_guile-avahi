@@ -49,7 +49,7 @@ scm_avahi_client_free (AvahiClient *client)
 
 /* Procedures.  */
 
-#define SCM_AVAHI_SET_CLIENT_CALLBACK(client)	\
+#define SCM_AVAHI_SET_CLIENT_CALLBACK(client, callback)	\
   SCM_SET_SMOB_OBJECT_2 (client, callback)
 #define SCM_AVAHI_CLIENT_CALLBACK(client)	\
   SCM_SMOB_OBJECT_2 (client)
@@ -70,14 +70,15 @@ client_trampoline (AvahiClient *c_client,
 #define FUNC_NAME "client_trampoline"
 {
   SCM client, callback;
+  AvahiClient *c_client2;
 
   client = (SCM) SCM_PACK ((scm_t_bits) data);
+  c_client2 = scm_to_avahi_client (client, 0, FUNC_NAME);
 
   /* Sanity check.  */
-  if ((c_client != NULL)
-      && (c_client != scm_to_avahi_client (client, 0, FUNC_NAME)))
-    /* FIXME: This test fails! */
-    abort ();
+  if ((c_client != NULL) && (c_client2 != NULL))
+    if (c_client != c_client2)
+      abort ();
 
   callback = SCM_AVAHI_CLIENT_CALLBACK (client);
 
@@ -105,19 +106,19 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
 
   c_poll = scm_to_avahi_poll (poll, 1, FUNC_NAME);
   c_flags = scm_to_avahi_client_flags (flags, 2, FUNC_NAME);
+  SCM_VALIDATE_PROC (3, callback);
 
   /* We have to create the SMOB first so that we can pass it as "user data"
      to `avahi_client_new ()'.  Thus, we need to set it afterwards.  */
-  /* XXX: What if it gets GC'd at this point?  */
   client = scm_from_avahi_client (NULL);
+  SCM_AVAHI_SET_CLIENT_CALLBACK (client, callback);
+
   c_client = avahi_client_new (c_poll, c_flags, client_trampoline,
 			       (void *) client, &err);
   if (!c_client)
     abort ();
 
   SCM_SET_SMOB_DATA (client, (scm_t_bits) c_client);
-
-  SCM_AVAHI_SET_CLIENT_CALLBACK (callback);
 
   return (client);
 }
