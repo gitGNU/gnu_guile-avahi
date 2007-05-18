@@ -2,6 +2,29 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-18 16:13:24 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-8
+
+    Summary:
+      Added the documentation framework (from Guile-GnuTLS).
+    Revision:
+      guile-avahi--devo--0--patch-8
+
+    * Makefile.am (SUBDIRS): Added `doc'.
+    
+    * configure.ac: Produce `doc/Makefile'.
+
+    new files:
+     doc/.arch-ids/=id doc/.arch-ids/Makefile.am.id
+     doc/.arch-ids/extract-c-doc.scm.id doc/.arch-inventory
+     doc/Makefile.am doc/extract-c-doc.scm doc/guile-avahi.texi
+
+    modified files:
+     ChangeLog Makefile.am configure.ac
+
+    new directories:
+     doc doc/.arch-ids
+
+
 2007-05-18 15:36:49 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-7
 
     Summary:

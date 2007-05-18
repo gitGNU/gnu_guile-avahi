@@ -1,0 +1,342 @@
+\input texinfo  @c -*-texinfo-*-
+
+@c %**start of header
+@setfilename guile-avahi.info
+@settitle Using Avahi in Guile Scheme Programs
+@footnotestyle end
+@setchapternewpage odd
+@c %**end of header
+
+@set EDITION 1
+@include version.texi
+
+
+@ifinfo
+@dircategory The Algorithmic Language Scheme
+@direntry
+* Guile-Avahi: (Guile-Avahi).     Guile bindings for Avahi.
+@end direntry
+
+This file documents Guile-Avahi.
+
+Copyright @copyright{} 2007 Ludovic Court@`es
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the author.
+@end ifinfo
+
+@titlepage
+@title Using Avahi in Guile Scheme Programs
+@subtitle For Guile-Avahi @value{VERSION}
+@author Ludovic Court@`es
+
+@page
+@vskip 0pt plus 1filll
+Edition @value{EDITION} @*
+@c Updated for Guile-Avahi @value{VERSION} @*
+@value{UPDATED} @*
+
+Copyright @copyright{} 2007 Ludovic Court@`es
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the author.
+@end titlepage
+
+@contents
+
+@c *********************************************************************
+@node Top, Introduction, (dir), (dir)
+@top Using Avahi in Guile Scheme Programs
+
+This document describes Guile-Avahi version @value{VERSION}.  It was
+last updated in @value{UPDATED-MONTH}.
+
+@menu
+* Introduction::                What this is about.
+* Conventions::                 Naming conventions and other idiosyncrasies.
+* Examples::                    Quick start.
+* API Reference::               The Scheme Avahi programming interface.
+* Concept Index::               Concepts.
+* Procedure Index::             Scheme Procedures.
+* Variable Index::              Scheme Variables.
+@end menu
+
+@c *********************************************************************
+@node Introduction, Conventions, Top, Top
+@chapter Introduction
+
+Guile-Avahi provides GNU Guile @dfn{bindings} to the
+@uref{http://avahi.org/, Avahi library}.  In other
+words, it makes it possible to write Scheme programs that use the
+facilities of Avahi.  Avahi is a C library that implements the
+@uref{http://dns-sd.org/, DNS-SD} @dfn{service discovery} protocol,
+sometimes also referred to as ``Bonjour''.
+
+More precisely, Guile-Avahi provides bindings for the @dfn{client}
+library of Avahi.  The client library allows application to use
+service discovery by transparently connecting them to the Avahi
+@dfn{system-wide daemon} using @uref{http://dbus.freedesktop.org,
+D-Bus}.  This daemon actually implements the DNS-SD protocols and
+handles service discovery and publication on behalf of applications
+running on the same host.
+
+Thus, the functionality of Guile-Avahi could be provided to Guile
+Scheme applications by writing a D-Bus client to the Avahi daemon in
+Scheme.  Alas, no Scheme-friendly D-Bus implementation was available
+at the time Guile-Avahi was started, hence the approach taken by
+Guile-Avahi.
+
+This document provides an overview of the Scheme API to Avahi.  The
+reader is assumed to have basic knowledge of the protocol and library.
+
+
+@c *********************************************************************
+@node Conventions, Examples, Introduction, Top
+@chapter Conventions
+
+This chapter details the conventions used in Guile-Avahi, as well as
+specificities of the mapping of the C API to Scheme.
+
+@menu
+* Enumerates and Constants::    Representation of C-side constants.
+* Procedure Names::             Naming conventions.
+* Error Handling::              Exceptions.
+@end menu
+
+@node Enumerates and Constants, Procedure Names, Conventions, Conventions
+@section Enumerates and Constants
+
+@cindex enumerate
+@cindex constant
+
+Lots of enumerates and constants are used in the Avahi C API.  For
+each C enumerate type, a disjoint Scheme type is used---thus,
+enumerate values and constants are not represented by Scheme symbols
+nor by integers.  This makes it impossible to use an enumerate value
+of the wrong type on the Scheme side: such errors are automatically
+detected by type-checking.
+
+The enumerate values are bound to variables exported by the
+@code{(avahi)} and other modules within the @code{avahi} hierarchy.
+These variables are named according to the following convention:
+
+@itemize
+@item All variable names are lower-case; the underscore @code{_}
+character used in the C API is replaced by hyphen @code{-}.
+@item All variable names are prepended by the name of the enumerate
+type and the slash @code{/} character.
+@item In some cases, the variable name is made more explicit than the
+one of the C API, e.g., by avoid abbreviations.
+@end itemize
+
+Consider for instance this C-side enumerate:
+
+@example
+typedef enum
+@{
+  AVAHI_CLIENT_S_REGISTERING,
+  AVAHI_CLIENT_S_RUNNING,
+  AVAHI_CLIENT_S_COLLISION,
+  AVAHI_CLIENT_FAILURE,
+  AVAHI_CLIENT_CONNECTING
+@} AvahiClientState;
+@end example
+
+The corresponding Scheme values are bound to the following variables
+exported by the @code{(avahi client)} module:
+
+@example
+client-state/s-registering
+client-state/s-running
+client-state/s-collision
+client-state/failure
+client-state/connecting
+@end example
+
+Hopefully, most variable names can be deduced from this convention.
+
+Scheme-side ``enumerate'' values can be compared using @code{eq?}
+(@pxref{Equality, equality predicates,, guile, The GNU Guile Reference
+Manual}).  Consider the following example:
+
+@findex session-cipher
+
+@example
+(let ((client (make-client ...)))
+
+  ;;
+  ;; ...
+  ;;
+
+  ;; Check the client state.
+  (if (eq? (client-state client) client-state/failure)
+      (format #t "Oh, we failed.")))
+@end example
+
+In addition, all enumerate values can be converted to a human-readable
+string, in a type-specific way.  For instance,
+@code{(watch-event->string watch-event/in)} yields @code{"in"}.  Note
+that these strings may not be sufficient for use in a user interface
+since they are fairly concise and not internationalized.
+
+
+@node Procedure Names, Error Handling, Enumerates and Constants, Conventions
+@section Procedure Names
+
+Unlike C functions in Avahi, the corresponding Scheme procedures are
+named in a way that is close to natural English.  Abbreviations are
+also avoided.  For instance, the Scheme procedure corresponding to
+@code{avahi_client_get_version} is named
+@code{client-server-version}.  The @code{avahi_}
+prefix is always omitted from variable names since a similar effect
+can be achieved using Guile's nifty binding renaming facilities,
+should it be needed (@pxref{Using Guile Modules,,, guile, The GNU
+Guile Reference Manual}).
+
+@node Error Handling,  , Procedure Names, Conventions
+@section Error Handling
+
+@cindex exceptions
+@cindex errors
+@cindex @code{avahi-error}
+@findex error->string
+
+FIXME: Check this!
+
+Avahi errors are implemented as Scheme exceptions (@pxref{Exceptions,
+exceptions in Guile,, guile, The GNU Guile Reference Manual}).  Each
+time a Avahi function returns an error, an exception with key
+@code{avahi-error} is raised.  The additional arguments that are
+thrown include an error code and the name of the Avahi procedure that
+raised the exception.  The error code is pretty much like an enumerate
+value: it is one of the @code{error/} variables exported by the
+@code{(avahi)} module (@pxref{Enumerates and Constants}).  Exceptions
+can be turned into error messages using the @code{error->string}
+procedure.
+
+The following examples illustrates how Avahi exceptions can be
+handled:
+
+@example
+(let ((session (make-session connection-end/server)))
+
+  ;;
+  ;; ...
+  ;;
+
+  (catch 'avahi-error
+    (lambda ()
+      (handshake session))
+    (lambda (key err function . currently-unused)
+      (format (current-error-port)
+              "a Avahi error was raised by `~a': ~a~%"
+              function (error->string err)))))
+@end example
+
+Again, error values can be compared using @code{eq?}:
+
+@example
+    ;; `avahi-error' handler.
+    (lambda (key err function . currently-unused)
+      (if (eq? err error/fatal-alert-received)
+          (format (current-error-port)
+                  "a fatal alert was caught!~%")
+          (format (current-error-port)
+                  "something bad happened: ~a~%"
+                  (error->string err))))
+@end example
+
+Note that the @code{catch} handler is currently passed only 3
+arguments but future versions might provide it with additional
+arguments.  Thus, it must be prepared to handle more than 3 arguments,
+as in this example.
+
+
+@c *********************************************************************
+@node Examples, API Reference, Conventions, Top
+@chapter Examples
+
+This chapter lists examples that illustrate common use cases.
+
+
+@c *********************************************************************
+@node API Reference, Concept Index, Examples, Top
+@chapter API Reference
+
+This chapter documents Guile-Avahi Scheme procedures.  Note that
+further details can be found in @ref{Top, The Avahi Reference
+Manual,, avahi, Transport Layer Security Library for the GNU System}.
+
+@menu
+* Core Interface::              Common Avahi facilities.
+* Client Interface::            Client-related facilities.
+@end menu
+
+@node Core Interface, Client Interface, API Reference, API Reference
+@section Core Interface
+
+This section lists the Scheme procedures exported by the
+@code{(avahi)} module.
+
+@include common.c.texi
+
+The low-level API for watches, timeouts, and ``polls'', all of which
+serve as building blocks for the create of event loops (e.g., using
+@code{make-guile-poll}) are described below.
+
+@include watch.c.texi
+
+@node Client Interface,  , Core Interface, API Reference
+@section Client Interface
+
+This section lists the Scheme procedures exported by the @code{(avahi
+client)} module.
+
+@include client.c.texi
+
+
+@c *********************************************************************
+@node Concept Index, Procedure Index, API Reference, Top
+@unnumbered Concept Index
+@printindex cp
+
+@node Procedure Index, Variable Index, Concept Index, Top
+@unnumbered Procedure Index
+@printindex fn
+
+@node Variable Index,  , Procedure Index, Top
+@unnumbered Variable Index
+@printindex vr
+
+
+@bye
+
+@ignore
+;;; arch-tag: ee5f2081-9153-48fc-b4ee-2024381c65d7
+@end ignore
+
+@c Local Variables:
+@c ispell-local-dictionary: "american"
+@c End:

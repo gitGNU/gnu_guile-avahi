@@ -38,6 +38,7 @@ PKG_CHECK_MODULES([AVAHI], [avahi-client], [],
 
 AC_CONFIG_FILES([Makefile
 	         modules/Makefile
+		 doc/Makefile
 	         src/Makefile
 		 tests/Makefile
 		 pre-inst-guile])

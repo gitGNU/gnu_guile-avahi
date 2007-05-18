@@ -15,6 +15,18 @@
 #  License along with Guile-Avahi; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = foreign
+GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules
 
-SUBDIRS = modules doc src tests
+SNARF_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src
+
+
+BUILT_SOURCES = common.c.texi watch.c.texi client.c.texi
+CLEANFILES    = $(BUILT_SOURCES)
+info_TEXINFOS = guile-avahi.texi
+EXTRA_DIST    = extract-c-doc.scm
+
+%.c.texi: $(top_srcdir)/src/%.c
+	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-c-doc.scm"	\
+	   -e '(apply main (cdr (command-line)))'		\
+	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS)"			\
+	   > "$@"
