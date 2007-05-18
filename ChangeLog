@@ -2,6 +2,30 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-18 14:49:14 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-5
+
+    Summary:
+      Augmented the client API.
+    Revision:
+      guile-avahi--devo--0--patch-5
+
+    * modules/avahi/client.scm: Updated.
+    
+    * src/client.c (SCM_AVAHI_SET_CLIENT_POLL, SCM_AVAHI_CLIENT_POLL): New
+      macros.
+      (mark_avahi_client): Mark the poll associated with CLIENT.
+      (scm_avahi_make_client): Associate POLL with the newly-created client.
+      (scm_avahi_client_server_version, scm_avahi_client_host_name,
+      scm_avahi_client_host_fqdn, scm_avahi_client_state,
+      scm_avahi_set_client_host_name_x): New.
+    
+    * tests/simple-poll.scm: Test the new `client-' procedures.
+
+    modified files:
+     ChangeLog modules/avahi/client.scm src/client.c
+     tests/simple-poll.scm
+
+
 2007-05-18 09:31:48 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-4
 
     Summary:

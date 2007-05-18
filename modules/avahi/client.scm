@@ -17,7 +17,9 @@
 
 (define-module (avahi client)
   :use-module (avahi)
-  :export (client? make-client
+  :export (client? make-client client-server-version
+           client-host-name client-host-fqdn client-state
+           set-client-host-name!
 
            client-state->string
            client-state/s-registering client-state/s-running

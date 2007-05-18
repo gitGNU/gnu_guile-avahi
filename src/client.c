@@ -53,10 +53,16 @@ scm_avahi_client_free (AvahiClient *client)
   SCM_SET_SMOB_OBJECT_2 (client, callback)
 #define SCM_AVAHI_CLIENT_CALLBACK(client)	\
   SCM_SMOB_OBJECT_2 (client)
+#define SCM_AVAHI_SET_CLIENT_POLL(client, poll)	\
+  SCM_SET_SMOB_OBJECT_3 (client, poll)
+#define SCM_AVAHI_CLIENT_POLL(client)		\
+  SCM_SMOB_OBJECT_3 (client)
 
-/* Mark the closure associated with CLIENT.  */
+/* Mark the poll and closure associated with CLIENT.  */
 SCM_SMOB_MARK (scm_tc16_avahi_client, mark_avahi_client, client)
 {
+  scm_gc_mark (SCM_AVAHI_CLIENT_POLL (client));
+
   return (SCM_AVAHI_CLIENT_CALLBACK (client));
 }
 
@@ -112,6 +118,7 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
      to `avahi_client_new ()'.  Thus, we need to set it afterwards.  */
   client = scm_from_avahi_client (NULL);
   SCM_AVAHI_SET_CLIENT_CALLBACK (client, callback);
+  SCM_AVAHI_SET_CLIENT_POLL (client, poll);
 
   c_client = avahi_client_new (c_poll, c_flags, client_trampoline,
 			       (void *) client, &err);
@@ -121,6 +128,99 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
   SCM_SET_SMOB_DATA (client, (scm_t_bits) c_client);
 
   return (client);
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_client_server_version, "client-server-version",
+	    1, 0, 0,
+	    (SCM client),
+	    "Return the version (a string) of the server the client "
+	    "is connected to.")
+#define FUNC_NAME s_scm_avahi_client_server_version
+{
+  const char *c_version;
+  AvahiClient *c_client;
+
+  c_client = scm_to_avahi_client (client, 1, FUNC_NAME);
+  c_version = avahi_client_get_version_string (c_client);
+
+  return (scm_from_locale_string (c_version));
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_client_host_name, "client-host-name",
+	    1, 0, 0,
+	    (SCM client),
+	    "Return the host name of the server @var{client} is "
+	    "connected to.")
+#define FUNC_NAME s_scm_avahi_client_host_name
+{
+  const char *c_hostname;
+  AvahiClient *c_client;
+
+  c_client = scm_to_avahi_client (client, 1, FUNC_NAME);
+  c_hostname = avahi_client_get_host_name (c_client);
+
+  return (scm_from_locale_string (c_hostname));
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_set_client_host_name_x, "set-client-host-name!",
+	    2, 0, 0,
+	    (SCM client, SCM name),
+	    "Change @var{client}'s host name to @var{name}.")
+#define FUNC_NAME s_scm_avahi_set_client_host_name_x
+{
+  char *c_hostname;
+  size_t c_hostname_len;
+  AvahiClient *c_client;
+
+  c_client = scm_to_avahi_client (client, 1, FUNC_NAME);
+  SCM_VALIDATE_STRING (2, name);
+
+  c_hostname_len = scm_c_string_length (name);
+  c_hostname = (char *) alloca (c_hostname_len + 1);
+  (void) scm_to_locale_stringbuf (name, c_hostname, c_hostname_len);
+  c_hostname[c_hostname_len] = '\0';
+
+  /* XXX: What's the meaning of the return value? */
+  (void) avahi_client_set_host_name (c_client, c_hostname);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_client_host_fqdn, "client-host-fqdn",
+	    1, 0, 0,
+	    (SCM client),
+	    "Return the fully qualified domain name (FQDN) of the "
+	    "server @var{client} is connected to.")
+#define FUNC_NAME s_scm_avahi_client_host_fqdn
+{
+  const char *c_fqdn;
+  AvahiClient *c_client;
+
+  c_client = scm_to_avahi_client (client, 1, FUNC_NAME);
+  c_fqdn = avahi_client_get_host_name_fqdn (c_client);
+
+  return (scm_from_locale_string (c_fqdn));
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_client_state, "client-state",
+	    1, 0, 0,
+	    (SCM client),
+	    "Return the state (a @code{client-state/} value) of "
+	    "@var{client}.")
+#define FUNC_NAME s_scm_avahi_client_state
+{
+  AvahiClientState c_state;
+  AvahiClient *c_client;
+
+  c_client = scm_to_avahi_client (client, 1, FUNC_NAME);
+  c_state = avahi_client_get_state (c_client);
+
+  return (scm_from_avahi_client_state (c_state));
 }
 #undef FUNC_NAME
 

@@ -50,9 +50,18 @@
                                              (list
                                               client-flag/ignore-user-config)
                                              client-callback)))
-                   (client? client)
-                   (iterate-simple-poll poll 700)
-                   #t))))
+                   (and (client? client)
+                        (begin
+                          (iterate-simple-poll poll 700)
+                          #t)
+                        (every string?
+                               (map apply
+                                    (list client-server-version
+                                          client-host-name
+                                          client-host-fqdn)
+                                    (make-list 3 (list client))))
+                        (eq? (client-state client)
+                             client-state/s-running))))))
 
     (lambda ()
       ;; failure.
