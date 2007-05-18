@@ -17,7 +17,7 @@
 
 GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules
 
-noinst_HEADERS = watch.h
+noinst_HEADERS = watch.h utils.h
 
 EXTRA_DIST =					\
   make-enum-map.scm make-smob-types.scm		\
@@ -36,7 +36,7 @@ libguile_avahi_v_0_la_SOURCES = utils.c watch.c common.c client.c
 libguile_avahi_v_0_la_CFLAGS = $(AVAHI_CFLAGS)
 libguile_avahi_v_0_la_LIBADD = $(AVAHI_LIBS)
 
-AM_CPPFLAGS = -I$(builddir)
+AM_CPPFLAGS = -I$(builddir) -I$(srcdir)
 
 
 %-enums.h: $(srcdir)/make-enum-header.scm

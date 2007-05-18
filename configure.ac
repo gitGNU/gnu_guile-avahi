@@ -14,7 +14,6 @@ AC_CONFIG_HEADER([src/config.h])
 
 # Checks for programs.
 AC_PROG_CC
-gl_EARLY
 AC_PROG_LIBTOOL
 
 GUILE_PROGS
@@ -40,6 +39,7 @@ PKG_CHECK_MODULES([AVAHI], [avahi-client], [],
 AC_CONFIG_FILES([Makefile
 	         modules/Makefile
 	         src/Makefile
+		 tests/Makefile
 		 pre-inst-guile])
 AC_CONFIG_COMMANDS([pre-inst-guile-exec], [chmod +x pre-inst-guile])
 

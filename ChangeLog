@@ -2,6 +2,32 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-18 09:31:48 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-4
+
+    Summary:
+      Added a basic test framework.
+    Revision:
+      guile-avahi--devo--0--patch-4
+
+    * Makefile.am (SUBDIRS): Added `tests'.
+    
+    * configure.ac: Removed `gl_EARLY' invocation.
+      Produce `tests/Makefile'.
+    
+    * src/Makefile.am (noinst_HEADERS): Added "utils.h".
+      (AM_CPPFLAGS): Added `-I$(srcdir)'.
+
+    new files:
+     tests/.arch-ids/=id tests/.arch-ids/Makefile.am.id
+     tests/Makefile.am tests/simple-poll.scm
+
+    modified files:
+     ChangeLog Makefile.am configure.ac src/Makefile.am
+
+    new directories:
+     tests tests/.arch-ids
+
+
 2007-05-17 15:50:57 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-3
 
     Summary:

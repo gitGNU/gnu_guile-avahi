@@ -15,6 +15,8 @@
 #  License along with Guile-Avahi; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = foreign
+TESTS = simple-poll.scm
 
-SUBDIRS = modules src tests
+EXTRA_DIST = $(TESTS)
+
+TESTS_ENVIRONMENT = $(top_builddir)/pre-inst-guile
