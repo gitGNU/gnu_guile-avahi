@@ -101,7 +101,8 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
 	    "(a @code{poll} object as returned by, e.g., "
 	    "@code{(simple-poll (make-simple-poll))}) for I/O management.  "
 	    "In addition, when the client state changes, @code{callback} "
-	    "(a XXX-argument procedure) will be invoked.  @var{flags} "
+	    "(a two-argument procedure) will be invoked and passed the "
+	    "client object and a client-state value.  @var{flags} must "
 	    "be a list of client flags (i.e., @code{client-flag/} values).")
 #define FUNC_NAME s_scm_avahi_make_client
 {
@@ -123,8 +124,8 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
 
   c_client = avahi_client_new (c_poll, c_flags, client_trampoline,
 			       (void *) client, &err);
-  if (!c_client)
-    scm_avahi_error (AVAHI_ERR_NO_MEMORY, FUNC_NAME);
+  if (c_client == NULL)
+    scm_avahi_error (err, FUNC_NAME);
 
   SCM_SET_SMOB_DATA (client, (scm_t_bits) c_client);
 

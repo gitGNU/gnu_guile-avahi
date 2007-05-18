@@ -2,6 +2,18 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-18 17:52:27 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-10
+
+    Summary:
+      Documentation updates.
+    Revision:
+      guile-avahi--devo--0--patch-10
+
+
+    modified files:
+     ChangeLog doc/guile-avahi.texi src/client.c src/common.c
+
+
 2007-05-18 17:07:06 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-9
 
     Summary:

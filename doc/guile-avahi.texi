@@ -167,6 +167,8 @@ typedef enum
 The corresponding Scheme values are bound to the following variables
 exported by the @code{(avahi client)} module:
 
+@vindex client-state/s-registering
+
 @example
 client-state/s-registering
 client-state/s-running
@@ -181,8 +183,6 @@ Scheme-side ``enumerate'' values can be compared using @code{eq?}
 (@pxref{Equality, equality predicates,, guile, The GNU Guile Reference
 Manual}).  Consider the following example:
 
-@findex session-cipher
-
 @example
 (let ((client (make-client ...)))
 
@@ -194,6 +194,9 @@ Manual}).  Consider the following example:
   (if (eq? (client-state client) client-state/failure)
       (format #t "Oh, we failed.")))
 @end example
+
+@vindex watch-event/in
+@findex watch-event->string
 
 In addition, all enumerate values can be converted to a human-readable
 string, in a type-specific way.  For instance,
@@ -223,8 +226,6 @@ Guile Reference Manual}).
 @cindex @code{avahi-error}
 @findex error->string
 
-FIXME: Check this!
-
 Avahi errors are implemented as Scheme exceptions (@pxref{Exceptions,
 exceptions in Guile,, guile, The GNU Guile Reference Manual}).  Each
 time a Avahi function returns an error, an exception with key
@@ -240,7 +241,7 @@ The following examples illustrates how Avahi exceptions can be
 handled:
 
 @example
-(let ((session (make-session connection-end/server)))
+(let ((poll (make-simple-poll)))
 
   ;;
   ;; ...
@@ -248,24 +249,24 @@ handled:
 
   (catch 'avahi-error
     (lambda ()
-      (handshake session))
+      (run-simple-poll (simple-poll poll)))
     (lambda (key err function . currently-unused)
       (format (current-error-port)
-              "a Avahi error was raised by `~a': ~a~%"
+              "an Avahi error was raised by `~a': ~a~%"
               function (error->string err)))))
 @end example
 
 Again, error values can be compared using @code{eq?}:
 
+@vindex error/no-daemon
+
 @example
     ;; `avahi-error' handler.
     (lambda (key err function . currently-unused)
-      (if (eq? err error/fatal-alert-received)
+      (if (eq? err error/no-daemon)
           (format (current-error-port)
-                  "a fatal alert was caught!~%")
-          (format (current-error-port)
-                  "something bad happened: ~a~%"
-                  (error->string err))))
+                  "~a: the Avahi daemon is not running~%"
+                  function)))
 @end example
 
 Note that the @code{catch} handler is currently passed only 3
@@ -280,14 +281,16 @@ as in this example.
 
 This chapter lists examples that illustrate common use cases.
 
+FIXME: Actually it doesn't.
+
 
 @c *********************************************************************
 @node API Reference, Concept Index, Examples, Top
 @chapter API Reference
 
 This chapter documents Guile-Avahi Scheme procedures.  Note that
-further details can be found in @ref{Top, The Avahi Reference
-Manual,, avahi, Transport Layer Security Library for the GNU System}.
+further details can be found in the @uref{http://avahi.org/, Avahi C
+API reference}.
 
 @menu
 * Core Interface::              Common Avahi facilities.
