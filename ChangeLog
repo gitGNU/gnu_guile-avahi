@@ -2,6 +2,34 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-18 15:35:27 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-6
+
+    Summary:
+      Augmented the poll API.
+    Revision:
+      guile-avahi--devo--0--patch-6
+
+    * modules/avahi.scm: Updated.
+    
+    * src/watch.c: Include <assert.h>.
+      (AvahiTimeout)[enabled]: New field.
+      (watch_new): Don't assign the return value from Scheme to `stuff'.
+      (watch_free): Use a single-argument callback.
+      (timeout_new): Pass seconds and nanoseconds to the callback.  Check
+      whether the timeout is actually enabled.
+      (timeout_update): Likewise.
+      (timeout_free): Use a single-argument callback.
+      (mark_avahi_watch, mark_avahi_timeout): New.
+      (scm_avahi_invoke_watch, scm_avahi_invoke_timeout): New.
+      (apply_avahi_watch, apply_avahi_timeout): Removed.
+      (scm_avahi_watch_fd, scm_avahi_watch_events, scm_avahi_watch_user_data,
+      scm_avahi_set_watch_user_data_x, scm_avahi_timeout_value,
+      scm_avahi_timeout_user_data, scm_avahi_set_timeout_user_data_x): New.
+
+    modified files:
+     ChangeLog modules/avahi.scm src/watch.c
+
+
 2007-05-18 14:49:14 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-5
 
     Summary:
