@@ -2,6 +2,22 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-18 15:36:49 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-7
+
+    Summary:
+      Added a `guile-poll' test.
+    Revision:
+      guile-avahi--devo--0--patch-7
+
+    * tests/Makefile.am: Added `guile-poll.scm'.
+
+    new files:
+     tests/guile-poll.scm
+
+    modified files:
+     ChangeLog tests/Makefile.am
+
+
 2007-05-18 15:35:27 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-6
 
     Summary:
