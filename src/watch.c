@@ -29,6 +29,7 @@
 #include "common-smobs.h"
 #include "common-enums.h"
 #include "utils.h"
+#include "errors.h"
 
 
 struct AvahiWatch
@@ -226,7 +227,8 @@ SCM_DEFINE (scm_avahi_invoke_watch, "invoke-watch",
 	    "notifies the interested code that the events listed in "
 	    "@var{events} (a list of @code{watch-event/} values) occurred "
 	    "on the file descriptor associated with @var{watch}.  The "
-	    "return value is unspecified.")
+	    "return value is unspecified.  An @code{error/invalid-object} "
+	    "error is raised if @var{watch} is no longer valid.")
 #define FUNC_NAME s_scm_avahi_invoke_watch
 {
   int c_fd;
@@ -240,7 +242,7 @@ SCM_DEFINE (scm_avahi_invoke_watch, "invoke-watch",
   c_fd = c_watch->fd;
 
   if (c_watch->dead)
-    abort ();
+    scm_avahi_error (AVAHI_ERR_INVALID_OBJECT, FUNC_NAME);
   else
     c_watch->callback (c_watch, c_fd, c_events,
 		       c_watch->userdata);
@@ -255,7 +257,8 @@ SCM_DEFINE (scm_avahi_invoke_timeout, "invoke-timeout",
 	    "Invoke the call-back associated with @var{timeout}.  This "
 	    "notifies the interested code that the timeout associated "
 	    "with @var{timeout} has been reached.  The return value is "
-	    "unspecified.")
+	    "unspecified.  An @code{error/invalid-object} error is raised "
+	    "if @var{timeout} is disabled or is no longer valid.")
 #define FUNC_NAME s_scm_avahi_invoke_timeout
 {
   AvahiTimeout *c_timeout;
@@ -265,7 +268,7 @@ SCM_DEFINE (scm_avahi_invoke_timeout, "invoke-timeout",
   assert (c_timeout->callback);
 
   if ((c_timeout->dead) || (!c_timeout->enabled))
-    abort ();
+    scm_avahi_error (AVAHI_ERR_INVALID_OBJECT, FUNC_NAME);
   else
     c_timeout->callback (c_timeout, c_timeout->userdata);
 

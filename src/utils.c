@@ -20,6 +20,7 @@
 #endif
 
 #include "utils.h"
+#include "errors.h"
 
 #include "common-enums.h"
 #include "client-enums.h"
@@ -45,7 +46,7 @@ scm_from_avahi_watch_events (AvahiWatchEvent c_events)
 
   if (c_events != 0)
     /* XXX: We failed to interpret one of the events flags.  */
-    abort ();
+    scm_avahi_error (AVAHI_ERR_FAILURE, __FUNCTION__);
 
 #undef MATCH_EVENTS
 

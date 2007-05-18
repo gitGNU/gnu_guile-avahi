@@ -15,42 +15,17 @@
    License along with Guile-Avahi; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA  */
 
-#ifndef GUILE_AVAHI_UTILS_H
-#define GUILE_AVAHI_UTILS_H
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#ifndef GUILE_AVAHI_ERRORS_H
+#define GUILE_AVAHI_ERRORS_H
 
 #include <libguile.h>
 
-
-/* Compiler twiddling.  */
+#include "utils.h"
 
-#ifdef __GNUC__
-# define EXPECT    __builtin_expect
-# define NO_RETURN __attribute__ ((__noreturn__))
-#else
-# define EXPECT(_expr, _value) (_expr)
-# define NO_RETURN
-#endif
-
-#define EXPECT_TRUE(_expr)  EXPECT ((_expr), 1)
-#define EXPECT_FALSE(_expr) EXPECT ((_expr), 0)
-
-
-/* Avahi helpers.  */
-
-#include <avahi-common/watch.h>
-#include <avahi-client/client.h>
-
-SCM_API SCM scm_from_avahi_watch_events (AvahiWatchEvent events);
-SCM_API AvahiWatchEvent scm_to_avahi_watch_events (SCM events, int pos,
-						   const char *func_name);
-SCM_API AvahiClientFlags scm_to_avahi_client_flags (SCM flags, int pos,
-						    const char *func_name);
+SCM_API void scm_avahi_error (int, const char *) NO_RETURN;
+SCM_API void scm_avahi_init_error (void);
 
 #endif
 
-/* arch-tag: 2cd14488-a545-43e4-8991-7c25b048fd72
+/* arch-tag: e7a92e44-b399-4c85-99d4-2dd3564600f7
  */

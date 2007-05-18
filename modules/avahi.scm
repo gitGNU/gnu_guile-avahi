@@ -25,7 +25,64 @@
            make-simple-poll simple-poll iterate-simple-poll run-simple-poll
 
            watch-event->string
-           watch-event/in watch-event/out watch-event/err watch-event/hup))
+           watch-event/in watch-event/out watch-event/err watch-event/hup
+
+           error->string
+
+           error/ok
+           error/failure
+           error/bad-state
+           error/invalid-host-name
+           error/invalid-domain-name
+           error/no-network
+           error/invalid-ttl
+           error/is-pattern
+           error/collision
+           error/invalid-record
+           error/invalid-service-name
+           error/invalid-service-type
+           error/invalid-port
+           error/invalid-key
+           error/invalid-address
+           error/timeout
+           error/too-many-clients
+           error/too-many-objects
+           error/too-many-entries
+           error/os
+           error/access-denied
+           error/invalid-operation
+           error/dbus-error
+           error/disconnected
+           error/no-memory
+           error/invalid-object
+           error/no-daemon
+           error/invalid-interface
+           error/invalid-protocol
+           error/invalid-flags
+           error/not-found
+           error/invalid-config
+           error/version-mismatch
+           error/invalid-service-subtype
+           error/invalid-packet
+           error/invalid-dns-error
+           error/dns-formerr
+           error/dns-servfail
+           error/dns-nxdomain
+           error/dns-notimp
+           error/dns-refused
+           error/dns-yxdomain
+           error/dns-yxrrset
+           error/dns-nxrrset
+           error/dns-notauth
+           error/dns-notzone
+           error/invalid-rdata
+           error/invalid-dns-class
+           error/invalid-dns-type
+           error/not-supported
+           error/not-permitted
+           error/invalid-argument
+           error/is-empty
+           error/no-change))
 
 (load-extension "libguile-avahi-v-0" "scm_avahi_common_init")
 

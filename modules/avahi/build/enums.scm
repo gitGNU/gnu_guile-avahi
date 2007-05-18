@@ -293,6 +293,72 @@
 ;;; Actual enumerations.
 ;;;
 
+(define %error-enum
+  (make-enum-type 'error "int"
+                  '(
+ok
+failure
+bad-state
+invalid-host-name
+invalid-domain-name
+no-network
+invalid-ttl
+is-pattern
+collision
+invalid-record
+
+invalid-service-name
+invalid-service-type
+invalid-port
+invalid-key
+invalid-address
+timeout
+too-many-clients
+too-many-objects
+too-many-entries
+os
+
+access-denied
+invalid-operation
+dbus-error
+disconnected
+no-memory
+invalid-object
+no-daemon
+invalid-interface
+invalid-protocol
+invalid-flags
+
+not-found
+invalid-config
+version-mismatch
+invalid-service-subtype
+invalid-packet
+invalid-dns-error
+dns-formerr
+dns-servfail
+dns-nxdomain
+dns-notimp
+
+dns-refused
+dns-yxdomain
+dns-yxrrset
+dns-nxrrset
+dns-notauth
+dns-notzone
+invalid-rdata
+invalid-dns-class
+invalid-dns-type
+not-supported
+
+not-permitted
+invalid-argument
+is-empty
+no-change)
+                  "avahi_strerror"
+                  "AVAHI_ERR_"))
+
+
 (define %watch-event-enum
   (make-enum-type 'watch-event "AvahiWatchEvent"
                   '(in out err hup)
@@ -302,7 +368,7 @@
 
 (define %avahi-common-enums
   ;; All enums.
-  (list %watch-event-enum))
+  (list %error-enum %watch-event-enum))
 
 
 (define %client-state-enum

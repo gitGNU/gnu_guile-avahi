@@ -30,6 +30,7 @@
 #include "client-enums.h"
 
 #include "utils.h"
+#include "errors.h"
 
 
 /* SMOB and enums type definitions.  */
@@ -123,7 +124,7 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
   c_client = avahi_client_new (c_poll, c_flags, client_trampoline,
 			       (void *) client, &err);
   if (!c_client)
-    abort ();
+    scm_avahi_error (AVAHI_ERR_NO_MEMORY, FUNC_NAME);
 
   SCM_SET_SMOB_DATA (client, (scm_t_bits) c_client);
 

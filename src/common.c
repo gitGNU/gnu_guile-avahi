@@ -24,6 +24,7 @@
 #include <libguile.h>
 
 #include "watch.h"
+#include "errors.h"
 
 #include "common-enums.h"
 #include "common-smobs.h"
@@ -88,7 +89,7 @@ SCM_DEFINE (scm_avahi_make_guile_poll, "make-guile-poll",
 				       new_timeout, update_timeout_x,
 				       free_timeout);
   if (!c_guile_poll)
-    abort ();
+    scm_avahi_error (AVAHI_ERR_NO_MEMORY, FUNC_NAME);
 
   return (scm_from_avahi_guile_poll (c_guile_poll));
 }
@@ -126,7 +127,7 @@ SCM_DEFINE (scm_avahi_make_simple_poll, "make-simple-poll",
 
   c_simple_poll = avahi_simple_poll_new ();
   if (!c_simple_poll)
-    abort ();
+    scm_avahi_error (AVAHI_ERR_NO_MEMORY, FUNC_NAME);
 
   return (scm_from_avahi_simple_poll (c_simple_poll));
 }
@@ -214,7 +215,8 @@ SCM_DEFINE (scm_avahi_iterate_simple_poll, "iterate-simple-poll",
   else if (err > 0)
     result = SCM_BOOL_F;
   else
-    abort ();
+    /* XXX: How to get a more meaningful error code? */
+    scm_avahi_error (AVAHI_ERR_FAILURE, FUNC_NAME);
 
   return (result);
 }
@@ -241,7 +243,7 @@ SCM_DEFINE (scm_avahi_run_simple_poll, "run-simple-poll",
   else if (err > 0)
     result = SCM_BOOL_F;
   else
-    abort ();
+    scm_avahi_error (AVAHI_ERR_FAILURE, FUNC_NAME);
 
   return (result);
 }
@@ -256,6 +258,7 @@ scm_avahi_common_init (void)
 
   scm_avahi_define_enums ();
   scm_avahi_init_watch ();
+  scm_avahi_init_error ();
 }
 
 /* arch-tag: d880c883-2fe1-49a0-b0c8-cd5a45880cec

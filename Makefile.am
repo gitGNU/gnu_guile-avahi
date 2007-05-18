@@ -17,4 +17,4 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = modules doc src tests
+SUBDIRS = modules src doc tests

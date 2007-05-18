@@ -15,42 +15,37 @@
    License along with Guile-Avahi; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA  */
 
-#ifndef GUILE_AVAHI_UTILS_H
-#define GUILE_AVAHI_UTILS_H
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <libguile.h>
+#include <avahi-common/error.h>
+
+#include "errors.h"
+#include "common-enums.h"
+
+SCM_SYMBOL (avahi_error_key, "avahi-error");
+
+void
+scm_avahi_error (int c_err, const char *c_func)
+{
+  SCM err, func;
+
+  /* Note: If error code C_ERR is unknown, then ERR will be `#f'.  */
+  err = scm_from_avahi_error (c_err);
+  func = scm_from_locale_symbol (c_func);
+
+  (void) scm_throw (avahi_error_key, scm_list_2 (err, func));
+
+  /* XXX: This is actually never reached, but since the Guile headers don't
+     declare `scm_throw ()' as `noreturn', we must add this to avoid GCC's
+     complaints.  */
+  abort ();
+}
 
 
-/* Compiler twiddling.  */
+void
+scm_avahi_init_error (void)
+{
+#include "errors.c.x"
+}
 
-#ifdef __GNUC__
-# define EXPECT    __builtin_expect
-# define NO_RETURN __attribute__ ((__noreturn__))
-#else
-# define EXPECT(_expr, _value) (_expr)
-# define NO_RETURN
-#endif
-
-#define EXPECT_TRUE(_expr)  EXPECT ((_expr), 1)
-#define EXPECT_FALSE(_expr) EXPECT ((_expr), 0)
-
-
-/* Avahi helpers.  */
-
-#include <avahi-common/watch.h>
-#include <avahi-client/client.h>
-
-SCM_API SCM scm_from_avahi_watch_events (AvahiWatchEvent events);
-SCM_API AvahiWatchEvent scm_to_avahi_watch_events (SCM events, int pos,
-						   const char *func_name);
-SCM_API AvahiClientFlags scm_to_avahi_client_flags (SCM flags, int pos,
-						    const char *func_name);
-
-#endif
-
-/* arch-tag: 2cd14488-a545-43e4-8991-7c25b048fd72
+/* arch-tag: 48f07ecf-65c4-480c-b043-a51eab592d6b
  */
