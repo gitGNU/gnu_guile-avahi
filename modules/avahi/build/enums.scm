@@ -34,7 +34,8 @@
            %cipher-enum %mac-enum %compression-method-enum %kx-enum
            %protocol-enum %certificate-type-enum
 
-           %avahi-common-enums %avahi-client-enums))
+           %avahi-common-enums %avahi-client-enums
+           %avahi-publish-enums))
 
 ;;;
 ;;; This module helps with the creation of bindings for the C enumerate
@@ -370,7 +371,7 @@ no-change)
   ;; All enums.
   (list %error-enum %watch-event-enum))
 
-
+
 (define %client-state-enum
   (make-enum-type 'client-state "AvahiClientState"
                   '(s-registering s-running s-collision failure connecting)
@@ -384,7 +385,51 @@ no-change)
                   "AVAHI_CLIENT_"))
 
 (define %avahi-client-enums
-  ;; Nothing so far.
   (list %client-state-enum %client-flags-enum))
+
+
+(define %entry-group-state-enum
+  (make-enum-type 'entry-group-state "AvahiEntryGroupState"
+                  '(uncommited registering established
+                    collision failure)
+                  #f
+                  "AVAHI_ENTRY_GROUP_"))
+
+(define %publish-flag-enum
+  (make-enum-type 'publish-flag "AvahiPublishFlags"
+                  '(unique no-probe no-announce allow-multiple
+                    no-reverse no-cookie update use-wide-area
+                    use-multicast)
+                  #f
+                  "AVAHI_PUBLISH_"))
+
+(define %avahi-publish-enums
+  (list %entry-group-state-enum %publish-flag-enum))
+
+
+(define %domain-browser-enum
+  (make-enum-type 'domain-browser "AvahiDomainBrowserType"
+                  '(browse browse-default register
+                    register-default browse-legacy)
+                  #f
+                  "AVAHI_DOMAIN_BROWSER_"))
+
+(define %lookup-flag-enum
+  (make-enum-type 'lookup-flag "AvahiLookupFlags"
+                  '(use-wide-area use-multicast no-txt no-address)
+                  #f
+                  "AVAHI_LOOKUP_"))
+
+(define %lookup-result-flag-enum
+  (make-enum-type 'lookup-result-flag "AvahiLookupResultFlags"
+                  '(cached wide-area multicast local
+                    our-own static)
+                  #f
+                  "AVAHI_LOOKUP_RESULT_"))
+
+(define %avahi-browse-enums
+  (list %domain-browser-enum %lookup-flag-enum
+        %lookup-result-flag-enum))
+
 
 ;;; arch-tag: 9e3eb6bb-61a5-4e85-861f-1914ab9677b0

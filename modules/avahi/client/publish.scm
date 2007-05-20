@@ -1,5 +1,3 @@
-;;; Help produce Guile wrappers for Avahi types.
-;;;
 ;;; Guile-Avahi --- Guile bindings for Avahi.
 ;;; Copyright (C) 2007  Ludovic Courtès <ludovic.courtes@laas.fr>
 ;;;
@@ -17,29 +15,21 @@
 ;;; License along with Guile-Avahi; if not, write to the Free Software
 ;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-(use-modules (avahi build enums))
+(define-module (avahi client publish)
+  :use-module (avahi client)
+  :export (entry-group? make-entry-group
 
-
-;;;
-;;; The program.
-;;;
+           entry-group-state->string
+           entry-group-state/uncommited entry-group-state/registering
+           entry-group-state/established entry-group-state/collision
+           entry-group-state/failure
 
-(define (main . args)
-  (define %enums
-    `((common   . ,%avahi-common-enums)
-      (client   . ,%avahi-client-enums)
-      (publish  . ,%avahi-publish-enums)))
+           publish-flag->string
+           publish-flag/unique publish-flag/no-probe publish-flag/no-announce
+           publish-flag/allow-multiple publish-flag/no-reverse
+           publish-flag/no-cookie publish-flag/update
+           publish-flag/use-wide-area publish-flag/use-multicast))
 
-  (define %module
-    (string->symbol (car args)))
+(load-extension "libguile-avahi-v-0" "scm_avahi_publish_init")
 
-  (let ((port (current-output-port))
-        (enums (assq-ref %enums %module)))
-    (for-each (lambda (enum)
-                (output-enum-smob-definitions enum port))
-              enums)
-    (output-enum-definition-function enums port)))
-
-(apply main (cdr (command-line)))
-
-;;; arch-tag: 3deb7d3a-005d-4f83-a72a-7382ef1e74a0
+;;; arch-tag: 36180c98-3262-40a6-a90c-eb8f283e628e

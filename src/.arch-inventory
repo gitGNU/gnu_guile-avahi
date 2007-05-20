@@ -1,5 +1,5 @@
 # Generated source files.
 
-precious ^(config\.h(\.in)?|(common|client)-(enums|smobs)\.h|.*\.i\.c|.*\.c\.x|stamp-h[0-9]+)$
+precious ^(config\.h(\.in)?|(common|client|publish)-(enums|smobs)\.h|.*\.i\.c|.*\.c\.x|stamp-h[0-9]+)$
 
 # arch-tag: b0afc2c1-61c4-4232-b018-9d096387fa68

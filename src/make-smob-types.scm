@@ -26,8 +26,9 @@
 
 (define (main . args)
   (define %smobs
-    `((common . ,%avahi-common-smobs)
-      (client . ,%avahi-client-smobs)))
+    `((common   . ,%avahi-common-smobs)
+      (client   . ,%avahi-client-smobs)
+      (publish  . ,%avahi-publish-smobs)))
 
   (define %module
     (string->symbol (car args)))

@@ -89,8 +89,8 @@ client_trampoline (AvahiClient *c_client,
 
   callback = SCM_AVAHI_CLIENT_CALLBACK (client);
 
-  scm_call_2 (callback, client,
-	      scm_from_avahi_client_state (c_state));
+  (void) scm_call_2 (callback, client,
+		     scm_from_avahi_client_state (c_state));
 }
 #undef FUNC_NAME
 

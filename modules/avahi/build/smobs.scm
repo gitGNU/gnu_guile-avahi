@@ -29,7 +29,8 @@
            output-smob-type-predicate
            output-c->smob-converter output-smob->c-converter
 
-           %avahi-common-smobs %avahi-client-smobs))
+           %avahi-common-smobs %avahi-client-smobs
+           %avahi-publish-smobs))
 
 
 ;;;
@@ -176,13 +177,22 @@
   (list %poll-smob %simple-poll-smob %guile-poll-smob
         %watch-smob %timeout-smob))
 
-
+
 (define %client-smob
   (make-smob-type "AvahiClient *" 'client
                   "scm_avahi_client_free"))
 
 (define %avahi-client-smobs
   (list %client-smob))
+
+
+
+(define %entry-group-smob
+  (make-smob-type "AvahiEntryGroup *" 'entry-group
+                  "scm_avahi_entry_group_free"))
+
+(define %avahi-publish-smobs
+  (list %entry-group-smob))
 
 
 ;;; arch-tag: 26bf79ef-6dee-45f2-9e9d-2d209c518278

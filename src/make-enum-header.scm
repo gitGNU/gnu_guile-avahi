@@ -26,8 +26,9 @@
 
 (define (main . args)
   (define %enums
-    `((common . ,%avahi-common-enums)
-      (client . ,%avahi-client-enums)))
+    `((common   . ,%avahi-common-enums)
+      (client   . ,%avahi-client-enums)
+      (publish  . ,%avahi-publish-enums)))
 
   (define %module
     (string->symbol (car args)))

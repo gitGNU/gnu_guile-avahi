@@ -2,6 +2,51 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-20 22:05:17 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-11
+
+    Summary:
+      Started support for service publication.
+    Revision:
+      guile-avahi--devo--0--patch-11
+
+    * modules/avahi/build/enums.scm (%entry-group-state-enum,
+      %publish-flag-enum, %avahi-publish-enums, %domain-browser-enum,
+      %lookup-flag-enum, %avahi-browse-enums): New.
+    
+    * modules/avahi/build/smobs.scm (%entry-group-smob,
+      %avahi-publish-smobs): New.
+    
+    * src/.arch-inventory: Updated.
+    
+    * src/Makefile.am (BUILT_SOURCES): Added `publish-{enums,smobs}.{h,i.c}'.
+      (libguile_avahi_v_0_la_SOURCES): Added `publish.c'.
+    
+    * src/client.c (client_trampoline): Cast to `(void)' return of
+      `scm_call_2 ()'.
+    
+    * src/make-enum-header.scm (main): Support `publish'.
+    
+    * src/make-enum-map.scm: Likewise.
+    
+    * src/make-smob-header.scm: Likewise.
+    
+    * src/make-smob-types.scm: Likewise.
+
+    new files:
+     modules/avahi/client/.arch-ids/=id
+     modules/avahi/client/publish.scm src/publish.c
+
+    modified files:
+     ChangeLog modules/avahi/build/enums.scm
+     modules/avahi/build/smobs.scm src/.arch-inventory
+     src/Makefile.am src/client.c src/make-enum-header.scm
+     src/make-enum-map.scm src/make-smob-header.scm
+     src/make-smob-types.scm
+
+    new directories:
+     modules/avahi/client modules/avahi/client/.arch-ids
+
+
 2007-05-18 17:52:27 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-10
 
     Summary:
