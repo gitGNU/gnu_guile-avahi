@@ -19,11 +19,16 @@
 # include "config.h"
 #endif
 
+#ifdef HAVE_NET_IF_H
+# include <net/if.h>
+#endif
+
 #include "utils.h"
 #include "errors.h"
 
 #include "common-enums.h"
 #include "client-enums.h"
+#include "publish-enums.h"
 
 
 SCM
@@ -90,6 +95,53 @@ scm_to_avahi_client_flags (SCM flags, int pos, const char *func_name)
     }
 
   return (c_flags);
+}
+#undef FUNC_NAME
+
+AvahiPublishFlags
+scm_to_avahi_publish_flags (SCM flags, int pos, const char *func_name)
+#define FUNC_NAME func_name
+{
+  AvahiPublishFlags c_flags;
+
+  SCM_VALIDATE_LIST (1, flags);
+
+  for (c_flags = 0;
+       !scm_is_null (flags);
+       flags = SCM_CDR (flags))
+    {
+      c_flags |= scm_to_avahi_publish_flag (SCM_CAR (flags), 1,
+					    FUNC_NAME);
+    }
+
+  return (c_flags);
+}
+#undef FUNC_NAME
+
+
+/* Interfaces.  */
+
+AvahiIfIndex
+scm_to_avahi_interface_index (SCM interface, int pos, const char *func_name)
+#define FUNC_NAME func_name
+{
+  AvahiIfIndex c_result;
+
+  if (scm_is_integer (interface))
+    c_result = (AvahiIfIndex) scm_to_int (interface);
+#ifdef HAVE_IF_NAMETOINDEX
+  else if (scm_is_string (interface))
+    {
+      char *c_interface;
+
+      SCM_AVAHI_TO_C_STRING (interface, c_interface);
+      c_result = (AvahiIfIndex) if_nametoindex (c_interface);
+    }
+#endif
+  else
+    c_result = scm_to_avahi_interface (interface, pos, func_name);
+
+  return (c_result);
 }
 #undef FUNC_NAME
 

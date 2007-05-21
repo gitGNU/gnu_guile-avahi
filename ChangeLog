@@ -2,6 +2,56 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-21 22:46:12 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-12
+
+    Summary:
+      Finished `(avahi client publish)'.
+    Revision:
+      guile-avahi--devo--0--patch-12
+
+    * configure.ac: Check for `net/if.h', `arpa/inet.h' and `gmp.h'.
+      Check for `if_nametoindex ()' and `__gmpz_init ()'.
+    
+    * modules/Makefile.am (nobase_dist_guilemodule_DATA): Added
+      `avahi/client/publish.scm'.
+    
+    * modules/avahi.scm: Updated.
+    
+    * modules/avahi/build/enums.scm (%protocol-enum, %interface-enum): New.
+      (%avahi-common-enums): Use them.
+    
+    * modules/avahi/client/publish.scm: Updated.
+    
+    * src/client.c (client_trampoline): Invoke `SCM_SET_SMOB_DATA ()' if
+      needed.
+    
+    * src/publish.h (mark_entry_group): Mark the client as well.
+      (scm_avahi_make_entry_group): Attach CLIENT to GROUP.
+      (scm_avahi_commit_entry_group, scm_avahi_reset_entry_group_x,
+      scm_avahi_entry_group_state, scm_avahi_entry_group_empty_p,
+      scm_avahi_add_entry_group_service_x,
+      scm_avahi_add_entry_group_service_subtype_x,
+      scm_avahi_update_entry_group_service_x,
+      scm_avahi_add_entry_group_address_x, scm_avahi_alternative_host_name,
+      scm_avahi_alternative_service_name): New.
+    
+    * src/utils.c: Use <net/inet.h> and "publish-enums.h".
+      (scm_to_avahi_publish_flags, scm_to_avahi_interface_index): New.
+    
+    * src/utils.h (SCM_AVAHI_TO_C_STRING, scm_avahi_to_c_string): New macros.
+    
+    * tests/Makefile.am (TESTS): Added `publish.scm'.
+
+    new files:
+     tests/publish.scm
+
+    modified files:
+     ChangeLog configure.ac modules/Makefile.am modules/avahi.scm
+     modules/avahi/build/enums.scm modules/avahi/client/publish.scm
+     src/client.c src/publish.c src/utils.c src/utils.h
+     tests/Makefile.am
+
+
 2007-05-20 22:05:17 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-11
 
     Summary:

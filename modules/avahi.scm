@@ -27,6 +27,12 @@
            watch-event->string
            watch-event/in watch-event/out watch-event/err watch-event/hup
 
+           protocol->string
+           protocol/inet protocol/inet6 protocol/unspec protocol/unspecified
+
+           interface->string
+           interface/unspec interface/unspecified
+
            error->string
 
            error/ok
@@ -86,5 +92,8 @@
 
 (load-extension "libguile-avahi-v-0" "scm_avahi_common_init")
 
+;; Aliases.
+(define protocol/unspecified    protocol/unspec)
+(define interface/unspecified   interface/unspec)
 
 ;;; arch-tag: 4efd650a-4839-4972-9119-1f01c957fc0d

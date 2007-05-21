@@ -366,10 +366,22 @@ no-change)
                   #f
                   "AVAHI_WATCH_"))
 
+(define %protocol-enum
+  (make-enum-type 'protocol "AvahiProtocol"
+                  '(inet inet6 unspec)
+                  "avahi_proto_to_string"
+                  "AVAHI_PROTO_"))
+
+(define %interface-enum
+  (make-enum-type 'interface "AvahiIfIndex"
+                  '(unspec)
+                  #f
+                  "AVAHI_IF_"))
+
 
 (define %avahi-common-enums
   ;; All enums.
-  (list %error-enum %watch-event-enum))
+  (list %error-enum %watch-event-enum %protocol-enum %interface-enum))
 
 
 (define %client-state-enum

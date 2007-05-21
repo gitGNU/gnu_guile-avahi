@@ -19,9 +19,22 @@
 # include "config.h"
 #endif
 
+#include <alloca.h>
+
 #include <avahi-client/publish.h>
+#include <avahi-common/alternative.h>
+#include <avahi-common/malloc.h>
 #include <libguile.h>
 
+#ifdef HAVE_GMP_H
+# include <gmp.h>
+#endif
+
+#ifdef HAVE_ARPA_INET_H
+# include <arpa/inet.h>
+#endif
+
+#include "utils.h"
 #include "errors.h"
 
 #include "common-enums.h"
@@ -39,7 +52,7 @@ static inline void
 scm_avahi_entry_group_free (AvahiEntryGroup *c_group)
 {
   if (c_group != NULL)
-    avahi_entry_group_free (c_group);
+    (void) avahi_entry_group_free (c_group);
 }
 
 #include "publish-smobs.i.c"
@@ -52,10 +65,17 @@ scm_avahi_entry_group_free (AvahiEntryGroup *c_group)
   SCM_SET_SMOB_OBJECT_2 (group, callback)
 #define SCM_AVAHI_ENTRY_GROUP_CALLBACK(group)	\
   SCM_SMOB_OBJECT_2 (group)
+#define SCM_AVAHI_SET_ENTRY_GROUP_CLIENT(group, client)	\
+  SCM_SET_SMOB_OBJECT_3 (group, client)
+#define SCM_AVAHI_ENTRY_GROUP_CLIENT(group)	\
+  SCM_SMOB_OBJECT_3 (group)
 
-/* Mark the closure associated with GROUP.  */
+
+/* Mark the client and closure associated with GROUP.  */
 SCM_SMOB_MARK (scm_tc16_avahi_entry_group, mark_entry_group, group)
 {
+  scm_gc_mark (SCM_AVAHI_ENTRY_GROUP_CLIENT (group));
+
   return (SCM_AVAHI_ENTRY_GROUP_CALLBACK (group));
 }
 
@@ -79,7 +99,7 @@ SCM_DEFINE (scm_avahi_make_entry_group, "make-entry-group",
 	    "Return a new entry group using @var{client} and "
 	    "@var{callback} as the state-change notification procedure.  "
 	    "@var{callback} should be a two-argument procedure.  It will "
-	    "be passed the group object and the groupe entry's state "
+	    "be passed the group object and the group entry's state "
 	    "(i.e., a @code{group-entry-state/} value).")
 #define FUNC_NAME s_scm_avahi_make_entry_group
 {
@@ -94,6 +114,7 @@ SCM_DEFINE (scm_avahi_make_entry_group, "make-entry-group",
      to `avahi_entry_group_new ()'.  Thus, we need to set it afterwards.  */
   group = scm_from_avahi_entry_group (NULL);
   SCM_AVAHI_SET_ENTRY_GROUP_CALLBACK (group, callback);
+  SCM_AVAHI_SET_ENTRY_GROUP_CLIENT (group, client);
 
   c_group = avahi_entry_group_new (c_client, entry_group_trampoline,
 				   (void *) group);
@@ -103,6 +124,425 @@ SCM_DEFINE (scm_avahi_make_entry_group, "make-entry-group",
   SCM_SET_SMOB_DATA (group, (scm_t_bits) c_group);
 
   return (group);
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_commit_entry_group, "commit-entry-group",
+	    1, 0, 0,
+	    (SCM group),
+	    "Commit entry group @var{group}, i.e., register its entries "
+	    "on the network.  It is an error to commit an empty group.")
+#define FUNC_NAME s_scm_avahi_commit_entry_group
+{
+  int err;
+  AvahiEntryGroup *c_group;
+
+  c_group = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  err = avahi_entry_group_commit (c_group);
+  if (EXPECT_FALSE (err))
+    scm_avahi_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_reset_entry_group_x, "reset-entry-group!",
+	    1, 0, 0,
+	    (SCM group),
+	    "Reset @var{group}.")
+#define FUNC_NAME s_scm_avahi_reset_entry_group_x
+{
+  int err;
+  AvahiEntryGroup *c_group;
+
+  c_group = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  err = avahi_entry_group_reset (c_group);
+  if (EXPECT_FALSE (err))
+    scm_avahi_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_entry_group_state, "entry-group-state",
+	    1, 0, 0,
+	    (SCM group),
+	    "Return the state of @var{group}, i.e., an "
+	    "@code{entry-group-state/} value.")
+#define FUNC_NAME s_scm_avahi_entry_group_state
+{
+  int c_state;
+  AvahiEntryGroup *c_group;
+
+  c_group = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  c_state = avahi_entry_group_get_state (c_group);
+  if (c_state < 0)
+    scm_avahi_error (c_state, FUNC_NAME);
+
+  return (scm_from_avahi_entry_group_state ((AvahiEntryGroupState) c_state));
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_entry_group_empty_p, "entry-group-empty?",
+	    1, 0, 0,
+	    (SCM group),
+	    "Return @code{#t} if @var{group} is empty, @code{#f} otherwise.")
+#define FUNC_NAME s_scm_avahi_entry_group_empty_p
+{
+  AvahiEntryGroup *c_group;
+
+  c_group = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+
+  return (scm_from_bool (avahi_entry_group_is_empty (c_group)));
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_entry_group_client, "entry-group-client",
+	    1, 0, 0,
+	    (SCM group),
+	    "Return the client used by @var{group}.")
+#define FUNC_NAME s_scm_avahi_entry_group_client
+{
+  /* Type-check.  */
+  (void) scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+
+  return (SCM_AVAHI_ENTRY_GROUP_CLIENT (group));
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_add_entry_group_service_x,
+	    "add-entry-group-service!",
+	    9, 0, 1,
+	    (SCM group, SCM interface, SCM protocol, SCM publish_flags,
+	     SCM service_name, SCM service_type, SCM domain, SCM host,
+	     SCM port, SCM txt),
+	    "Add a service of type @var{service-type} (e.g., "
+	    "@code{\"_http._tcp\"}) named @var{service-name} to "
+	    "@var{group}.  @var{port} should be an integer telling "
+	    "which port this service is listening on; @var{host} can "
+	    "be a string indicating which host it is running on, or "
+	    "@code{#f} to let the daemon decide by itself (recommended).  "
+	    "Likewise, @var{domain} can be @code{#f} (recommended) or "
+	    "a string indicating the domain where this service is to be "
+	    "registered.  Additionaly @var{txt} arguments should be string "
+	    "denoting additional @code{txt} properties (e.g., "
+	    "@code{\"color-printer=yes\"}).  Finally, @var{interface} and "
+	    "@var{protocol} denote, respectively, the network interface "
+	    "and protocol used to publish the service.  @var{interface} may "
+	    "be @code{interface/unspecified}, in which case the daemon "
+	    "will choose the most appropriate interface, or it can be a "
+	    "string (e.g., @code{\"eth0\"}), or an integer OS-provided "
+	    "integer index; similarly, @var{protocol} may be "
+	    "@code{protocol/unspecified}, in which case the daemon will "
+	    "choose a protocol, or it can be any other @code{protocol/} "
+	    "value.")
+#define FUNC_NAME s_scm_avahi_add_entry_group_service_x
+{
+  int err;
+  AvahiEntryGroup *c_group;
+  AvahiIfIndex c_interface;
+  AvahiProtocol c_protocol;
+  AvahiPublishFlags c_flags;
+  AvahiStringList *c_txt;
+  char *c_name, *c_type, *c_domain, *c_host;
+  unsigned short c_port;
+  int c_pos;
+
+  c_group     = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
+  c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
+  c_flags     = scm_to_avahi_publish_flags (publish_flags, 4, FUNC_NAME);
+                scm_avahi_to_c_string (service_name, c_name, 5, FUNC_NAME);
+                scm_avahi_to_c_string (service_type, c_type, 6, FUNC_NAME);
+  if (!scm_is_eq (domain, SCM_BOOL_F))
+    scm_avahi_to_c_string (domain, c_domain, 7, FUNC_NAME);
+  else
+    c_domain  = NULL;
+  if (!scm_is_eq (host, SCM_BOOL_F))
+    scm_avahi_to_c_string (host, c_host, 8, FUNC_NAME);
+  else
+    c_host    = NULL;
+  c_port      = scm_to_ushort (port);
+
+  for (c_pos = 9, c_txt = NULL;
+       scm_is_pair (txt);
+       txt = SCM_CDR (txt), c_pos++)
+    {
+      if (EXPECT_TRUE (scm_is_string (SCM_CAR (txt))))
+	{
+	  char *c_txt_item;
+	  AvahiStringList *c_head;
+
+	  /* XXX: This is both stack- and heap-intensive.  */
+	  SCM_AVAHI_TO_C_STRING (SCM_CAR (txt), c_txt_item);
+
+	  if (c_txt == NULL)
+	    c_head = avahi_string_list_new (c_txt_item, NULL);
+	  else
+	    c_head = avahi_string_list_add (c_txt, c_txt_item);
+
+	  if (EXPECT_TRUE (c_head == NULL))
+	    avahi_string_list_free (c_txt);
+	  else
+	    c_txt = c_head;
+	}
+      else
+	{
+	  avahi_string_list_free (c_txt);
+	  scm_wrong_type_arg (FUNC_NAME, c_pos, SCM_CAR (txt));
+	}
+    }
+
+  err = avahi_entry_group_add_service_strlst (c_group, c_interface,
+					      c_protocol, c_flags,
+					      c_name, c_type,
+					      c_domain, c_host,
+					      c_port, c_txt);
+  avahi_string_list_free (c_txt);
+
+  if (EXPECT_FALSE (err))
+    scm_avahi_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_add_entry_group_service_subtype_x,
+	    "add-entry-group-service-subtype!",
+	    8, 0, 0,
+	    (SCM group, SCM interface, SCM protocol, SCM publish_flags,
+	     SCM service_name, SCM service_type, SCM domain,
+	     SCM subtype),
+	    "Add @var{subtype} as a sub-type of a service already "
+	    "present in @var{group}.  You may add as many subtypes "
+	    "for a service as you wish.")
+#define FUNC_NAME s_scm_avahi_add_entry_group_service_subtype_x
+{
+  int err;
+  AvahiEntryGroup *c_group;
+  AvahiIfIndex c_interface;
+  AvahiProtocol c_protocol;
+  AvahiPublishFlags c_flags;
+  char *c_name, *c_type, *c_domain, *c_subtype;
+
+  c_group     = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
+  c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
+  c_flags     = scm_to_avahi_publish_flags (publish_flags, 4, FUNC_NAME);
+                scm_avahi_to_c_string (service_name, c_name, 5, FUNC_NAME);
+                scm_avahi_to_c_string (service_type, c_type, 6, FUNC_NAME);
+  if (!scm_is_eq (domain, SCM_BOOL_F))
+    scm_avahi_to_c_string (domain, c_domain, 7, FUNC_NAME);
+  else
+    c_domain  = NULL;
+
+  scm_avahi_to_c_string (subtype, c_subtype, 8, FUNC_NAME);
+
+  err = avahi_entry_group_add_service_subtype (c_group, c_interface,
+					       c_protocol, c_flags,
+					       c_name, c_type,
+					       c_domain, c_subtype);
+  if (EXPECT_FALSE (err))
+    scm_avahi_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_update_entry_group_service_x,
+	    "update-entry-group-service!",
+	    7, 0, 1,
+	    (SCM group, SCM interface, SCM protocol, SCM publish_flags,
+	     SCM service_name, SCM service_type, SCM domain,
+	     SCM txt),
+	    "Update the service named @var{service-name} in "
+	    "@var{group}.")
+#define FUNC_NAME s_scm_avahi_update_entry_group_service_x
+{
+  int err;
+  AvahiEntryGroup *c_group;
+  AvahiIfIndex c_interface;
+  AvahiProtocol c_protocol;
+  AvahiPublishFlags c_flags;
+  AvahiStringList *c_txt;
+  char *c_name, *c_type, *c_domain;
+  int c_pos;
+
+  c_group     = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
+  c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
+  c_flags     = scm_to_avahi_publish_flags (publish_flags, 4, FUNC_NAME);
+                scm_avahi_to_c_string (service_name, c_name, 5, FUNC_NAME);
+                scm_avahi_to_c_string (service_type, c_type, 6, FUNC_NAME);
+  if (!scm_is_eq (domain, SCM_BOOL_F))
+    scm_avahi_to_c_string (domain, c_domain, 7, FUNC_NAME);
+  else
+    c_domain  = NULL;
+
+  for (c_pos = 8, c_txt = NULL;
+       scm_is_pair (txt);
+       txt = SCM_CDR (txt), c_pos++)
+    {
+      if (EXPECT_TRUE (scm_is_string (SCM_CAR (txt))))
+	{
+	  char *c_txt_item;
+	  AvahiStringList *c_head;
+
+	  /* XXX: This is both stack- and heap-intensive.  */
+	  SCM_AVAHI_TO_C_STRING (SCM_CAR (txt), c_txt_item);
+
+	  if (c_txt == NULL)
+	    c_head = avahi_string_list_new (c_txt_item, NULL);
+	  else
+	    c_head = avahi_string_list_add (c_txt, c_txt_item);
+
+	  if (EXPECT_TRUE (c_head == NULL))
+	    avahi_string_list_free (c_txt);
+	  else
+	    c_txt = c_head;
+	}
+      else
+	{
+	  avahi_string_list_free (c_txt);
+	  scm_wrong_type_arg (FUNC_NAME, c_pos, SCM_CAR (txt));
+	}
+    }
+
+  err = avahi_entry_group_update_service_txt_strlst (c_group, c_interface,
+						     c_protocol, c_flags,
+						     c_name, c_type,
+						     c_domain, c_txt);
+  avahi_string_list_free (c_txt);
+
+  if (EXPECT_FALSE (err))
+    scm_avahi_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_add_entry_group_address_x, "add-entry-group-address!",
+	    7, 0, 0,
+	    (SCM group, SCM interface, SCM protocol, SCM publish_flags,
+	     SCM fqdn, SCM address_protocol, SCM address),
+	    "Add to @var{group} a mapping from fully-qualified domain name "
+	    "@var{fqdn} to address @var{address}.  Depending on "
+	    "@var{address-protocol} (a @code{protocol/} value), @var{address} "
+	    "should be a 32-bit or 128-bit integer (for IPv4 and IPv6, "
+	    "respectively) in host byte order (@pxref{Network Address "
+	    "Conversion,, guile, The GNU Guile Reference Manual}).")
+#define FUNC_NAME s_scm_avahi_add_entry_group_address_x
+{
+  int err;
+  AvahiEntryGroup *c_group;
+  AvahiIfIndex c_interface;
+  AvahiProtocol c_protocol, c_addrproto;
+  AvahiPublishFlags c_flags;
+  AvahiAddress c_address;
+  char *c_fqdn;
+
+  c_group     = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
+  c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
+  c_flags     = scm_to_avahi_publish_flags (publish_flags, 4, FUNC_NAME);
+                scm_avahi_to_c_string (fqdn, c_fqdn, 5, FUNC_NAME);
+  c_addrproto = scm_to_avahi_protocol (address_protocol, 6, FUNC_NAME);
+
+  c_address.proto = c_addrproto;
+  switch (c_addrproto)
+    {
+#ifdef HAVE_ARPA_INET_H
+    case AVAHI_PROTO_INET:
+      c_address.data.ipv4.address = htonl (scm_to_uint32 (address));
+      break;
+#endif
+
+#ifdef HAVE_GMP_H
+    case AVAHI_PROTO_INET6:
+      {
+	mpz_t mpz;
+	size_t count;
+
+	mpz_init (mpz);
+	scm_to_mpz (address, mpz);
+	if (EXPECT_FALSE (mpz_sizeinbase (mpz, 2) > 128))
+	  {
+	    mpz_clear (mpz);
+	    scm_wrong_type_arg (FUNC_NAME, 7, address);
+	  }
+	else
+	  mpz_export (&c_address.data.ipv6.address, &count,
+		      1 /* order = most significant word first */,
+		      7, 1 /* endian */, 0 /* nails */, mpz);
+
+	mpz_clear (mpz);
+	break;
+      }
+#endif
+
+    default:
+      scm_avahi_error (AVAHI_ERR_NOT_SUPPORTED, FUNC_NAME);
+    }
+
+  err = avahi_entry_group_add_address (c_group, c_interface,
+				       c_protocol, c_flags,
+				       c_fqdn, &c_address);
+  if (EXPECT_FALSE (err))
+    scm_avahi_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_alternative_host_name, "alternative-host-name",
+	    1, 0, 0,
+	    (SCM hostname),
+	    "Find an alternative name to @var{hostname}.  If called "
+	    "with an original host name, @code{\"2\"} is appended.  "
+	    "Afterwards the number is incremented on each call (i.e., "
+	    "@code{\"foo\"} becomes @code{\"foo2\"}, which becomes "
+	    "@code{\"foo3\"}, and so on).")
+#define FUNC_NAME s_scm_avahi_alternative_host_name
+{
+  SCM result;
+  char *c_hostname, *c_new_name;
+
+  scm_avahi_to_c_string (hostname, c_hostname, 1, FUNC_NAME);
+
+  c_new_name = avahi_alternative_host_name (c_hostname);
+  if (EXPECT_FALSE (c_new_name == NULL))
+    scm_avahi_error (AVAHI_ERR_NO_MEMORY, FUNC_NAME);
+
+  result = scm_from_locale_string (c_new_name);
+  avahi_free (c_new_name);
+
+  return result;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_alternative_service_name, "alternative-service-name",
+	    1, 0, 0,
+	    (SCM service_name),
+	    "Find an alternative name to @var{service-name}.  If called "
+	    "with an original service name, @code{\" #2\"} is appended.  "
+	    "Afterwards the number is incremented on each call (i.e., "
+	    "@code{\"foo\"} becomes @code{\"foo #2\"}, which becomes "
+	    "@code{\"foo #3\"}, and so on).")
+#define FUNC_NAME s_scm_avahi_alternative_service_name
+{
+  SCM result;
+  char *c_service_name, *c_new_name;
+
+  scm_avahi_to_c_string (service_name, c_service_name, 1, FUNC_NAME);
+
+  c_new_name = avahi_alternative_service_name (c_service_name);
+  if (EXPECT_FALSE (c_new_name == NULL))
+    scm_avahi_error (AVAHI_ERR_NO_MEMORY, FUNC_NAME);
+
+  result = scm_from_locale_string (c_new_name);
+  avahi_free (c_new_name);
+
+  return result;
 }
 #undef FUNC_NAME
 

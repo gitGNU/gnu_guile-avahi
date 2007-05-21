@@ -39,6 +39,30 @@
 #define EXPECT_FALSE(_expr) EXPECT ((_expr), 0)
 
 
+/* String handling.  */
+
+/* Store the contents of STRING into a stack-allocated C string.  */
+#define SCM_AVAHI_TO_C_STRING(_string, _c_string)			\
+do									\
+{									\
+  size_t _c_len;							\
+  _c_len = scm_c_string_length (_string);				\
+  (_c_string) = (char *) alloca (_c_len + 1);				\
+  (void) scm_to_locale_stringbuf ((_string), (_c_string), _c_len);	\
+  (_c_string)[_c_len] = '\0';						\
+}									\
+while (0)
+
+#define scm_avahi_to_c_string(_string, _c_string, _pos, _func)	\
+do								\
+{								\
+  SCM_VALIDATE_STRING ((_pos), (_string));			\
+  SCM_AVAHI_TO_C_STRING ((_string), (_c_string));		\
+}								\
+while (0)
+
+
+
 /* Avahi helpers.  */
 
 #include <avahi-common/watch.h>
@@ -49,6 +73,10 @@ SCM_API AvahiWatchEvent scm_to_avahi_watch_events (SCM events, int pos,
 						   const char *func_name);
 SCM_API AvahiClientFlags scm_to_avahi_client_flags (SCM flags, int pos,
 						    const char *func_name);
+SCM_API AvahiPublishFlags scm_to_avahi_publish_flags (SCM flags, int pos,
+						      const char *func_name);
+SCM_API AvahiIfIndex scm_to_avahi_interface_index (SCM interface, int pos,
+						   const char *func_name);
 
 #endif
 

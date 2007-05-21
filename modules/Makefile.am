@@ -17,7 +17,9 @@
 
 guilemoduledir = $(GUILE_SITE)
 
-nobase_dist_guilemodule_DATA = avahi.scm avahi/client.scm
+nobase_dist_guilemodule_DATA =			\
+  avahi.scm avahi/client.scm			\
+  avahi/client/publish.scm
 
 documentation_modules = system/documentation/README		\
 		        system/documentation/c-snarf.scm	\

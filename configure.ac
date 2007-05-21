@@ -31,10 +31,15 @@ PKG_CHECK_MODULES([AVAHI], [avahi-client], [],
    [AC_MSG_ERROR([Avahi could not be found, please install it first.])])
 
 # Checks for header files.
+AC_CHECK_HEADERS([net/if.h arpa/inet.h gmp.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
+AC_CHECK_FUNCS([if_nametoindex])
+AC_CHECK_LIB([gmp], [__gmpz_init], [LIBS="$LIBS -lgmp"],
+  [AC_MSG_ERROR([GNU MP not found, see README])])
+
 
 AC_CONFIG_FILES([Makefile
 	         modules/Makefile

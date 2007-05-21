@@ -82,10 +82,16 @@ client_trampoline (AvahiClient *c_client,
   client = (SCM) SCM_PACK ((scm_t_bits) data);
   c_client2 = scm_to_avahi_client (client, 0, FUNC_NAME);
 
-  /* Sanity check.  */
-  if ((c_client != NULL) && (c_client2 != NULL))
-    if (c_client != c_client2)
-      abort ();
+  if (c_client2 == NULL)
+    /* Called from within `make-client' and the SMOB is not well-formed yet:
+       update CLIENT so that the call-back sees a valid SMOB.  */
+    SCM_SET_SMOB_DATA (client, (scm_t_bits) c_client);
+  else
+    {
+      /* Sanity check.  */
+      if ((c_client != NULL) && (c_client2 != c_client))
+	abort ();
+    }
 
   callback = SCM_AVAHI_CLIENT_CALLBACK (client);
 
@@ -127,7 +133,15 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
   if (c_client == NULL)
     scm_avahi_error (err, FUNC_NAME);
 
-  SCM_SET_SMOB_DATA (client, (scm_t_bits) c_client);
+  if (SCM_SMOB_DATA (client) == (scm_t_bits) NULL)
+    SCM_SET_SMOB_DATA (client, (scm_t_bits) c_client);
+  else
+    {
+      /* The SMOB was updated by `client_trampoline ()': make sure it is
+	 actually valid.  */
+      if (SCM_SMOB_DATA (client) != (scm_t_bits) c_client)
+	abort ();
+    }
 
   return (client);
 }

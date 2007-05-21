@@ -18,6 +18,12 @@
 (define-module (avahi client publish)
   :use-module (avahi client)
   :export (entry-group? make-entry-group
+           commit-entry-group reset-entry-group! entry-group-state
+           empty-group-empty? empty-group-client add-entry-group-service!
+           add-entry-group-service-subtype! update-entry-group-service!
+           add-entry-group-address!
+
+           alternative-service-name alternative-host-name
 
            entry-group-state->string
            entry-group-state/uncommited entry-group-state/registering
