@@ -30,7 +30,7 @@
            output-c->smob-converter output-smob->c-converter
 
            %avahi-common-smobs %avahi-client-smobs
-           %avahi-publish-smobs))
+           %avahi-publish-smobs %avahi-lookup-smobs))
 
 
 ;;;
@@ -193,6 +193,37 @@
 
 (define %avahi-publish-smobs
   (list %entry-group-smob))
+
+
+(define %domain-browser-smob
+  (make-smob-type "AvahiDomainBrowser *" 'domain-browser
+                  "avahi_domain_browser_free"))
+
+(define %service-browser-smob
+  (make-smob-type "AvahiServiceBrowser *" 'service-browser
+                  "avahi_service_browser_free"))
+
+(define %service-type-browser-smob
+  (make-smob-type "AvahiServiceTypeBrowser *" 'service-type-browser
+                  "avahi_service_type_browser_free"))
+
+(define %service-resolver-smob
+  (make-smob-type "AvahiServiceResolver *" 'service-resolver
+                  "avahi_service_resolver_free"))
+
+(define %host-name-resolver-smob
+  (make-smob-type "AvahiHostNameResolver *" 'host-name-resolver
+                  "avahi_host_name_resolver_free"))
+
+(define %address-resolver-smob
+  (make-smob-type "AvahiAddressResolver *" 'address-resolver
+                  "avahi_address_resolver_free"))
+
+
+(define %avahi-lookup-smobs
+  (list %domain-browser-smob %service-browser-smob
+        %service-type-browser-smob %service-resolver-smob
+        %host-name-resolver-smob %address-resolver-smob))
 
 
 ;;; arch-tag: 26bf79ef-6dee-45f2-9e9d-2d209c518278

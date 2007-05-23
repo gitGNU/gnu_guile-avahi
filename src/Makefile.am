@@ -26,18 +26,20 @@ EXTRA_DIST =					\
 BUILT_SOURCES = common-smobs.h common-enums.h		\
 		client-smobs.h client-enums.h		\
 		publish-smobs.h publish-enums.h		\
+		lookup-smobs.h lookup-enums.h		\
 		common-enums.i.c common-smobs.i.c	\
 		client-enums.i.c client-smobs.i.c	\
 		publish-enums.i.c publish-smobs.i.c	\
+		lookup-enums.i.c lookup-smobs.i.c	\
 		common.c.x watch.c.x client.c.x		\
-		errors.c.x publish.c.x
+		errors.c.x publish.c.x lookup.c.x
 CLEANFILES = $(BUILT_SOURCES)
 
 lib_LTLIBRARIES = libguile-avahi-v-0.la
 
 libguile_avahi_v_0_la_SOURCES =			\
   utils.c errors.c watch.c common.c client.c	\
-  publish.c
+  publish.c lookup.c
 libguile_avahi_v_0_la_CFLAGS = $(AVAHI_CFLAGS)
 libguile_avahi_v_0_la_LIBADD = $(AVAHI_LIBS)
 

@@ -35,7 +35,7 @@
            %protocol-enum %certificate-type-enum
 
            %avahi-common-enums %avahi-client-enums
-           %avahi-publish-enums))
+           %avahi-publish-enums %avahi-lookup-enums))
 
 ;;;
 ;;; This module helps with the creation of bindings for the C enumerate
@@ -419,12 +419,19 @@ no-change)
   (list %entry-group-state-enum %publish-flag-enum))
 
 
-(define %domain-browser-enum
-  (make-enum-type 'domain-browser "AvahiDomainBrowserType"
+(define %domain-browser-type-enum
+  (make-enum-type 'domain-browser-type "AvahiDomainBrowserType"
                   '(browse browse-default register
                     register-default browse-legacy)
                   #f
                   "AVAHI_DOMAIN_BROWSER_"))
+
+(define %browser-event-enum
+  (make-enum-type 'browser-event "AvahiBrowserEvent"
+                  '(new remove cache-exhausted all-for-now
+                    failure)
+                  #f
+                  "AVAHI_BROWSER_"))
 
 (define %lookup-flag-enum
   (make-enum-type 'lookup-flag "AvahiLookupFlags"
@@ -439,9 +446,9 @@ no-change)
                   #f
                   "AVAHI_LOOKUP_RESULT_"))
 
-(define %avahi-browse-enums
-  (list %domain-browser-enum %lookup-flag-enum
-        %lookup-result-flag-enum))
+(define %avahi-lookup-enums
+  (list %domain-browser-type-enum %browser-event-enum
+        %lookup-flag-enum %lookup-result-flag-enum))
 
 
 ;;; arch-tag: 9e3eb6bb-61a5-4e85-861f-1914ab9677b0

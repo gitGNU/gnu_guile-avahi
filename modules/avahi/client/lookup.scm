@@ -1,5 +1,3 @@
-;;; Help produce Guile wrappers for Avahi types.
-;;;
 ;;; Guile-Avahi --- Guile bindings for Avahi.
 ;;; Copyright (C) 2007  Ludovic Courtès <ludovic.courtes@laas.fr>
 ;;;
@@ -17,30 +15,24 @@
 ;;; License along with Guile-Avahi; if not, write to the Free Software
 ;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-(use-modules (avahi build smobs))
+(define-module (avahi client lookup)
+  :use-module (avahi client)
+  :export (domain-browser? make-domain-browser
 
-
-;;;
-;;; The program.
-;;;
+           lookup-flag->string
+           lookup-flag/use-wide-area lookup-flag/use-multicast
+           lookup-flag/no-txt lookup-flag/no-address
 
-(define (main . args)
-  (define %smobs
-    `((common   . ,%avahi-common-smobs)
-      (client   . ,%avahi-client-smobs)
-      (publish  . ,%avahi-publish-smobs)
-      (lookup   . ,%avahi-lookup-smobs)))
+           domain-browser-type->string
+           domain-browser-type/browse domain-browser-type/browse-default
+           domain-browser-type/register domain-browser-type/register-default
+           domain-browser-type/browse-legacy
 
-  (define %module
-    (string->symbol (car args)))
+           browser-event->string
+           browser-event/new browser-event/remove
+           browser-event/cache-exhausted browser-event/all-for-now
+           browser-event/failure))
 
-  (let ((port (current-output-port))
-        (smobs (assoc-ref %smobs %module)))
-    (for-each (lambda (type)
-                (output-smob-type-definition type port)
-                (output-smob-type-predicate type port))
-              smobs)))
+(load-extension "libguile-avahi-v-0" "scm_avahi_lookup_init")
 
-(apply main (cdr (command-line)))
-
-;;; arch-tag: 364811a0-6d0a-431a-ae50-d2f7dc529903
+;;; arch-tag: 9ab68bd4-4705-42e5-89c3-e02551be4d09

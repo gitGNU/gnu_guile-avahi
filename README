@@ -1,8 +1,27 @@
 Guile-Avahi
 -----------
 
-Experimental Avahi bindings for GNU Guile 1.8.
+Avahi bindings for GNU Guile 1.8.
 
   http://avahi.org/
   http://www.gnu.org/software/guile/
+
+
+Dependencies
+............
+
+Requirements:
+
+  Avahi     >= 0.6.13
+  GNU Guile >= 1.8.0
+
+Optional:
+
+  GMP[*]    >= 4.1
+
+[*] If GMP is not found, then procedures such as
+    `add-entry-group-address!' won't be able to handle raw
+    IPv6 addresses.  GMP may be found at:
+    http://www.gnu.org/software/gmp/ .
+
 

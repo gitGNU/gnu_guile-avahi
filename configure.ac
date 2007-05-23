@@ -22,7 +22,6 @@ AC_PATH_PROG([guile_snarf], [guile-snarf], [not-found])
 if test "x$guile_snarf" = "xnot-found"; then
    AC_MSG_ERROR([`guile-snarf' not found.  Please install Guile 1.8.x or later.])
 fi
-GUILE_FLAGS
 GUILE_SITE_DIR
 
 # Avahi.
@@ -36,9 +35,9 @@ AC_CHECK_HEADERS([net/if.h arpa/inet.h gmp.h])
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
-AC_CHECK_FUNCS([if_nametoindex])
+AC_CHECK_FUNCS([if_nametoindex if_indextoname])
 AC_CHECK_LIB([gmp], [__gmpz_init], [LIBS="$LIBS -lgmp"],
-  [AC_MSG_ERROR([GNU MP not found, see README])])
+  [AC_MSG_WARN([GNU MP not found, see README])])
 
 
 AC_CONFIG_FILES([Makefile

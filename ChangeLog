@@ -2,6 +2,52 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-23 21:33:25 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-14
+
+    Summary:
+      Started support for the `lookup' interface.
+    Revision:
+      guile-avahi--devo--0--patch-14
+
+    * README: Updated.
+    
+    * configure.ac: Don't abort when GMP's not found.  Look for
+      `if_indextoname ()'.
+    
+    * modules/Makefile.am (nobase_dist_guilemodule_DATA): Added `lookup.scm'.
+    
+    * modules/avahi/build/enums.scm (%domain-browser-enum): Renamed to...
+      (%domain-browser-type-enum): this.
+      (%browser-event-enum, %avahi-lookup-enums): New.
+    
+    * modules/avahi/build/smobs.scm (%domain-browser-smob,
+      %service-browser-smob, %service-type-browser-smob,
+      %service-resolver-smob, %host-name-resolver-smob,
+      %address-resolver-smob, %avahi-lookup-smobs): New.
+    
+    * src/.arch-inventory: Updated.
+    
+    * src/Makefile.am (BUILT_SOURCES): Added the `lookup' stuff.
+      (libguile_avahi_v_0_la_SOURCES): Added `lookup.c'.
+    
+    * src/make-{enum,smob}-{header,types,map}.scm: Updated.
+    
+    * src/utils.c (scm_from_avahi_lookup_result_flags,
+      scm_from_avahi_interface_index, scm_to_avahi_lookup_flags): New.
+    
+    * src/utils.h: Updated.
+
+    new files:
+     modules/avahi/client/lookup.scm src/lookup.c
+
+    modified files:
+     ChangeLog README configure.ac modules/Makefile.am
+     modules/avahi/build/enums.scm modules/avahi/build/smobs.scm
+     src/.arch-inventory src/Makefile.am src/make-enum-header.scm
+     src/make-enum-map.scm src/make-smob-header.scm
+     src/make-smob-types.scm src/utils.c src/utils.h
+
+
 2007-05-23 19:45:55 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-13
 
     Summary:

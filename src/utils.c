@@ -29,8 +29,10 @@
 #include "common-enums.h"
 #include "client-enums.h"
 #include "publish-enums.h"
+#include "lookup-enums.h"
 
 
+
 SCM
 scm_from_avahi_watch_events (AvahiWatchEvent c_events)
 {
@@ -53,11 +55,59 @@ scm_from_avahi_watch_events (AvahiWatchEvent c_events)
     /* XXX: We failed to interpret one of the events flags.  */
     scm_avahi_error (AVAHI_ERR_FAILURE, __FUNCTION__);
 
-#undef MATCH_EVENTS
+#undef MATCH_EVENT
 
   return events;
 }
 
+SCM
+scm_from_avahi_lookup_result_flags (AvahiLookupResultFlags c_flags)
+{
+  SCM flags = SCM_EOL;
+
+#define MATCH_FLAG(_value)						\
+  if (c_flags & (_value))						\
+    {									\
+      flags = scm_cons (scm_from_avahi_lookup_result_flag (_value),	\
+			flags);						\
+      c_flags &= ~(_value);						\
+    }
+
+  MATCH_FLAG (AVAHI_LOOKUP_RESULT_CACHED);
+  MATCH_FLAG (AVAHI_LOOKUP_RESULT_WIDE_AREA);
+  MATCH_FLAG (AVAHI_LOOKUP_RESULT_MULTICAST);
+  MATCH_FLAG (AVAHI_LOOKUP_RESULT_LOCAL);
+  MATCH_FLAG (AVAHI_LOOKUP_RESULT_OUR_OWN);
+  MATCH_FLAG (AVAHI_LOOKUP_RESULT_STATIC);
+
+  if (c_flags != 0)
+    /* XXX: We failed to interpret one of the flags flags.  */
+    scm_avahi_error (AVAHI_ERR_FAILURE, __FUNCTION__);
+
+#undef MATCH_FLAG
+
+  return flags;
+}
+
+SCM
+scm_from_avahi_interface_index (AvahiIfIndex c_interface)
+{
+#if (defined HAVE_IF_INDEXTONAME) && (defined IFNAMSIZ)
+  char c_name[IFNAMSIZ];
+
+  if (c_interface < 0)
+    scm_avahi_error (AVAHI_ERR_FAILURE, __FUNCTION__);
+
+  if (if_indextoname ((unsigned int) c_interface, c_name) == NULL)
+    scm_avahi_error (AVAHI_ERR_FAILURE, __FUNCTION__);
+
+  return (scm_from_locale_string (c_name));
+#else
+  return (scm_from_int ((int) c_interface));
+#endif /* HAVE_IF_INDEXTONAME */
+}
+
+
 AvahiWatchEvent
 scm_to_avahi_watch_events (SCM events, int pos, const char *func_name)
 #define FUNC_NAME func_name
@@ -117,6 +167,27 @@ scm_to_avahi_publish_flags (SCM flags, int pos, const char *func_name)
   return (c_flags);
 }
 #undef FUNC_NAME
+
+AvahiLookupFlags
+scm_to_avahi_lookup_flags (SCM flags, int pos, const char *func_name)
+#define FUNC_NAME func_name
+{
+  AvahiLookupFlags c_flags;
+
+  SCM_VALIDATE_LIST (1, flags);
+
+  for (c_flags = 0;
+       !scm_is_null (flags);
+       flags = SCM_CDR (flags))
+    {
+      c_flags |= scm_to_avahi_lookup_flag (SCM_CAR (flags), 1,
+					   FUNC_NAME);
+    }
+
+  return (c_flags);
+}
+#undef FUNC_NAME
+
 
 
 /* Interfaces.  */

@@ -69,12 +69,17 @@ while (0)
 #include <avahi-client/client.h>
 
 SCM_API SCM scm_from_avahi_watch_events (AvahiWatchEvent events);
+SCM_API SCM scm_from_avahi_interface_index (AvahiIfIndex iface);
+SCM_API SCM scm_from_avahi_lookup_result_flags (AvahiLookupResultFlags flags);
+
 SCM_API AvahiWatchEvent scm_to_avahi_watch_events (SCM events, int pos,
 						   const char *func_name);
 SCM_API AvahiClientFlags scm_to_avahi_client_flags (SCM flags, int pos,
 						    const char *func_name);
 SCM_API AvahiPublishFlags scm_to_avahi_publish_flags (SCM flags, int pos,
 						      const char *func_name);
+SCM_API AvahiLookupFlags scm_to_avahi_lookup_flags (SCM flags, int pos,
+						    const char *func_name);
 SCM_API AvahiIfIndex scm_to_avahi_interface_index (SCM interface, int pos,
 						   const char *func_name);
 
