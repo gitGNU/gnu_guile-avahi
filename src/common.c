@@ -96,7 +96,7 @@ SCM_DEFINE (scm_avahi_make_guile_poll, "make-guile-poll",
 	    "@var{update-watch} is passed the @code{watch} object and a "
 	    "new list of events; @var{update-timeout} is passed a new "
 	    "expiration time or @code{#f}.\n"
-	    "@item Finally, @var{free-watch} and @code{free-timeout} are "
+	    "@item Finally, @var{free-watch} and @var{free-timeout} are "
 	    "called when the poll is asked to to no longer look handle "
 	    "them.  For instance, when @var{free-watch} is called, the "
 	    "event loop code may remove the associated file descriptor "

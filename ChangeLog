@@ -2,6 +2,24 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-23 19:45:55 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-13
+
+    Summary:
+      Updated the documentation.
+    Revision:
+      guile-avahi--devo--0--patch-13
+
+    * doc/Makefile.am (BUILT_SOURCES): Added `publish.c.texi'.
+    
+    * doc/guile-avahi.texi (Service Publication): New.
+    
+    * src/common.c, src/publish.c: Small documentation fixes.
+
+    modified files:
+     ChangeLog doc/Makefile.am doc/guile-avahi.texi src/common.c
+     src/publish.c
+
+
 2007-05-21 22:46:12 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-12
 
     Summary:

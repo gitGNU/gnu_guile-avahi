@@ -430,7 +430,7 @@ SCM_DEFINE (scm_avahi_add_entry_group_address_x, "add-entry-group-address!",
 	    "@var{address-protocol} (a @code{protocol/} value), @var{address} "
 	    "should be a 32-bit or 128-bit integer (for IPv4 and IPv6, "
 	    "respectively) in host byte order (@pxref{Network Address "
-	    "Conversion,, guile, The GNU Guile Reference Manual}).")
+	    "Conversion,,, guile, The GNU Guile Reference Manual}).")
 #define FUNC_NAME s_scm_avahi_add_entry_group_address_x
 {
   int err;

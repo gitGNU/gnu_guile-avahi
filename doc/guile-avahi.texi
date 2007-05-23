@@ -295,6 +295,7 @@ API reference}.
 @menu
 * Core Interface::              Common Avahi facilities.
 * Client Interface::            Client-related facilities.
+* Service Publication::         Publishing services.
 @end menu
 
 @node Core Interface, Client Interface, API Reference, API Reference
@@ -311,13 +312,23 @@ serve as building blocks for the create of event loops (e.g., using
 
 @include watch.c.texi
 
-@node Client Interface,  , Core Interface, API Reference
+@node Client Interface, Service Publication, Core Interface, API Reference
 @section Client Interface
 
 This section lists the Scheme procedures exported by the @code{(avahi
 client)} module.
 
 @include client.c.texi
+
+
+@node Service Publication,  , Client Interface, API Reference
+@section Service Publication
+
+The service publication API is provided by the @code{(avahi client
+publish)}.  To publish services, one must first create a client for
+the Avahi daemon (@pxref{Client Interface}).
+
+@include publish.c.texi
 
 
 @c *********************************************************************

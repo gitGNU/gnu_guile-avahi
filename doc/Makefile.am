@@ -20,7 +20,8 @@ GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules
 SNARF_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src
 
 
-BUILT_SOURCES = common.c.texi watch.c.texi client.c.texi
+BUILT_SOURCES = common.c.texi watch.c.texi client.c.texi	\
+		publish.c.texi
 CLEANFILES    = $(BUILT_SOURCES)
 info_TEXINFOS = guile-avahi.texi
 EXTRA_DIST    = extract-c-doc.scm
