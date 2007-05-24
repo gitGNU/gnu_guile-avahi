@@ -2,6 +2,22 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-24 22:41:13 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-17
+
+    Summary:
+      Added a test case for browsing.
+    Revision:
+      guile-avahi--devo--0--patch-17
+
+    * tests/Makefile.am (TESTS): Added `publish+browse.scm'.
+
+    new files:
+     tests/publish+browse.scm
+
+    modified files:
+     ChangeLog tests/Makefile.am
+
+
 2007-05-24 22:34:22 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-16
 
     Summary:
