@@ -264,7 +264,7 @@ SCM_DEFINE (scm_avahi_make_service_type_browser, "make-service-type-browser",
 	    (SCM client, SCM interface, SCM protocol, SCM domain,
 	     SCM lookup_flags, SCM callback),
 	    "Return a new service type browser using the specified "
-	    "@var{client}, @var{interface, etc.  Upon browsing events "
+	    "@var{client}, @var{interface}, etc.  Upon browsing events "
 	    "(discovery, removal, etc.) @var{callback} will be called "
 	    "and passed:\n\n"
 	    "@itemize\n"
@@ -353,7 +353,7 @@ SCM_DEFINE (scm_avahi_make_service_browser, "make-service-browser",
 	    (SCM client, SCM interface, SCM protocol, SCM type,
 	     SCM domain, SCM lookup_flags, SCM callback),
 	    "Return a new service browser using the specified "
-	    "@var{client}, @var{interface, etc.  Upon browsing events "
+	    "@var{client}, @var{interface}, etc.  Upon browsing events "
 	    "(discovery, removal, etc.) @var{callback} will be called "
 	    "and passed:\n\n"
 	    "@itemize\n"

@@ -2,6 +2,23 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-24 23:16:30 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-19
+
+    Summary:
+      Updated the documentation.
+    Revision:
+      guile-avahi--devo--0--patch-19
+
+    * doc/Makefile.am (BUILT_SOURCES): Added `lookup.c.texi'.
+    
+    * doc/guile-avahi.texi (Service Browsing): New node.
+    
+    * src/lookup.c: Fixed a couple of docstrings.
+
+    modified files:
+     ChangeLog doc/Makefile.am doc/guile-avahi.texi src/lookup.c
+
+
 2007-05-24 23:14:56 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-18
 
     Summary:

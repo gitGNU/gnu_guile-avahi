@@ -21,7 +21,7 @@ SNARF_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src
 
 
 BUILT_SOURCES = common.c.texi watch.c.texi client.c.texi	\
-		publish.c.texi
+		publish.c.texi lookup.c.texi
 CLEANFILES    = $(BUILT_SOURCES)
 info_TEXINFOS = guile-avahi.texi
 EXTRA_DIST    = extract-c-doc.scm

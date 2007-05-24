@@ -296,6 +296,7 @@ API reference}.
 * Core Interface::              Common Avahi facilities.
 * Client Interface::            Client-related facilities.
 * Service Publication::         Publishing services.
+* Service Browsing::            Discovering published services.
 @end menu
 
 @node Core Interface, Client Interface, API Reference, API Reference
@@ -321,7 +322,7 @@ client)} module.
 @include client.c.texi
 
 
-@node Service Publication,  , Client Interface, API Reference
+@node Service Publication, Service Browsing, Client Interface, API Reference
 @section Service Publication
 
 The service publication API is provided by the @code{(avahi client
@@ -329,6 +330,18 @@ publish)}.  To publish services, one must first create a client for
 the Avahi daemon (@pxref{Client Interface}).
 
 @include publish.c.texi
+
+
+@node Service Browsing,  , Service Publication, API Reference
+@section Service Browsing
+
+The service discovery API is provided by the @code{(avahi client
+lookup)} module.  Service discovery typically consists of two phases:
+@dfn{browsing} where one can find, e.g., available services, and
+@dfn{resolution} where one can, e.g., get detailed information about a
+discovered service such as its IP address.
+
+@include lookup.c.texi
 
 
 @c *********************************************************************
