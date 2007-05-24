@@ -197,27 +197,27 @@
 
 (define %domain-browser-smob
   (make-smob-type "AvahiDomainBrowser *" 'domain-browser
-                  "avahi_domain_browser_free"))
+                  "scm_avahi_domain_browser_free"))
 
 (define %service-browser-smob
   (make-smob-type "AvahiServiceBrowser *" 'service-browser
-                  "avahi_service_browser_free"))
+                  "scm_avahi_service_browser_free"))
 
 (define %service-type-browser-smob
   (make-smob-type "AvahiServiceTypeBrowser *" 'service-type-browser
-                  "avahi_service_type_browser_free"))
+                  "scm_avahi_service_type_browser_free"))
 
 (define %service-resolver-smob
   (make-smob-type "AvahiServiceResolver *" 'service-resolver
-                  "avahi_service_resolver_free"))
+                  "scm_avahi_service_resolver_free"))
 
 (define %host-name-resolver-smob
   (make-smob-type "AvahiHostNameResolver *" 'host-name-resolver
-                  "avahi_host_name_resolver_free"))
+                  "scm_avahi_host_name_resolver_free"))
 
 (define %address-resolver-smob
   (make-smob-type "AvahiAddressResolver *" 'address-resolver
-                  "avahi_address_resolver_free"))
+                  "scm_avahi_address_resolver_free"))
 
 
 (define %avahi-lookup-smobs

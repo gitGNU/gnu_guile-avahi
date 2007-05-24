@@ -2,6 +2,34 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-24 21:54:15 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-15
+
+    Summary:
+      Added support for all browsers.
+    Revision:
+      guile-avahi--devo--0--patch-15
+
+    * modules/avahi/build/smobs.scm (%domain-browser-smob): Use
+      `scm_avahi_domain_browser_free  ()' rather than
+      `avahi_domain_browser_free ()'.
+      (%service-browser-smob, %service-type-browser-smob,
+      %service-resolver-smob, %host-name-resolver-smob,
+      %address-resolver-smob): Likewise.
+    
+    * modules/avahi/client/lookup.scm: Updated.
+    
+    * src/lookup.c (SAFE_DESTRUCTOR): New macro.
+      (SCM_AVAHI_SET_DOMAIN_BROWSER_*): Renamed to `SCM_AVAHI_SET_BROWSER_*'.
+      (SCM_AVAHI_DOMAIN_BROWSER_*): Likewise.
+      (BROWSER_MARK_SMOB, BROWSER_CLIENT_ACCESSOR): New.
+      (service_type_browser_trampoline, scm_avahi_make_service_type_browser,
+      service_browser_trampoline, scm_avahi_make_service_browser): New.
+
+    modified files:
+     ChangeLog modules/avahi/build/smobs.scm
+     modules/avahi/client/lookup.scm src/lookup.c
+
+
 2007-05-23 21:33:25 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-14
 
     Summary:

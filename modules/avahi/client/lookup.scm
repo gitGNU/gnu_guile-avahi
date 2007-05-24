@@ -17,7 +17,10 @@
 
 (define-module (avahi client lookup)
   :use-module (avahi client)
-  :export (domain-browser? make-domain-browser
+  :export (domain-browser? make-domain-browser domain-browser-client
+           service-browser? make-service-browser service-browser-client
+           service-type-browser? make-service-type-browser
+           service-type-browser-client
 
            lookup-flag->string
            lookup-flag/use-wide-area lookup-flag/use-multicast
