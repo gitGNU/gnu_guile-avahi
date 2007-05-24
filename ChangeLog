@@ -2,6 +2,24 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-24 23:14:56 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-18
+
+    Summary:
+      `(system documentation c-snarf)' fixes.
+    Revision:
+      guile-avahi--devo--0--patch-18
+
+    * modules/system/documentation/c-snarf.scm
+      (parse-documentation-item)[read-strings]: New procedure.
+      Use it when reading `scheme-name', so that procedure names split into
+      several C strings are properly read.
+      Use it also for `documentation'; this fixes a bug since previously, it
+      would not stop when a non-string is encountered.
+
+    modified files:
+     ChangeLog modules/system/documentation/c-snarf.scm
+
+
 2007-05-24 22:41:13 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-17
 
     Summary:

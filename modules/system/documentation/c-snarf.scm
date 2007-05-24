@@ -88,6 +88,16 @@ denoting the argument names."
 preprocessor.  The result is an alist whose keys represent specific aspects
 of a procedure's documentation: @code{c-name}, @code{scheme-name},
  @code{documentation} (a Texinfo documentation string), etc."
+
+  (define (read-strings)
+    ;; Read several subsequent strings and return their concatenation.
+    (let loop ((str (read))
+               (result '()))
+      (if (or (eof-object? str)
+              (not (string? str)))
+          (string-concatenate (reverse! result))
+          (loop (read) (cons str result)))))
+
   ;;(format (current-error-port) "doc-item: ~a~%" item)
   (let* ((item (string-trim-both item #\space))
 	 (space (string-index item #\space)))
@@ -98,7 +108,8 @@ of a procedure's documentation: @code{c-name}, @code{scheme-name},
 	  (cond ((string=? kind "cname")
 		 (cons 'c-name (string-trim-both rest #\space)))
 		((string=? kind "fname")
-		 (cons 'scheme-name (with-input-from-string rest read)))
+		 (cons 'scheme-name
+                       (with-input-from-string rest read-strings)))
 		((string=? kind "type")
 		 (cons 'type (with-input-from-string rest read)))
 		((string=? kind "location")
@@ -125,13 +136,7 @@ of a procedure's documentation: @code{c-name}, @code{scheme-name},
 		 ;; docstring (may consist of several C strings which we
 		 ;; assume to be equivalent to Scheme strings)
 		 (cons 'documentation
-		       (with-input-from-string item
-			 (lambda ()
-			   (let loop ((str (read))
-				      (result '()))
-			     (if (eof-object? str)
-				 (apply string-append (reverse! result))
-				 (loop (read) (cons str result)))))))))))))
+		       (with-input-from-string item read-strings))))))))
 
 (define (parse-snarfed-line line)
   "Parse @var{line}, a string that contains documentation returned for a
