@@ -123,6 +123,17 @@ BROWSER_CLIENT_ACCESSOR (service_browser, "service-browser")
 #define scm_from_avahi_service_type scm_from_avahi_domain
 #define scm_from_avahi_service_name scm_from_avahi_domain
 
+/* Likewise, `domain' arguments can be NULL in C.  */
+#define scm_to_avahi_domain(_domain, _c_domain, _pos, _func)		\
+do									\
+{									\
+  if (scm_is_false (_domain))						\
+    (_c_domain) = NULL;							\
+  else									\
+    scm_avahi_to_c_string ((_domain), (_c_domain), (_pos), (_func));	\
+}									\
+while (0)
+
 
 
 /* Browsers.  */
@@ -190,7 +201,7 @@ SCM_DEFINE (scm_avahi_make_domain_browser, "make-domain-browser",
   c_client    = scm_to_avahi_client (client, 1, FUNC_NAME);
   c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
   c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
-                scm_avahi_to_c_string (domain, c_domain, 4, FUNC_NAME);
+                scm_to_avahi_domain (domain, c_domain, 4, FUNC_NAME);
   c_type      = scm_to_avahi_domain_browser_type (domain_browser_type,
 						  5, FUNC_NAME);
   c_flags     = scm_to_avahi_lookup_flags (lookup_flags, 6, FUNC_NAME);
@@ -280,7 +291,7 @@ SCM_DEFINE (scm_avahi_make_service_type_browser, "make-service-type-browser",
   c_client    = scm_to_avahi_client (client, 1, FUNC_NAME);
   c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
   c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
-                scm_avahi_to_c_string (domain, c_domain, 4, FUNC_NAME);
+                scm_to_avahi_domain (domain, c_domain, 4, FUNC_NAME);
   c_flags     = scm_to_avahi_lookup_flags (lookup_flags, 5, FUNC_NAME);
   SCM_VALIDATE_PROC (6, callback);
 
@@ -371,7 +382,7 @@ SCM_DEFINE (scm_avahi_make_service_browser, "make-service-browser",
   c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
   c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
 		scm_avahi_to_c_string (type, c_type, 4, FUNC_NAME);
-                scm_avahi_to_c_string (domain, c_domain, 5, FUNC_NAME);
+                scm_to_avahi_domain (domain, c_domain, 5, FUNC_NAME);
   c_flags     = scm_to_avahi_lookup_flags (lookup_flags, 6, FUNC_NAME);
   SCM_VALIDATE_PROC (7, callback);
 

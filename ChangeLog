@@ -2,6 +2,21 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-24 22:34:22 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-16
+
+    Summary:
+      Allow for `#f' as the domain argument of browsers.
+    Revision:
+      guile-avahi--devo--0--patch-16
+
+    * src/lookup.c (scm_to_avahi_domain): New macro.
+      (scm_avahi_make_domain_browser, scm_avahi_make_service_type_browser,
+      scm_avahi_make_service_browser): Use it.
+
+    modified files:
+     ChangeLog src/lookup.c
+
+
 2007-05-24 21:54:15 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-15
 
     Summary:
