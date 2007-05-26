@@ -71,6 +71,8 @@ while (0)
 SCM_API SCM scm_from_avahi_watch_events (AvahiWatchEvent events);
 SCM_API SCM scm_from_avahi_interface_index (AvahiIfIndex iface);
 SCM_API SCM scm_from_avahi_lookup_result_flags (AvahiLookupResultFlags flags);
+SCM_API SCM scm_from_avahi_address (const AvahiAddress *address);
+SCM_API SCM scm_from_avahi_string_list (const AvahiStringList *lst);
 
 SCM_API AvahiWatchEvent scm_to_avahi_watch_events (SCM events, int pos,
 						   const char *func_name);
@@ -80,6 +82,9 @@ SCM_API AvahiPublishFlags scm_to_avahi_publish_flags (SCM flags, int pos,
 						      const char *func_name);
 SCM_API AvahiLookupFlags scm_to_avahi_lookup_flags (SCM flags, int pos,
 						    const char *func_name);
+SCM_API void scm_to_avahi_address (SCM address_protocol, SCM address,
+				   AvahiAddress *c_address,
+				   int pos, const char *func_name);
 SCM_API AvahiIfIndex scm_to_avahi_interface_index (SCM interface, int pos,
 						   const char *func_name);
 

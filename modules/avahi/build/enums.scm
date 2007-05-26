@@ -433,6 +433,12 @@ no-change)
                   #f
                   "AVAHI_BROWSER_"))
 
+(define %resolver-event-enum
+  (make-enum-type 'resolver-event "AvahiResolverEvent"
+                  '(found failure)
+                  #f
+                  "AVAHI_RESOLVER_"))
+
 (define %lookup-flag-enum
   (make-enum-type 'lookup-flag "AvahiLookupFlags"
                   '(use-wide-area use-multicast no-txt no-address)
@@ -447,7 +453,7 @@ no-change)
                   "AVAHI_LOOKUP_RESULT_"))
 
 (define %avahi-lookup-enums
-  (list %domain-browser-type-enum %browser-event-enum
+  (list %domain-browser-type-enum %browser-event-enum %resolver-event-enum
         %lookup-flag-enum %lookup-result-flag-enum))
 
 

@@ -2,6 +2,56 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-05-26 23:00:12 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-20
+
+    Summary:
+      Added resolvers, which finishes the `lookup' API.
+    Revision:
+      guile-avahi--devo--0--patch-20
+
+    * modules/avahi/build/enums.scm (%resolver-event-enum): New.
+      (%avahi-lookup-enums): Use it.
+    
+    * modules/avahi/client/lookup.scm: Updated.
+    
+    * src/lookup.c (SCM_AVAHI_*BROWSER*): Renamed to `SCM_AVAHI_*LOOKUP*' for
+      generalization.
+      (BROWSER_SMOB_MARK): Renamed to `SMOB_MARKER'.
+      (BROWSER_CLIENT_ACCESSOR): Renamed to `CLIENT_ACCESSOR'.
+      Added new SMOB markers and accessors.
+      (scm_from_avahi_host_name): New macro.
+      (service_resolver_trampoline, scm_avahi_make_service_resolver,
+      host_name_resolver_trampoline, scm_avahi_make_host_name_resolver,
+      address_resolver_trampoline, scm_avahi_make_address_resolver): New.
+    
+    * src/publish.c: Don't include <gmp.h> and <arpa/inet.h>.
+      (scm_avahi_add_entry_group_address_x): Use `scm_to_avahi_address ()'
+      rather than custom code.
+    
+    * src/utils.c: Include <gmp.h> and <arpa/inet.h>.
+      (scm_from_avahi_address, scm_from_avahi_string_list,
+      scm_to_avahi_address): New.
+    
+    * src/utils.h: Updated.
+    
+    * tests/Makefile.am (TESTS): Added `publish+resolve.scm'.
+    
+    * tests/publish+browse.scm: Fixed minor typos.
+
+    new files:
+     tests/publish+resolve.scm
+
+    modified files:
+     ChangeLog modules/avahi/build/enums.scm
+     modules/avahi/client/lookup.scm src/lookup.c src/publish.c
+     src/utils.c src/utils.h tests/Makefile.am
+     tests/publish+browse.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--base-0
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-1
+
+
 2007-05-24 23:16:30 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-19
 
     Summary:

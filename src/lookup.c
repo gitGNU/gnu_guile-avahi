@@ -64,38 +64,44 @@ SAFE_DESTRUCTOR (address_resolver, AddressResolver)
 
 /* SMOB helpers.  */
 
-#define SCM_AVAHI_SET_BROWSER_CALLBACK(group, callback)	\
+/* Note: Here we refer to `lookup' (as a noun) as either a browser or a
+   resolver object.  */
+
+#define SCM_AVAHI_SET_LOOKUP_CALLBACK(group, callback)	\
   SCM_SET_SMOB_OBJECT_2 (group, callback)
-#define SCM_AVAHI_BROWSER_CALLBACK(group)	\
+#define SCM_AVAHI_LOOKUP_CALLBACK(group)	\
   SCM_SMOB_OBJECT_2 (group)
-#define SCM_AVAHI_SET_BROWSER_CLIENT(group, client)	\
+#define SCM_AVAHI_SET_LOOKUP_CLIENT(group, client)	\
   SCM_SET_SMOB_OBJECT_3 (group, client)
-#define SCM_AVAHI_BROWSER_CLIENT(group)	\
+#define SCM_AVAHI_LOOKUP_CLIENT(group)	\
   SCM_SMOB_OBJECT_3 (group)
 
 
-/* Mark the client and closure associated with the given browser SMOB.  */
+/* Mark the client and closure associated with the given lookup SMOB.  */
 
-#define BROWSER_SMOB_MARK(_underscores)			\
+#define SMOB_MARKER(_underscores)			\
   SCM_SMOB_MARK (scm_tc16_avahi_ ## _underscores,	\
 		 mark_ ## _underscores,			\
-		 browser)				\
+		 lookup)				\
   {							\
-    scm_gc_mark (SCM_AVAHI_BROWSER_CLIENT (browser));	\
+    scm_gc_mark (SCM_AVAHI_LOOKUP_CLIENT (lookup));	\
 							\
-    return (SCM_AVAHI_BROWSER_CALLBACK (browser));	\
+    return (SCM_AVAHI_LOOKUP_CALLBACK (lookup));	\
   }
 
-BROWSER_SMOB_MARK (domain_browser)
-BROWSER_SMOB_MARK (service_type_browser)
-BROWSER_SMOB_MARK (service_browser)
+SMOB_MARKER (domain_browser)
+SMOB_MARKER (service_type_browser)
+SMOB_MARKER (service_browser)
+SMOB_MARKER (service_resolver)
+SMOB_MARKER (host_name_resolver)
+SMOB_MARKER (address_resolver)
 
-#undef BROWSER_SMOB_MARK
+#undef SMOB_MARKER
 
 
 /* Produce a Scheme procedure that returns the client associated with the
-   given browser SMOB.  */
-#define BROWSER_CLIENT_ACCESSOR(_underscores, _dashes)			\
+   given lookup SMOB.  */
+#define CLIENT_ACCESSOR(_underscores, _dashes)				\
   SCM_DEFINE (scm_avahi_ ## _underscores ## _client, _dashes "-client",	\
 	      1, 0, 0,							\
 	      (SCM _underscores),					\
@@ -106,14 +112,17 @@ BROWSER_SMOB_MARK (service_browser)
 					  s_scm_avahi_ ## _underscores	\
 					  ## _client);			\
 									\
-    return (SCM_AVAHI_BROWSER_CLIENT (_underscores));			\
+    return (SCM_AVAHI_LOOKUP_CLIENT (_underscores));			\
   }
 
-BROWSER_CLIENT_ACCESSOR (domain_browser, "domain-browser")
-BROWSER_CLIENT_ACCESSOR (service_type_browser, "service-type-browser")
-BROWSER_CLIENT_ACCESSOR (service_browser, "service-browser")
+CLIENT_ACCESSOR (domain_browser, "domain-browser")
+CLIENT_ACCESSOR (service_type_browser, "service-type-browser")
+CLIENT_ACCESSOR (service_browser, "service-browser")
+CLIENT_ACCESSOR (service_resolver, "service-resolver")
+CLIENT_ACCESSOR (host_name_resolver, "host-name-resolver")
+CLIENT_ACCESSOR (address_resolver, "address-resolver")
 
-#undef BROWSER_CLIENT_ACCESSOR
+#undef CLIENT_ACCESSOR
 
 /* Callbacks may be passed NULL pointers for domain, service type and name,
    e.g., in the case of a `AVAHI_BROWSER_CACHE_EXHAUSTED' event.  The
@@ -122,6 +131,7 @@ BROWSER_CLIENT_ACCESSOR (service_browser, "service-browser")
   (((_domain) == NULL) ? SCM_BOOL_F : scm_from_locale_string (_domain))
 #define scm_from_avahi_service_type scm_from_avahi_domain
 #define scm_from_avahi_service_name scm_from_avahi_domain
+#define scm_from_avahi_host_name    scm_from_avahi_domain
 
 /* Likewise, `domain' arguments can be NULL in C.  */
 #define scm_to_avahi_domain(_domain, _c_domain, _pos, _func)		\
@@ -151,7 +161,7 @@ domain_browser_trampoline (AvahiDomainBrowser *c_browser,
   SCM interface, protocol;
 
   browser = SCM_PACK ((scm_t_bits) data);
-  callback = SCM_AVAHI_BROWSER_CALLBACK (browser);
+  callback = SCM_AVAHI_LOOKUP_CALLBACK (browser);
 
   interface = (c_interface < 0)
     ? SCM_BOOL_F : scm_from_avahi_interface_index (c_interface);
@@ -184,7 +194,7 @@ SCM_DEFINE (scm_avahi_make_domain_browser, "make-domain-browser",
 	    "@item a browser event type (i.e., one of the "
 	    "@code{browser-event/} values);\n"
 	    "@item the domain;\n"
-	    "@item lookup result flags (i.e., one of the "
+	    "@item lookup result flags (i.e., a list of "
 	    "@code{lookup-result-flag/} values).\n"
 	    "@end itemize\n")
 #define FUNC_NAME s_scm_avahi_make_domain_browser
@@ -211,8 +221,8 @@ SCM_DEFINE (scm_avahi_make_domain_browser, "make-domain-browser",
   /* We have to create the SMOB first so that we can pass it as "user data"
      to `avahi_domain_browser_new ()'.  Thus, we need to set it afterwards.  */
   browser = scm_from_avahi_domain_browser (NULL);
-  SCM_AVAHI_SET_BROWSER_CALLBACK (browser, callback);
-  SCM_AVAHI_SET_BROWSER_CLIENT (browser, client);
+  SCM_AVAHI_SET_LOOKUP_CALLBACK (browser, callback);
+  SCM_AVAHI_SET_LOOKUP_CLIENT (browser, client);
 
   c_browser = avahi_domain_browser_new (c_client, c_interface, c_protocol,
 					c_domain, c_type, c_flags,
@@ -242,7 +252,7 @@ service_type_browser_trampoline (AvahiServiceTypeBrowser *c_browser,
   SCM interface, protocol;
 
   browser = SCM_PACK ((scm_t_bits) data);
-  callback = SCM_AVAHI_BROWSER_CALLBACK (browser);
+  callback = SCM_AVAHI_LOOKUP_CALLBACK (browser);
 
   interface = (c_interface < 0)
     ? SCM_BOOL_F : scm_from_avahi_interface_index (c_interface);
@@ -275,7 +285,7 @@ SCM_DEFINE (scm_avahi_make_service_type_browser, "make-service-type-browser",
 	    "@code{browser-event/} values);\n"
 	    "@item a service type (e.g., @code{\"_http._tcp\"});\n"
 	    "@item the domain;\n"
-	    "@item lookup result flags (i.e., one of the "
+	    "@item lookup result flags (i.e., a list of "
 	    "@code{lookup-result-flag/} values).\n"
 	    "@end itemize\n")
 #define FUNC_NAME s_scm_avahi_make_service_type_browser
@@ -297,8 +307,8 @@ SCM_DEFINE (scm_avahi_make_service_type_browser, "make-service-type-browser",
 
 
   browser = scm_from_avahi_service_type_browser (NULL);
-  SCM_AVAHI_SET_BROWSER_CALLBACK (browser, callback);
-  SCM_AVAHI_SET_BROWSER_CLIENT (browser, client);
+  SCM_AVAHI_SET_LOOKUP_CALLBACK (browser, callback);
+  SCM_AVAHI_SET_LOOKUP_CLIENT (browser, client);
 
   c_browser = avahi_service_type_browser_new (c_client, c_interface,
 					      c_protocol, c_domain, c_flags,
@@ -329,7 +339,7 @@ service_browser_trampoline (AvahiServiceBrowser *c_browser,
   SCM interface, protocol;
 
   browser = SCM_PACK ((scm_t_bits) data);
-  callback = SCM_AVAHI_BROWSER_CALLBACK (browser);
+  callback = SCM_AVAHI_LOOKUP_CALLBACK (browser);
 
   interface = (c_interface < 0)
     ? SCM_BOOL_F : scm_from_avahi_interface_index (c_interface);
@@ -357,7 +367,7 @@ SCM_DEFINE (scm_avahi_make_service_browser, "make-service-browser",
 	    "(discovery, removal, etc.) @var{callback} will be called "
 	    "and passed:\n\n"
 	    "@itemize\n"
-	    "@item the service type browser object;\n"
+	    "@item the service browser object;\n"
 	    "@item an interface name or number (depending on the OS);\n"
 	    "@item the protocol (i.e., one of the @code{protocol/} values);\n"
 	    "@item a browser event type (i.e., one of the "
@@ -365,7 +375,7 @@ SCM_DEFINE (scm_avahi_make_service_browser, "make-service-browser",
 	    "@item the service name;\n"
 	    "@item the service type (e.g., @code{\"_http._tcp\"});\n"
 	    "@item the domain;\n"
-	    "@item lookup result flags (i.e., one of the "
+	    "@item lookup result flags (i.e., a list of "
 	    "@code{lookup-result-flag/} values).\n"
 	    "@end itemize\n")
 #define FUNC_NAME s_scm_avahi_make_service_browser
@@ -388,8 +398,8 @@ SCM_DEFINE (scm_avahi_make_service_browser, "make-service-browser",
 
 
   browser = scm_from_avahi_service_browser (NULL);
-  SCM_AVAHI_SET_BROWSER_CALLBACK (browser, callback);
-  SCM_AVAHI_SET_BROWSER_CLIENT (browser, client);
+  SCM_AVAHI_SET_LOOKUP_CALLBACK (browser, callback);
+  SCM_AVAHI_SET_LOOKUP_CLIENT (browser, client);
 
   c_browser = avahi_service_browser_new (c_client, c_interface, c_protocol,
 					 c_type, c_domain, c_flags,
@@ -401,6 +411,314 @@ SCM_DEFINE (scm_avahi_make_service_browser, "make-service-browser",
   SCM_SET_SMOB_DATA (browser, (scm_t_bits) c_browser);
 
   return (browser);
+}
+#undef FUNC_NAME
+
+
+
+/* Resolvers.  */
+
+static void
+service_resolver_trampoline (AvahiServiceResolver *c_resolver,
+			     AvahiIfIndex c_interface,
+			     AvahiProtocol c_protocol,
+			     AvahiResolverEvent c_event,
+			     const char *c_name,
+			     const char *c_type,
+			     const char *c_domain,
+			     const char *c_host_name,
+			     const AvahiAddress *c_address,
+			     uint16_t c_port,
+			     AvahiStringList *c_txt,
+			     AvahiLookupResultFlags c_flags,
+			     void *data)
+{
+  SCM resolver, callback;
+  SCM interface, protocol;
+
+  resolver = SCM_PACK ((scm_t_bits) data);
+  callback = SCM_AVAHI_LOOKUP_CALLBACK (resolver);
+
+  interface = (c_interface < 0)
+    ? SCM_BOOL_F : scm_from_avahi_interface_index (c_interface);
+  protocol  = (c_protocol  < 0)
+    ? SCM_BOOL_F : scm_from_avahi_protocol (c_protocol);
+
+  (void) scm_apply (callback,
+		    scm_list_n (resolver, interface, protocol,
+				scm_from_avahi_resolver_event (c_event),
+				scm_from_avahi_service_name (c_name),
+				scm_from_avahi_service_type (c_type),
+				scm_from_avahi_domain (c_domain),
+				scm_from_avahi_host_name (c_host_name),
+				scm_from_avahi_protocol (c_address->proto),
+				scm_from_avahi_address (c_address),
+				scm_from_ushort (c_port),
+				scm_from_avahi_string_list (c_txt),
+				scm_from_avahi_lookup_result_flags (c_flags),
+				SCM_UNDEFINED),
+		    SCM_EOL);
+}
+
+SCM_DEFINE (scm_avahi_make_service_resolver, "make-service-resolver",
+	    9, 0, 0,
+	    (SCM client, SCM interface, SCM protocol, SCM service_name,
+	     SCM type, SCM domain, SCM a_protocol, SCM lookup_flags,
+	     SCM callback),
+	    "Return a new service resolver using the specified "
+	    "@var{client}, @var{interface}, etc., that will resolve the "
+	    "host name, IP address, port and @code{txt} properties of "
+	    "the service of type @var{type} named @var{service-name}.  "
+	    "Upon resolution, @var{callback} is invoked and passed:\n\n"
+	    "@itemize\n"
+	    "@item the service type resolver object;\n"
+	    "@item an interface name or number (depending on the OS);\n"
+	    "@item the protocol (i.e., one of the @code{protocol/} values);\n"
+	    "@item a resolver event type (i.e., one of the "
+	    "@code{resolver-event/} values);\n"
+	    "@item the service name;\n"
+	    "@item the service type (e.g., @code{\"_http._tcp\"});\n"
+	    "@item the domain;\n"
+	    "@item the host name (name of the host the service is running "
+	    "on);\n"
+	    "@item the host IP address type (i.e., "
+	    "@code{protocol/inet} for an IPv4 address and "
+	    "@code{protocol/inet6} for an IPv6 address);\n"
+	    "@item the host IP address in host byte order "
+	    "(@pxref{Network Address Conversion,,, guile, The GNU Guile "
+	    "Reference Manual});\n"
+	    "@item a list of @code{txt} properties (strings);\n"
+	    "@item lookup result flags (i.e., a list of "
+	    "@code{lookup-result-flag/} values).\n"
+	    "@end itemize\n"
+	    "An exception may be raised on failure.")
+#define FUNC_NAME s_scm_avahi_make_service_resolver
+{
+  SCM resolver;
+  AvahiClient *c_client;
+  AvahiServiceResolver *c_resolver;
+  AvahiIfIndex c_interface;
+  AvahiProtocol c_protocol, c_a_proto;
+  AvahiLookupFlags c_flags;
+  char *c_domain, *c_type, *c_name;
+
+  c_client    = scm_to_avahi_client (client, 1, FUNC_NAME);
+  c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
+  c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
+		scm_avahi_to_c_string (service_name, c_name, 4, FUNC_NAME);
+		scm_avahi_to_c_string (type, c_type, 5, FUNC_NAME);
+                scm_to_avahi_domain (domain, c_domain, 6, FUNC_NAME);
+  c_a_proto   = scm_to_avahi_protocol (a_protocol, 7, FUNC_NAME);
+  c_flags     = scm_to_avahi_lookup_flags (lookup_flags, 8, FUNC_NAME);
+  SCM_VALIDATE_PROC (9, callback);
+
+
+  resolver = scm_from_avahi_service_resolver (NULL);
+  SCM_AVAHI_SET_LOOKUP_CALLBACK (resolver, callback);
+  SCM_AVAHI_SET_LOOKUP_CLIENT (resolver, client);
+
+  c_resolver = avahi_service_resolver_new (c_client, c_interface, c_protocol,
+					   c_name, c_type, c_domain,
+					   c_a_proto, c_flags,
+					   service_resolver_trampoline,
+					   (void *) resolver);
+  if (c_resolver == NULL)
+    scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
+
+  SCM_SET_SMOB_DATA (resolver, (scm_t_bits) c_resolver);
+
+  return (resolver);
+}
+#undef FUNC_NAME
+
+
+static void
+host_name_resolver_trampoline (AvahiHostNameResolver *c_resolver,
+			       AvahiIfIndex c_interface,
+			       AvahiProtocol c_protocol,
+			       AvahiResolverEvent c_event,
+			       const char *c_host_name,
+			       const AvahiAddress *c_address,
+			       AvahiLookupResultFlags c_flags,
+			       void *data)
+{
+  SCM resolver, callback;
+  SCM interface, protocol;
+
+  resolver = SCM_PACK ((scm_t_bits) data);
+  callback = SCM_AVAHI_LOOKUP_CALLBACK (resolver);
+
+  interface = (c_interface < 0)
+    ? SCM_BOOL_F : scm_from_avahi_interface_index (c_interface);
+  protocol  = (c_protocol  < 0)
+    ? SCM_BOOL_F : scm_from_avahi_protocol (c_protocol);
+
+  (void) scm_apply (callback,
+		    scm_list_n (resolver, interface, protocol,
+				scm_from_avahi_resolver_event (c_event),
+				scm_from_avahi_host_name (c_host_name),
+				scm_from_avahi_protocol (c_address->proto),
+				scm_from_avahi_address (c_address),
+				scm_from_avahi_lookup_result_flags (c_flags),
+				SCM_UNDEFINED),
+		    SCM_EOL);
+}
+
+SCM_DEFINE (scm_avahi_make_host_name_resolver, "make-host-name-resolver",
+	    7, 0, 0,
+	    (SCM client, SCM interface, SCM protocol, SCM host_name,
+	     SCM a_protocol, SCM lookup_flags, SCM callback),
+	    "Return a new host-name resolver using the specified "
+	    "@var{client}, @var{interface}, etc., that will resolve "
+	    "@var{host-name}, i.e., find the corresponding IP address.  "
+	    "Upon resolution, @var{callback} is invoked and passed:\n\n"
+	    "@itemize\n"
+	    "@item the host-name resolver object;\n"
+	    "@item an interface name or number (depending on the OS);\n"
+	    "@item the protocol (i.e., one of the @code{protocol/} values);\n"
+	    "@item a resolver event type (i.e., one of the "
+	    "@code{resolver-event/} values);\n"
+	    "@item the host name;\n"
+	    "@item the host IP address type (i.e., "
+	    "@code{protocol/inet} for an IPv4 address and "
+	    "@code{protocol/inet6} for an IPv6 address);\n"
+	    "@item the host IP address in host byte order "
+	    "(@pxref{Network Address Conversion,,, guile, The GNU Guile "
+	    "Reference Manual});\n"
+	    "@item lookup result flags (i.e., a list of "
+	    "@code{lookup-result-flag/} values).\n"
+	    "@end itemize\n"
+	    "An exception may be raised on failure.")
+#define FUNC_NAME s_scm_avahi_make_host_name_resolver
+{
+  SCM resolver;
+  AvahiClient *c_client;
+  AvahiHostNameResolver *c_resolver;
+  AvahiIfIndex c_interface;
+  AvahiProtocol c_protocol, c_a_proto;
+  AvahiLookupFlags c_flags;
+  char *c_name;
+
+  c_client    = scm_to_avahi_client (client, 1, FUNC_NAME);
+  c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
+  c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
+		scm_avahi_to_c_string (host_name, c_name, 4, FUNC_NAME);
+  c_a_proto   = scm_to_avahi_protocol (a_protocol, 5, FUNC_NAME);
+  c_flags     = scm_to_avahi_lookup_flags (lookup_flags, 6, FUNC_NAME);
+  SCM_VALIDATE_PROC (7, callback);
+
+
+  resolver = scm_from_avahi_host_name_resolver (NULL);
+  SCM_AVAHI_SET_LOOKUP_CALLBACK (resolver, callback);
+  SCM_AVAHI_SET_LOOKUP_CLIENT (resolver, client);
+
+  c_resolver = avahi_host_name_resolver_new (c_client, c_interface, c_protocol,
+					     c_name, c_a_proto, c_flags,
+					     host_name_resolver_trampoline,
+					     (void *) resolver);
+  if (c_resolver == NULL)
+    scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
+
+  SCM_SET_SMOB_DATA (resolver, (scm_t_bits) c_resolver);
+
+  return (resolver);
+}
+#undef FUNC_NAME
+
+
+static void
+address_resolver_trampoline (AvahiAddressResolver *c_resolver,
+			     AvahiIfIndex c_interface,
+			     AvahiProtocol c_protocol,
+			     AvahiResolverEvent c_event,
+			     const AvahiAddress *c_address,
+			     const char *c_host_name,
+			     AvahiLookupResultFlags c_flags,
+			     void *data)
+{
+  SCM resolver, callback;
+  SCM interface, protocol;
+
+  resolver = SCM_PACK ((scm_t_bits) data);
+  callback = SCM_AVAHI_LOOKUP_CALLBACK (resolver);
+
+  interface = (c_interface < 0)
+    ? SCM_BOOL_F : scm_from_avahi_interface_index (c_interface);
+  protocol  = (c_protocol  < 0)
+    ? SCM_BOOL_F : scm_from_avahi_protocol (c_protocol);
+
+  (void) scm_apply (callback,
+		    scm_list_n (resolver, interface, protocol,
+				scm_from_avahi_resolver_event (c_event),
+				scm_from_avahi_protocol (c_address->proto),
+				scm_from_avahi_address (c_address),
+				scm_from_avahi_host_name (c_host_name),
+				scm_from_avahi_lookup_result_flags (c_flags),
+				SCM_UNDEFINED),
+		    SCM_EOL);
+}
+
+SCM_DEFINE (scm_avahi_make_address_resolver, "make-address-resolver",
+	    7, 0, 0,
+	    (SCM client, SCM interface, SCM protocol,
+	     SCM address_type, SCM address,
+	     SCM lookup_flags, SCM callback),
+	    "Return a new address resolver using the specified "
+	    "@var{client}, @var{interface}, etc., that will resolve the "
+	    "host name corresponding to @var{address} of type "
+	    "@var{address-type} (either @code{protocol/inet} for an "
+	    "IPv4 address or @code{protocol/inet6} for an IPv6 "
+	    "address).  As usual, @var{address} should be the raw IP "
+	    "address in host byte order (@pxref{Network Address "
+	    "Conversion,,, guile, The GNU Guile Reference Manual}).  "
+	    "Upon resolution, @var{callback} is invoked and passed:\n\n"
+	    "@itemize\n"
+	    "@item the address resolver object;\n"
+	    "@item an interface name or number (depending on the OS);\n"
+	    "@item the protocol (i.e., one of the @code{protocol/} values);\n"
+	    "@item a resolver event type (i.e., one of the "
+	    "@code{resolver-event/} values);\n"
+	    "@item the host IP address type (i.e., "
+	    "@var{address-type});\n"
+	    "@item the host IP address (i.e., @var{address});\n"
+	    "@item the corresponding host name;\n"
+	    "@item lookup result flags (i.e., a list of "
+	    "@code{lookup-result-flag/} values).\n"
+	    "@end itemize\n"
+	    "An exception may be raised on failure.")
+#define FUNC_NAME s_scm_avahi_make_address_resolver
+{
+  SCM resolver;
+  AvahiClient *c_client;
+  AvahiAddressResolver *c_resolver;
+  AvahiIfIndex c_interface;
+  AvahiProtocol c_protocol;
+  AvahiLookupFlags c_flags;
+  AvahiAddress c_address;
+
+  c_client    = scm_to_avahi_client (client, 1, FUNC_NAME);
+  c_interface = scm_to_avahi_interface_index (interface, 2, FUNC_NAME);
+  c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
+                scm_to_avahi_address (address_type, address, &c_address,
+				      5, FUNC_NAME);
+  c_flags     = scm_to_avahi_lookup_flags (lookup_flags, 6, FUNC_NAME);
+  SCM_VALIDATE_PROC (7, callback);
+
+
+  resolver = scm_from_avahi_address_resolver (NULL);
+  SCM_AVAHI_SET_LOOKUP_CALLBACK (resolver, callback);
+  SCM_AVAHI_SET_LOOKUP_CLIENT (resolver, client);
+
+  c_resolver = avahi_address_resolver_new (c_client, c_interface, c_protocol,
+					   &c_address, c_flags,
+					   address_resolver_trampoline,
+					   (void *) resolver);
+  if (c_resolver == NULL)
+    scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
+
+  SCM_SET_SMOB_DATA (resolver, (scm_t_bits) c_resolver);
+
+  return (resolver);
 }
 #undef FUNC_NAME
 
