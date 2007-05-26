@@ -22,6 +22,11 @@
            service-type-browser? make-service-type-browser
            service-type-browser-client
 
+           service-resolver? make-service-resolver service-resolver-client
+           address-resolver? make-address-resolver address-resolver-client
+           host-name-resolver? make-host-name-resolver
+           host-name-resolver-client
+
            lookup-flag->string
            lookup-flag/use-wide-area lookup-flag/use-multicast
            lookup-flag/no-txt lookup-flag/no-address
@@ -34,7 +39,10 @@
            browser-event->string
            browser-event/new browser-event/remove
            browser-event/cache-exhausted browser-event/all-for-now
-           browser-event/failure))
+           browser-event/failure
+
+           resolver-event->string
+           resolver-event/found resolver-event/failure))
 
 (load-extension "libguile-avahi-v-0" "scm_avahi_lookup_init")
 

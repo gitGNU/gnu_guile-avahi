@@ -26,14 +26,6 @@
 #include <avahi-common/malloc.h>
 #include <libguile.h>
 
-#ifdef HAVE_GMP_H
-# include <gmp.h>
-#endif
-
-#ifdef HAVE_ARPA_INET_H
-# include <arpa/inet.h>
-#endif
-
 #include "utils.h"
 #include "errors.h"
 
@@ -436,7 +428,7 @@ SCM_DEFINE (scm_avahi_add_entry_group_address_x, "add-entry-group-address!",
   int err;
   AvahiEntryGroup *c_group;
   AvahiIfIndex c_interface;
-  AvahiProtocol c_protocol, c_addrproto;
+  AvahiProtocol c_protocol;
   AvahiPublishFlags c_flags;
   AvahiAddress c_address;
   char *c_fqdn;
@@ -446,43 +438,8 @@ SCM_DEFINE (scm_avahi_add_entry_group_address_x, "add-entry-group-address!",
   c_protocol  = scm_to_avahi_protocol (protocol, 3, FUNC_NAME);
   c_flags     = scm_to_avahi_publish_flags (publish_flags, 4, FUNC_NAME);
                 scm_avahi_to_c_string (fqdn, c_fqdn, 5, FUNC_NAME);
-  c_addrproto = scm_to_avahi_protocol (address_protocol, 6, FUNC_NAME);
-
-  c_address.proto = c_addrproto;
-  switch (c_addrproto)
-    {
-#ifdef HAVE_ARPA_INET_H
-    case AVAHI_PROTO_INET:
-      c_address.data.ipv4.address = htonl (scm_to_uint32 (address));
-      break;
-#endif
-
-#ifdef HAVE_GMP_H
-    case AVAHI_PROTO_INET6:
-      {
-	mpz_t mpz;
-	size_t count;
-
-	mpz_init (mpz);
-	scm_to_mpz (address, mpz);
-	if (EXPECT_FALSE (mpz_sizeinbase (mpz, 2) > 128))
-	  {
-	    mpz_clear (mpz);
-	    scm_wrong_type_arg (FUNC_NAME, 7, address);
-	  }
-	else
-	  mpz_export (&c_address.data.ipv6.address, &count,
-		      1 /* order = most significant word first */,
-		      7, 1 /* endian */, 0 /* nails */, mpz);
-
-	mpz_clear (mpz);
-	break;
-      }
-#endif
-
-    default:
-      scm_avahi_error (AVAHI_ERR_NOT_SUPPORTED, FUNC_NAME);
-    }
+		scm_to_avahi_address (address_protocol, address,
+				      &c_address, 7, FUNC_NAME);
 
   err = avahi_entry_group_add_address (c_group, c_interface,
 				       c_protocol, c_flags,

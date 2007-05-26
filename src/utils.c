@@ -19,6 +19,14 @@
 # include "config.h"
 #endif
 
+#ifdef HAVE_GMP_H
+# include <gmp.h>
+#endif
+
+#ifdef HAVE_ARPA_INET_H
+# include <arpa/inet.h>
+#endif
+
 #ifdef HAVE_NET_IF_H
 # include <net/if.h>
 #endif
@@ -107,6 +115,64 @@ scm_from_avahi_interface_index (AvahiIfIndex c_interface)
 #endif /* HAVE_IF_INDEXTONAME */
 }
 
+SCM
+scm_from_avahi_address (const AvahiAddress *c_address)
+{
+  SCM result;
+
+  switch (c_address->proto)
+    {
+#ifdef HAVE_ARPA_INET_H
+    case AVAHI_PROTO_INET:
+      result = scm_from_uint32 (ntohl (c_address->data.ipv4.address));
+      break;
+#endif
+
+#ifdef HAVE_GMP_H
+    case AVAHI_PROTO_INET6:
+      {
+	mpz_t mpz;
+
+	/* FIXME: This is broken.  We need to check the host endianness and
+	   determine the ENDIAN argument as a function of it.  */
+	mpz_init (mpz);
+	mpz_import (mpz, 16 /* count = 128 bits */,
+		    1 /* order = most significant word first */,
+		    8 /* word size */, 1 /* endian */, 0 /* nails */,
+		    &c_address->data.ipv6.address);
+
+	result = scm_from_mpz (mpz);
+	mpz_clear (mpz);
+	break;
+      }
+#endif
+
+    default:
+      scm_avahi_error (AVAHI_ERR_NOT_SUPPORTED, __FUNCTION__);
+    }
+
+  return result;
+}
+
+SCM
+scm_from_avahi_string_list (const AvahiStringList *c_lst)
+{
+  SCM lst;
+
+  for (lst = SCM_EOL;
+       c_lst != NULL;
+       c_lst = avahi_string_list_get_next ((AvahiStringList *) c_lst))
+    {
+      uint8_t *c_str;
+
+      c_str = avahi_string_list_get_text ((AvahiStringList *) c_lst);
+      lst = scm_cons (scm_from_locale_string ((const char *) c_str),
+		      lst);
+    }
+
+  return (scm_reverse_x (lst, SCM_EOL));
+}
+
 
 AvahiWatchEvent
 scm_to_avahi_watch_events (SCM events, int pos, const char *func_name)
@@ -188,6 +254,59 @@ scm_to_avahi_lookup_flags (SCM flags, int pos, const char *func_name)
 }
 #undef FUNC_NAME
 
+
+void
+scm_to_avahi_address (SCM address_protocol, SCM address,
+		      AvahiAddress *c_address,
+		      int pos, const char *func_name)
+#define FUNC_NAME func_name
+{
+  AvahiProtocol c_addrproto;
+
+  c_addrproto = scm_to_avahi_protocol (address_protocol, pos - 1,
+				       FUNC_NAME);
+
+  c_address->proto = c_addrproto;
+
+  switch (c_addrproto)
+    {
+#ifdef HAVE_ARPA_INET_H
+    case AVAHI_PROTO_INET:
+      c_address->data.ipv4.address = htonl (scm_to_uint32 (address));
+      break;
+#endif
+
+#ifdef HAVE_GMP_H
+    case AVAHI_PROTO_INET6:
+      {
+	mpz_t mpz;
+	size_t count;
+
+	mpz_init (mpz);
+	scm_to_mpz (address, mpz);
+	if (EXPECT_FALSE (mpz_sizeinbase (mpz, 2) > 128))
+	  {
+	    mpz_clear (mpz);
+	    scm_wrong_type_arg (FUNC_NAME, pos, address);
+	  }
+	else
+	  /* FIXME: This is broken.  We need to check the host endianness and
+	     determine the ENDIAN argument as a function of it.  */
+	  mpz_export (&c_address->data.ipv6.address, &count,
+		      1 /* order = most significant word first */,
+		      8 /* word size */, 1 /* endian */,
+		      0 /* nails */, mpz);
+
+	mpz_clear (mpz);
+	break;
+      }
+#endif
+
+    default:
+      scm_avahi_error (AVAHI_ERR_NOT_SUPPORTED, FUNC_NAME);
+    }
+}
+#undef FUNC_NAME
 
 
 /* Interfaces.  */

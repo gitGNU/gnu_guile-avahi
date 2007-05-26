@@ -63,13 +63,13 @@
             (exit #t)))
 
 
-      (define (domain-browser-callback client interface protocol event
+      (define (domain-browser-callback browser interface protocol event
                                        domain flags)
         ;;(format #t "domain-browser: ~a ~a ~a~%"
         ;;        event domain flags)
         #t)
 
-      (define (service-type-browser-callback client interface protocol event
+      (define (service-type-browser-callback browser interface protocol event
                                              service-type domain flags)
         ;;(format #t "service-type: ~a ~a ~a ~a~%"
         ;;        event service-type domain flags)
@@ -78,7 +78,7 @@
                   (equal? %service-type service-type)))
         (exit-if-done))
 
-      (define (service-browser-callback client interface protocol event
+      (define (service-browser-callback browser interface protocol event
                                         service-name service-type
                                         domain flags)
         ;;(format #t "service: ~a ~a ~a ~a ~a~%"
