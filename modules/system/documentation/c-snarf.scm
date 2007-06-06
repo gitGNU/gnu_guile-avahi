@@ -1,6 +1,6 @@
 ;;; c-snarf.scm  --  Parsing documentation "snarffed" from C files.
 ;;;
-;;; Copyright 2006  Ludovic Courtès <ludovic.courtes@laas.fr>
+;;; Copyright 2006  Free Software Foundation
 ;;;
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
@@ -45,8 +45,9 @@
 ;;; High-level API.
 ;;;
 
-(define (run-cpp-and-extract-snarfing file cpp cflags)
-  (let ((pipe (apply open-pipe* OPEN_READ cpp file cflags)))
+(define (run-cpp-and-extract-snarfing file cpp cpp-flags)
+  (let ((pipe (apply open-pipe* OPEN_READ
+                     (cons cpp (append cpp-flags (list file))))))
     (parse-snarfing pipe)))
 
 
@@ -180,5 +181,10 @@ preprocessor output."
 
 
 ;;; c-snarf.scm ends here
+
+;;; Local Variables:
+;;; mode: scheme
+;;; coding: latin-1
+;;; End:
 
 ;;; arch-tag: dcba2446-ee43-46d8-a47e-e6e12f121988

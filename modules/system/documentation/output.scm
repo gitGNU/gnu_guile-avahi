@@ -1,6 +1,6 @@
 ;;; output.scm  --  Output documentation "snarffed" from C files in Texi/GDF.
 ;;;
-;;; Copyright 2006, 2007  Ludovic Courtès <ludovic.courtes@laas.fr>
+;;; Copyright 2006, 2007  Free Software Foundation
 ;;;
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
@@ -167,5 +167,10 @@ function."
 
 
 ;;; output.scm ends here
+
+;;; Local Variables:
+;;; mode: scheme
+;;; coding: latin-1
+;;; End:
 
 ;;; arch-tag: 20ca493a-6f1a-4d7f-9d24-ccce0d32df49
