@@ -21,8 +21,7 @@
 
 (use-modules (avahi)
              (avahi client)
-             (avahi client publish)
-             (srfi srfi-1))
+             (avahi client publish))
 
 (define (make-name-constructor prefix)
   (lambda ()

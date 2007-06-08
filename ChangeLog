@@ -2,6 +2,27 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-08 23:08:34 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-24
+
+    Summary:
+      Linted tests.
+    Revision:
+      guile-avahi--devo--0--patch-24
+
+    * tests/publish+browse.scm: Removed unused bindings and modules.
+    
+    * tests/publish.scm: Likewise.
+    
+    * tests/publish+resolve.scm: Likewise.
+
+    modified files:
+     ChangeLog tests/publish+browse.scm tests/publish+resolve.scm
+     tests/publish.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-5
+
+
 2007-06-08 23:08:24 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-23
 
     Summary:

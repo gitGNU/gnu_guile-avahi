@@ -24,8 +24,7 @@
              (avahi client)
              (avahi client publish)
              (avahi client lookup)
-             (avahi test)
-             (srfi srfi-1))
+             (avahi test))
 
 (define %service-type
   "_guile-avahi._tcp")
@@ -100,7 +99,7 @@
                                        protocol/unspecified
                                        address-type address '()
                                        resolver-callback)))
-          #t))
+          resolver))
 
       (define (service-resolver-callback resolver interface protocol event
                                          service-name service-type domain
@@ -132,7 +131,7 @@
                                             interface protocol %host-name
                                             protocol/unspecified '()
                                             host-name-resolver-callback)))
-              #t)))
+              (and service host-name))))
 
       (define (make-group-callback client)
         (lambda (group state)
