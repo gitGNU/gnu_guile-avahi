@@ -2,6 +2,32 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-08 23:08:24 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-23
+
+    Summary:
+      Have tests use `iterate-simple-poll' and eventually time-out.
+    Revision:
+      guile-avahi--devo--0--patch-23
+
+    * modules/Makefile.am (EXTRA_DIST): Added `avahi/test.scm'.
+    
+    * tests/publish+browse.scm: Use `(avahi test)'.
+      (exit-if-done): Removed.
+      (<main>): Use `iterate-simple-poll-until-true'.
+    
+    * tests/publish+resolve.scm: Likewise.
+
+    new files:
+     modules/avahi/test.scm
+
+    modified files:
+     ChangeLog modules/Makefile.am tests/publish+browse.scm
+     tests/publish+resolve.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-4
+
+
 2007-06-08 23:08:08 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-22
 
     Summary:
