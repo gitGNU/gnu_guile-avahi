@@ -24,6 +24,7 @@
              (avahi client)
              (avahi client publish)
              (avahi client lookup)
+             (avahi test)
              (srfi srfi-1))
 
 (define %service-type
@@ -52,12 +53,6 @@
       (define resolved-host-name? #f)
       (define resolved-service?   #f)
       (define resolved-address?   #f)
-
-      (define (exit-if-done)
-        ;; Exit if everything we wanted to encounter while browsing has been
-        ;; discovered.
-        (if (and resolved-host-name? resolved-address? resolved-service?)
-            (exit #t)))
 
 
       (define (make-address-resolver-callback expected-host-name
@@ -105,8 +100,7 @@
                                        protocol/unspecified
                                        address-type address '()
                                        resolver-callback)))
-          #t)
-        (exit-if-done))
+          #t))
 
       (define (service-resolver-callback resolver interface protocol event
                                          service-name service-type domain
@@ -119,8 +113,7 @@
         (set! resolved-service?
               (or resolved-service?
                   (eq? event resolver-event/found)
-                  (equal? %service-name service-name)))
-        (exit-if-done))
+                  (equal? %service-name service-name))))
 
       (define (service-browser-callback browser interface protocol event
                                         service-name service-type domain
@@ -139,8 +132,7 @@
                                             interface protocol %host-name
                                             protocol/unspecified '()
                                             host-name-resolver-callback)))
-              #t))
-        (exit-if-done))
+              #t)))
 
       (define (make-group-callback client)
         (lambda (group state)
@@ -182,7 +174,12 @@
                                          client-flag/ignore-user-config)
                                         client-callback)))
               (and (client? client)
-                   (run-simple-poll poll)))))
+                   (iterate-simple-poll-until-true
+                    poll
+                    (lambda ()
+                      (and resolved-host-name?
+                           resolved-service?
+                           resolved-address?)))))))
 
     (lambda ()
       ;; failure.

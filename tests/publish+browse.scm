@@ -24,6 +24,7 @@
              (avahi client)
              (avahi client publish)
              (avahi client lookup)
+             (avahi test)
              (srfi srfi-1))
 
 (define %service-type
@@ -56,12 +57,6 @@
       (define seen-service-type? #f)
       (define seen-service? #f)
 
-      (define (exit-if-done)
-        ;; Exit if everything we wanted to encounter while browsing has been
-        ;; discovered.
-        (if (and seen-service-type? seen-service?)
-            (exit #t)))
-
 
       (define (domain-browser-callback browser interface protocol event
                                        domain flags)
@@ -75,8 +70,7 @@
         ;;        event service-type domain flags)
         (set! seen-service-type?
               (or seen-service-type?
-                  (equal? %service-type service-type)))
-        (exit-if-done))
+                  (equal? %service-type service-type))))
 
       (define (service-browser-callback browser interface protocol event
                                         service-name service-type
@@ -85,8 +79,7 @@
         ;;        event service-name service-type domain flags)
         (set! seen-service?
               (or seen-service?
-                  (equal? %service-name service-name)))
-        (exit-if-done))
+                  (equal? %service-name service-name))))
 
       (define (make-group-callback client)
         (lambda (group state)
@@ -137,22 +130,10 @@
                                          client-flag/ignore-user-config)
                                         client-callback)))
               (and (client? client)
-                   (let ((start (gettimeofday)))
-                     (let loop ((now (gettimeofday)))
-                       (cond ((and seen-service-type? seen-service?)
-                              #t)
-                             ((> (- (car now) (car start)) 5)
-                              (format #t "timeout~%")
-                              #f)
-                             (else
-                              (begin
-                                ;; FIXME: `iterate-simple-poll' doesn't seem
-                                ;; to work here: only `client-callback' gets
-                                ;; called, then nothing more.
-
-                                ;;(iterate-simple-poll poll)
-                                (run-simple-poll poll)
-                                (loop (gettimeofday)))))))))))
+                   (iterate-simple-poll-until-true
+                    poll
+                    (lambda ()
+                      (and seen-service-type? seen-service?)))))))
 
     (lambda ()
       ;; failure.

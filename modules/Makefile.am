@@ -28,4 +28,5 @@ documentation_modules = system/documentation/README		\
 
 EXTRA_DIST = avahi/build/enums.scm avahi/build/smobs.scm	\
 	     avahi/build/callbacks.scm avahi/build/utils.scm	\
+	     avahi/test.scm					\
              $(documentation_modules)
