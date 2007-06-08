@@ -24,8 +24,7 @@
              (avahi client)
              (avahi client publish)
              (avahi client lookup)
-             (avahi test)
-             (srfi srfi-1))
+             (avahi test))
 
 (define %service-type
   "_guile-avahi._tcp")
@@ -33,16 +32,6 @@
 (define %service-name
   "guile-avahi-service")
 
-(define (make-name-constructor prefix)
-  (lambda ()
-    (string-append "guile-avahi-" prefix "-"
-                   (number->string (car (gettimeofday)) 16))))
-
-(define make-service-name
-  (make-name-constructor "service"))
-
-(define make-host-name
-  (make-name-constructor "host"))
 
 
 (dynamic-wind
