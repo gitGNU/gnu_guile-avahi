@@ -48,6 +48,12 @@ scm_avahi_client_free (AvahiClient *client)
 #include "client-smobs.i.c"
 
 
+/* Callback forward declarations.  */
+
+#include "client-callbacks.h"
+
+
+
 /* Procedures.  */
 
 #define SCM_AVAHI_SET_CLIENT_CALLBACK(client, callback)	\
@@ -71,10 +77,10 @@ SCM_SMOB_MARK (scm_tc16_avahi_client, mark_avahi_client, client)
 /* The client callback.  Note: it may be called at client creation time with
    C_CLIENT == NULL.  */
 static void
-client_trampoline (AvahiClient *c_client,
-		   AvahiClientState c_state,
-		   void *data)
-#define FUNC_NAME "client_trampoline"
+client_callback (AvahiClient *c_client,
+		 AvahiClientState c_state,
+		 void *data)
+#define FUNC_NAME "client_callback"
 {
   SCM client, callback;
   AvahiClient *c_client2;
@@ -128,7 +134,7 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
   SCM_AVAHI_SET_CLIENT_CALLBACK (client, callback);
   SCM_AVAHI_SET_CLIENT_POLL (client, poll);
 
-  c_client = avahi_client_new (c_poll, c_flags, client_trampoline,
+  c_client = avahi_client_new (c_poll, c_flags, client_callback_trampoline,
 			       (void *) client, &err);
   if (c_client == NULL)
     scm_avahi_error (err, FUNC_NAME);
@@ -137,7 +143,7 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
     SCM_SET_SMOB_DATA (client, (scm_t_bits) c_client);
   else
     {
-      /* The SMOB was updated by `client_trampoline ()': make sure it is
+      /* The SMOB was updated by `client_callback ()': make sure it is
 	 actually valid.  */
       if (SCM_SMOB_DATA (client) != (scm_t_bits) c_client)
 	abort ();
@@ -239,6 +245,12 @@ SCM_DEFINE (scm_avahi_client_state, "client-state",
   return (scm_from_avahi_client_state (c_state));
 }
 #undef FUNC_NAME
+
+
+/* Callback trampolines.  */
+
+#include "client-callbacks.i.c"
+
 
 
 /* Initialization.  */

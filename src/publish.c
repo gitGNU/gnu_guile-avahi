@@ -51,6 +51,12 @@ scm_avahi_entry_group_free (AvahiEntryGroup *c_group)
 #include "publish-enums.i.c"
 
 
+/* Callback forward declarations.  */
+
+#include "publish-callbacks.h"
+
+
+
 /* Procedures.  */
 
 #define SCM_AVAHI_SET_ENTRY_GROUP_CALLBACK(group, callback)	\
@@ -72,9 +78,9 @@ SCM_SMOB_MARK (scm_tc16_avahi_entry_group, mark_entry_group, group)
 }
 
 static void
-entry_group_trampoline (AvahiEntryGroup *c_group,
-			AvahiEntryGroupState c_state,
-			void *data)
+entry_group_callback (AvahiEntryGroup *c_group,
+		      AvahiEntryGroupState c_state,
+		      void *data)
 {
   SCM group, callback;
 
@@ -108,7 +114,7 @@ SCM_DEFINE (scm_avahi_make_entry_group, "make-entry-group",
   SCM_AVAHI_SET_ENTRY_GROUP_CALLBACK (group, callback);
   SCM_AVAHI_SET_ENTRY_GROUP_CLIENT (group, client);
 
-  c_group = avahi_entry_group_new (c_client, entry_group_trampoline,
+  c_group = avahi_entry_group_new (c_client, entry_group_callback_trampoline,
 				   (void *) group);
   if (c_group == NULL)
     scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
@@ -502,6 +508,12 @@ SCM_DEFINE (scm_avahi_alternative_service_name, "alternative-service-name",
   return result;
 }
 #undef FUNC_NAME
+
+
+/* Callback trampolines.  */
+
+#include "publish-callbacks.i.c"
+
 
 
 /* Initialization.  */

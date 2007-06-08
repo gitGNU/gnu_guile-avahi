@@ -25,12 +25,18 @@ EXTRA_DIST =					\
 
 BUILT_SOURCES = common-smobs.h common-enums.h		\
 		client-smobs.h client-enums.h		\
+		client-callbacks.h			\
 		publish-smobs.h publish-enums.h		\
+		publish-callbacks.h			\
 		lookup-smobs.h lookup-enums.h		\
+		lookup-callbacks.h			\
 		common-enums.i.c common-smobs.i.c	\
 		client-enums.i.c client-smobs.i.c	\
+		client-callbacks.i.c			\
 		publish-enums.i.c publish-smobs.i.c	\
+		publish-callbacks.i.c			\
 		lookup-enums.i.c lookup-smobs.i.c	\
+		lookup-callbacks.i.c			\
 		common.c.x watch.c.x client.c.x		\
 		errors.c.x publish.c.x lookup.c.x
 CLEANFILES = $(BUILT_SOURCES)
@@ -56,6 +62,12 @@ AM_CPPFLAGS = -I$(builddir) -I$(srcdir)
 	$(GUILE_FOR_BUILD) $^ `echo $@ | cut -f 1 -d -` > $@
 
 %-smobs.i.c: $(srcdir)/make-smob-types.scm
+	$(GUILE_FOR_BUILD) $^ `echo $@ | cut -f 1 -d -` > $@
+
+%-callbacks.h: $(srcdir)/make-callback-header.scm
+	$(GUILE_FOR_BUILD) $^ `echo $@ | cut -f 1 -d -` > $@
+
+%-callbacks.i.c: $(srcdir)/make-callback-trampolines.scm
 	$(GUILE_FOR_BUILD) $^ `echo $@ | cut -f 1 -d -` > $@
 
 
