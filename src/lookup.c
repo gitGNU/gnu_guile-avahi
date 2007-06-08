@@ -146,16 +146,22 @@ while (0)
 
 
 
+/* Callback forward declarations.  */
+
+#include "lookup-callbacks.h"
+
+
+
 /* Browsers.  */
 
 static void
-domain_browser_trampoline (AvahiDomainBrowser *c_browser,
-			   AvahiIfIndex c_interface,
-			   AvahiProtocol c_protocol,
-			   AvahiBrowserEvent c_event,
-			   const char *c_domain,
-			   AvahiLookupResultFlags c_flags,
-			   void *data)
+domain_browser_callback (AvahiDomainBrowser *c_browser,
+			 AvahiIfIndex c_interface,
+			 AvahiProtocol c_protocol,
+			 AvahiBrowserEvent c_event,
+			 const char *c_domain,
+			 AvahiLookupResultFlags c_flags,
+			 void *data)
 {
   SCM browser, callback;
   SCM interface, protocol;
@@ -226,7 +232,7 @@ SCM_DEFINE (scm_avahi_make_domain_browser, "make-domain-browser",
 
   c_browser = avahi_domain_browser_new (c_client, c_interface, c_protocol,
 					c_domain, c_type, c_flags,
-					domain_browser_trampoline,
+					domain_browser_callback_trampoline,
 					(void *) browser);
   if (c_browser == NULL)
     scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
@@ -239,14 +245,14 @@ SCM_DEFINE (scm_avahi_make_domain_browser, "make-domain-browser",
 
 
 static void
-service_type_browser_trampoline (AvahiServiceTypeBrowser *c_browser,
-				 AvahiIfIndex c_interface,
-				 AvahiProtocol c_protocol,
-				 AvahiBrowserEvent c_event,
-				 const char *c_type,
-				 const char *c_domain,
-				 AvahiLookupResultFlags c_flags,
-				 void *data)
+service_type_browser_callback (AvahiServiceTypeBrowser *c_browser,
+			       AvahiIfIndex c_interface,
+			       AvahiProtocol c_protocol,
+			       AvahiBrowserEvent c_event,
+			       const char *c_type,
+			       const char *c_domain,
+			       AvahiLookupResultFlags c_flags,
+			       void *data)
 {
   SCM browser, callback;
   SCM interface, protocol;
@@ -310,10 +316,11 @@ SCM_DEFINE (scm_avahi_make_service_type_browser, "make-service-type-browser",
   SCM_AVAHI_SET_LOOKUP_CALLBACK (browser, callback);
   SCM_AVAHI_SET_LOOKUP_CLIENT (browser, client);
 
-  c_browser = avahi_service_type_browser_new (c_client, c_interface,
-					      c_protocol, c_domain, c_flags,
-					      service_type_browser_trampoline,
-					      (void *) browser);
+  c_browser =
+    avahi_service_type_browser_new (c_client, c_interface,
+				    c_protocol, c_domain, c_flags,
+				    service_type_browser_callback_trampoline,
+				    (void *) browser);
   if (c_browser == NULL)
     scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
 
@@ -325,15 +332,15 @@ SCM_DEFINE (scm_avahi_make_service_type_browser, "make-service-type-browser",
 
 
 static void
-service_browser_trampoline (AvahiServiceBrowser *c_browser,
-			    AvahiIfIndex c_interface,
-			    AvahiProtocol c_protocol,
-			    AvahiBrowserEvent c_event,
-			    const char *c_name,
-			    const char *c_type,
-			    const char *c_domain,
-			    AvahiLookupResultFlags c_flags,
-			    void *data)
+service_browser_callback (AvahiServiceBrowser *c_browser,
+			  AvahiIfIndex c_interface,
+			  AvahiProtocol c_protocol,
+			  AvahiBrowserEvent c_event,
+			  const char *c_name,
+			  const char *c_type,
+			  const char *c_domain,
+			  AvahiLookupResultFlags c_flags,
+			  void *data)
 {
   SCM browser, callback;
   SCM interface, protocol;
@@ -403,7 +410,7 @@ SCM_DEFINE (scm_avahi_make_service_browser, "make-service-browser",
 
   c_browser = avahi_service_browser_new (c_client, c_interface, c_protocol,
 					 c_type, c_domain, c_flags,
-					 service_browser_trampoline,
+					 service_browser_callback_trampoline,
 					 (void *) browser);
   if (c_browser == NULL)
     scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
@@ -419,19 +426,19 @@ SCM_DEFINE (scm_avahi_make_service_browser, "make-service-browser",
 /* Resolvers.  */
 
 static void
-service_resolver_trampoline (AvahiServiceResolver *c_resolver,
-			     AvahiIfIndex c_interface,
-			     AvahiProtocol c_protocol,
-			     AvahiResolverEvent c_event,
-			     const char *c_name,
-			     const char *c_type,
-			     const char *c_domain,
-			     const char *c_host_name,
-			     const AvahiAddress *c_address,
-			     uint16_t c_port,
-			     AvahiStringList *c_txt,
-			     AvahiLookupResultFlags c_flags,
-			     void *data)
+service_resolver_callback (AvahiServiceResolver *c_resolver,
+			   AvahiIfIndex c_interface,
+			   AvahiProtocol c_protocol,
+			   AvahiResolverEvent c_event,
+			   const char *c_name,
+			   const char *c_type,
+			   const char *c_domain,
+			   const char *c_host_name,
+			   const AvahiAddress *c_address,
+			   uint16_t c_port,
+			   AvahiStringList *c_txt,
+			   AvahiLookupResultFlags c_flags,
+			   void *data)
 {
   SCM resolver, callback;
   SCM interface, protocol;
@@ -517,11 +524,12 @@ SCM_DEFINE (scm_avahi_make_service_resolver, "make-service-resolver",
   SCM_AVAHI_SET_LOOKUP_CALLBACK (resolver, callback);
   SCM_AVAHI_SET_LOOKUP_CLIENT (resolver, client);
 
-  c_resolver = avahi_service_resolver_new (c_client, c_interface, c_protocol,
-					   c_name, c_type, c_domain,
-					   c_a_proto, c_flags,
-					   service_resolver_trampoline,
-					   (void *) resolver);
+  c_resolver =
+    avahi_service_resolver_new (c_client, c_interface, c_protocol,
+				c_name, c_type, c_domain,
+				c_a_proto, c_flags,
+				service_resolver_callback_trampoline,
+				(void *) resolver);
   if (c_resolver == NULL)
     scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
 
@@ -533,14 +541,14 @@ SCM_DEFINE (scm_avahi_make_service_resolver, "make-service-resolver",
 
 
 static void
-host_name_resolver_trampoline (AvahiHostNameResolver *c_resolver,
-			       AvahiIfIndex c_interface,
-			       AvahiProtocol c_protocol,
-			       AvahiResolverEvent c_event,
-			       const char *c_host_name,
-			       const AvahiAddress *c_address,
-			       AvahiLookupResultFlags c_flags,
-			       void *data)
+host_name_resolver_callback (AvahiHostNameResolver *c_resolver,
+			     AvahiIfIndex c_interface,
+			     AvahiProtocol c_protocol,
+			     AvahiResolverEvent c_event,
+			     const char *c_host_name,
+			     const AvahiAddress *c_address,
+			     AvahiLookupResultFlags c_flags,
+			     void *data)
 {
   SCM resolver, callback;
   SCM interface, protocol;
@@ -612,10 +620,11 @@ SCM_DEFINE (scm_avahi_make_host_name_resolver, "make-host-name-resolver",
   SCM_AVAHI_SET_LOOKUP_CALLBACK (resolver, callback);
   SCM_AVAHI_SET_LOOKUP_CLIENT (resolver, client);
 
-  c_resolver = avahi_host_name_resolver_new (c_client, c_interface, c_protocol,
-					     c_name, c_a_proto, c_flags,
-					     host_name_resolver_trampoline,
-					     (void *) resolver);
+  c_resolver =
+    avahi_host_name_resolver_new (c_client, c_interface, c_protocol,
+				  c_name, c_a_proto, c_flags,
+				  host_name_resolver_callback_trampoline,
+				  (void *) resolver);
   if (c_resolver == NULL)
     scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
 
@@ -627,14 +636,14 @@ SCM_DEFINE (scm_avahi_make_host_name_resolver, "make-host-name-resolver",
 
 
 static void
-address_resolver_trampoline (AvahiAddressResolver *c_resolver,
-			     AvahiIfIndex c_interface,
-			     AvahiProtocol c_protocol,
-			     AvahiResolverEvent c_event,
-			     const AvahiAddress *c_address,
-			     const char *c_host_name,
-			     AvahiLookupResultFlags c_flags,
-			     void *data)
+address_resolver_callback (AvahiAddressResolver *c_resolver,
+			   AvahiIfIndex c_interface,
+			   AvahiProtocol c_protocol,
+			   AvahiResolverEvent c_event,
+			   const AvahiAddress *c_address,
+			   const char *c_host_name,
+			   AvahiLookupResultFlags c_flags,
+			   void *data)
 {
   SCM resolver, callback;
   SCM interface, protocol;
@@ -709,10 +718,11 @@ SCM_DEFINE (scm_avahi_make_address_resolver, "make-address-resolver",
   SCM_AVAHI_SET_LOOKUP_CALLBACK (resolver, callback);
   SCM_AVAHI_SET_LOOKUP_CLIENT (resolver, client);
 
-  c_resolver = avahi_address_resolver_new (c_client, c_interface, c_protocol,
-					   &c_address, c_flags,
-					   address_resolver_trampoline,
-					   (void *) resolver);
+  c_resolver =
+    avahi_address_resolver_new (c_client, c_interface, c_protocol,
+				&c_address, c_flags,
+				address_resolver_callback_trampoline,
+				(void *) resolver);
   if (c_resolver == NULL)
     scm_avahi_error (avahi_client_errno (c_client), FUNC_NAME);
 
@@ -721,6 +731,11 @@ SCM_DEFINE (scm_avahi_make_address_resolver, "make-address-resolver",
   return (resolver);
 }
 #undef FUNC_NAME
+
+
+/* Callback trampolines.  */
+
+#include "lookup-callbacks.i.c"
 
 
 

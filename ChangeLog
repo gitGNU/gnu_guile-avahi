@@ -2,6 +2,40 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-08 23:08:08 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-22
+
+    Summary:
+      Have call-backs run in Guile mode.
+    Revision:
+      guile-avahi--devo--0--patch-22
+
+    * modules/Makefile.am (EXTRA_DIST): Added `avahi/build/callbacks.scm'.
+    
+    * src/Makefile.am (BUILT_SOURCES): Added
+      `{client,publish,lookup}-callbacks.{h,i.c}'.
+      (%-callbacks.h, %-callbacks.i.c): New rules.
+    
+    * src/client.c: Include "client-callbacks.h" and "client-callbacks.i.c".
+      (client_trampoline): Renamed to `client_callback'.
+      (scm_avahi_make_client): Use `client_callback_trampoline' instead of
+      `client_callback'.
+    
+    * src/lookup.c: Likewise.
+    
+    * src/publish.c: Likewise.
+
+    new files:
+     modules/avahi/build/callbacks.scm src/make-callback-header.scm
+     src/make-callback-trampolines.scm
+
+    modified files:
+     ChangeLog modules/Makefile.am src/Makefile.am src/client.c
+     src/lookup.c src/publish.c
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-3
+
+
 2007-06-06 21:37:16 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-21
 
     Summary:
