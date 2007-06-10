@@ -102,7 +102,8 @@ SCM_DEFINE (scm_avahi_make_guile_poll, "make-guile-poll",
 	    "event loop code may remove the associated file descriptor "
 	    "from the list of descriptors passed to @code{select}.\n"
 	    "@end itemize\n\n"
-	    "The Guile-Avahi distribution comes with a detailed example.")
+	    "The Guile-Avahi source code distribution comes with a "
+	    "detailed example.")
 #define FUNC_NAME s_scm_avahi_make_guile_poll
 {
   AvahiGuilePoll *c_guile_poll;
