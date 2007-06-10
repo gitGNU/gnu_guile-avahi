@@ -2,6 +2,22 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-10 16:11:55 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-26
+
+    Summary:
+      Cleaned up `guile-poll.scm'.
+    Revision:
+      guile-avahi--devo--0--patch-26
+
+    * tests/guile-poll.scm: Cleaned up.
+
+    modified files:
+     ChangeLog tests/guile-poll.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-7
+
+
 2007-06-10 16:11:41 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-25
 
     Summary:

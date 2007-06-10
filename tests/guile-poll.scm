@@ -211,30 +211,31 @@
                                   (time-min next exit-delay)
                                   (if exit-delay
                                       exit-delay
-                                      next)))
-                    (%%%      (debug "next-deadline: ~a ~a~%"
-                                     (and delay (time-second delay))
-                                     (and delay (time-nanosecond delay))))
-                    (~~~      (debug "fds: ~a ~a ~a~%"
-                                     (length read-fds) (length write-fds)
-                                     (length except-fds)))
-                    (selected (select read-fds write-fds except-fds
-                                      (and delay (time-second delay))
-                                      (and delay
-                                           (quotient (time-nanosecond delay)
-                                                     1000))))
-                    (reads    (car selected))
-                    (writes   (cadr selected))
-                    (excepts  (caddr selected)))
+                                      next))))
+               (debug "next-deadline: ~a ~a~%"
+                      (and delay (time-second delay))
+                      (and delay (time-nanosecond delay)))
+               (debug "fds: ~a ~a ~a~%"
+                      (length read-fds) (length write-fds)
+                      (length except-fds))
 
-               (if (and end-time
-                        (time>? (current-time time-utc) end-time))
-                   #t
-                   (begin
-                     (run-watches reads watch-event/in)
-                     (run-watches writes watch-event/out)
-                     (run-watches excepts watch-event/err)
-                     (loop))))))))))
+               (let* ((selected (select read-fds write-fds except-fds
+                                        (and delay (time-second delay))
+                                        (and delay
+                                             (quotient (time-nanosecond delay)
+                                                       1000))))
+                      (reads    (car selected))
+                      (writes   (cadr selected))
+                      (excepts  (caddr selected)))
+
+                 (if (and end-time
+                          (time>? (current-time time-utc) end-time))
+                     #t
+                     (begin
+                       (run-watches reads watch-event/in)
+                       (run-watches writes watch-event/out)
+                       (run-watches excepts watch-event/err)
+                       (loop)))))))))))
 
 
 
