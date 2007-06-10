@@ -16,8 +16,10 @@
 ;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 (define-module (avahi)
-  :export (watch? watch-fd watch-events watch-user-data invoke-watch
-           timeout? timeout-value timeout-user-data invoke-timeout
+  :export (watch? watch-fd watch-events invoke-watch
+           watch-user-data set-watch-user-data!
+           timeout? timeout-value invoke-timeout
+           timeout-user-data set-timeout-user-data!
 
            poll? simple-poll? guile-poll?
 
