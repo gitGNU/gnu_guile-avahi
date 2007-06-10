@@ -2,6 +2,25 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-10 16:12:07 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-27
+
+    Summary:
+      Small doc improvements.
+    Revision:
+      guile-avahi--devo--0--patch-27
+
+    * doc/guile-avahi.texi (Publishing a Service): Nitpick.
+      (Core Interface): Mention what `make-guile-poll' is for.
+    
+    * src/common.c (scm_avahi_make_guile_poll): Improved docstring.
+
+    modified files:
+     ChangeLog doc/guile-avahi.texi src/common.c
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-8
+
+
 2007-06-10 16:11:55 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-26
 
     Summary:

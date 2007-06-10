@@ -308,6 +308,8 @@ the group's call-back is invoked and passed the
 running so that the service remains published.
 @end itemize
 
+Here is the complete example:
+
 @example
 (use-modules (avahi)
              (avahi client)
@@ -473,8 +475,11 @@ This section lists the Scheme procedures exported by the
 @include common.c.texi
 
 The low-level API for watches, timeouts, and ``polls'', all of which
-serve as building blocks for the create of event loops (e.g., using
-@code{make-guile-poll}) are described below.
+serve as building blocks for the creation of event loops (using
+@code{make-guile-poll}) are described below.  In practice, you should
+only need it in applications where the Avahi event loop needs to be
+integrated in some other event loop; in other cases, the ``simple
+poll'' should be enough.
 
 @include watch.c.texi
 
