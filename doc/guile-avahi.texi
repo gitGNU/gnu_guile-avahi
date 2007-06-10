@@ -281,7 +281,172 @@ as in this example.
 
 This chapter lists examples that illustrate common use cases.
 
-FIXME: Actually it doesn't.
+@menu
+* Publishing a Service::        Advertising a service.
+* Browsing Published Services:: Looking for services.
+* Resolving Services::          Finding a service's IP address and port.
+@end menu
+
+@node Publishing a Service, Browsing Published Services, Examples, Examples
+@section Publishing a Service
+
+The following example shows the simplest way to publish a service.
+There are several stages:
+
+@itemize
+@item Create an Avahi client using @code{make-client}.  This will
+actually connect the application to the Avahi daemon that will
+eventually perform operations on behalf of the application.
+@item When the client switches to the running state (i.e.,
+@code{client-state/s-running}), create an @dfn{entry group} with
+@code{make-entry-group} and add a service (or several services,
+addresses, etc.) to it.
+@item Commit the entry group using @code{commit-entry-group}.
+@item When all entries in the group have been successfully published,
+the group's call-back is invoked and passed the
+@code{entry-group-state/established} state.  The application must keep
+running so that the service remains published.
+@end itemize
+
+@example
+(use-modules (avahi)
+             (avahi client)
+             (avahi client publish))
+
+(define (group-callback group state)
+  (if (eq? state entry-group-state/established)
+      (format #t "service is now published!~%")))
+
+(define client-callback
+  (let ((group #f))
+    (lambda (client state)
+      (if (eq? state client-state/s-running)
+          (begin
+            ;; The client is now running so we can create an entry
+            ;; group and publish a service.
+            (set! group (make-entry-group client group-callback))
+            (add-entry-group-service! group interface/unspecified
+                                      protocol/unspecified '()
+                                      "my-avahi-service"
+                                      "_some-service-type._tcp"
+                                      #f #f ;; any domain and host
+                                      1234  ;; the port number
+
+                                      ;; additional `txt' properties
+                                      "scheme=yes" "java=no")
+
+            ;; Commit the entry group, i.e., actually publish
+            ;; the service.
+            (commit-entry-group group))))))
+
+;; The main loop.
+(let* ((poll (make-simple-poll))
+       (client (make-client (simple-poll poll)
+                            '() ;; no flags
+                            client-callback)))
+  (and (client? client)
+
+       ;; Run forever.
+       (run-simple-poll poll)))
+@end example
+
+Of course, publishing a host address or service subtype works
+similarly.
+
+
+@node Browsing Published Services, Resolving Services, Publishing a Service, Examples
+@section Browsing Published Services
+
+Browsing advertised services requires a number of stages.  First, an
+Avahi daemon client must be created, as usual (@pxref{Publishing a
+Service}).
+
+@example
+(use-modules (avahi)
+             (avahi client)
+             (avahi client lookup))
+
+(define %service-type
+  ;; The type of services we are looking for.
+  "_workstation._tcp")
+
+(define (service-browser-callback browser interface protocol event
+                                  service-name service-type
+                                  domain flags)
+  (if (eq? event browser-event/new)
+      (format #t "found service `~a' of type `~a'~%"
+              service-name service-type)))
+
+(define client-callback
+  (let ((browser #f))
+    (lambda (client state)
+      (if (eq? state client-state/s-running)
+          ;; Now that the client is up and running, create a service
+          ;; browser looking for services of type `%service-type' on
+          ;; any network interface and using any protocol.
+          (set! browser
+                (make-service-browser client
+                                      interface/unspecified
+                                      protocol/unspecified
+                                      %service-type #f '()
+                                      service-browser-callback))))))
+
+
+(let* ((poll (make-simple-poll))
+       (client (make-client (simple-poll poll)
+                            '() ;; no flags
+                            client-callback)))
+  (and (client? client)
+       (run-simple-poll poll)))
+@end example
+
+In this example, the service type being looked for is
+@code{"_workstation._tcp"}.  It is used to advertise the presence of
+computers on a local area network, rather than an actual service.
+
+@node Resolving Services,  , Browsing Published Services, Examples
+@section Resolving Services
+
+The previous example allowed us to @emph{find} services of a given
+type, but did not provide us with information such as the IP address
+of the host providing the service and the port number where the
+service can be found.  To obtain this information, a @dfn{service
+resolver} must be launched, e.g., by augmenting the service browser
+call-back as follows:
+
+@example
+(define (service-browser-callback browser interface protocol event
+                                  service-name service-type
+                                  domain flags)
+
+  (define (service-resolver-callback resolver interface protocol event
+                                     service-name service-type domain
+                                     host-name address-type address port
+                                     txt flags)
+    ;; Handle service resolution events.
+    (cond ((eq? event resolver-event/found)
+           (format #t "resolved service `~a' at `~a:~a'~%"
+                   service-name host-name port))
+          ((eq? event resolver-event/failure)
+           (format #t "failed to resolve service `~a'~%"
+                   service-name))))
+
+  (if (eq? event browser-event/new)
+      (begin
+        (format #t "found service `~a' of type `~a'~%"
+                service-name service-type)
+
+        ;; Launch a service resolver for the service we just found.
+        (make-service-resolver (service-browser-client browser)
+                               interface protocol
+                               service-name service-type domain
+                               protocol/unspecified '()
+                               service-resolver-callback))))
+@end example
+
+Now you know all the important things you need to know to benefit from
+Avahi!
+
 
 
 @c *********************************************************************
