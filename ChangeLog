@@ -2,6 +2,23 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-12 19:04:21 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-35
+
+    Summary:
+      Added missing files.
+    Revision:
+      guile-avahi--devo--0--patch-35
+
+    * src/Makefile.am (EXTRA_DIST): Added `make-callback-header.scm' and
+      `make-callback-trampolines.scm'.
+
+    modified files:
+     ChangeLog src/Makefile.am
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-16
+
+
 2007-06-12 14:39:21 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-34
 
     Summary:
