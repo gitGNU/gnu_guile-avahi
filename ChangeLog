@@ -2,6 +2,21 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-12 10:31:45 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-30
+
+    Summary:
+      Documented `{browser,resolver}-event' values.
+    Revision:
+      guile-avahi--devo--0--patch-30
+
+
+    modified files:
+     ChangeLog doc/guile-avahi.texi
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-11
+
+
 2007-06-12 10:31:29 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-29
 
     Summary:

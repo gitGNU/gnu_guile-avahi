@@ -594,6 +594,40 @@ Procedures to create browsers and resolvers are described below.
 
 @include lookup.c.texi
 
+Browser and resolver call-backs are usually passed a browser event or
+resolver event value, respectively, among the following:
+
+@defvr {Scheme Variable} browser-event/new
+The object is new on the network.
+@end defvr
+
+@defvr {Scheme Variable} browser-event/remove
+The object has been removed from the network.
+@end defvr
+
+@defvr {Scheme Variable} browser-event/cache-exhausted
+One-time event, to notify the user that all entries from the caches
+have been sent.
+@end defvr
+
+@defvr {Scheme Variable} browser-event/all-for-now
+One-time event, to notify the user that more records will probably not
+show up in the near future, i.e., all cache entries have been read and
+all static servers been queried.
+@end defvr
+
+@defvr {Scheme Variable} browser-event/failure
+Browsing failed.
+@end defvr
+
+@defvr {Scheme Variable} resolver-event/found
+RR found, resolving successful.
+@end defvr
+
+@defvr {Scheme Variable} resolver-event/failure
+Resolving failed.
+@end defvr
+
 
 @c *********************************************************************
 @node Concept Index, Procedure Index, API Reference, Top
