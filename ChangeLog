@@ -2,6 +2,25 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-12 14:39:00 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-32
+
+    Summary:
+      Small doc improvements and fixes.
+    Revision:
+      guile-avahi--devo--0--patch-32
+
+    * src/common.c (scm_avahi_make_guile_poll): Renamed arguments to
+      `update_XXX_x' to denote their mutability aspect.  Updated docstring.
+    
+    * modules/avahi/client/publish.scm: Fixed typo for `entry-group-client'.
+
+    modified files:
+     ChangeLog modules/avahi/client/publish.scm src/common.c
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-13
+
+
 2007-06-12 14:38:46 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-31
 
     Summary:
