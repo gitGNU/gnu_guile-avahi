@@ -2,6 +2,37 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-12 14:39:10 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-33
+
+    Summary:
+      Fixed and augmented the `guile-poll.scm' test.
+    Revision:
+      guile-avahi--devo--0--patch-33
+
+    * modules/avahi/test.scm (%service-type, make-name-constructor,
+      make-service-name, make-host-name, %timeout-sec): New.
+    
+    * tests/Makefile.am (TESTS): Run `guile-poll.scm' as the last test.
+    
+    * tests/guile-poll.scm: Use modules `lookup' and `publish'.
+      (run-timeouts): Removed.
+      (make-avahi-client-event-loop)[run-timeouts!]: New.  This fixes a bug
+      where modification to the TIMEOUTS global from within `invoke-timeout'
+      were annulled by a later `set!'.
+      (main)[%group, %browser, seen-service?, make-service-browser-callback,
+      make-group-callback]: New.
+      [client-callback]: Create a new entry group.
+      Make stdout unbuffered.  Loop until the published service is found,
+      iterate at most %TIMEOUT-SEC seconds.
+
+    modified files:
+     ChangeLog modules/avahi/test.scm tests/Makefile.am
+     tests/guile-poll.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-14
+
+
 2007-06-12 14:39:00 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-32
 
     Summary:

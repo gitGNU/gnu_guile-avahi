@@ -15,8 +15,9 @@
 #  License along with Guile-Avahi; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-TESTS = simple-poll.scm guile-poll.scm publish.scm	\
-	publish+browse.scm publish+resolve.scm
+TESTS = simple-poll.scm publish.scm		\
+	publish+browse.scm publish+resolve.scm	\
+        guile-poll.scm
 
 EXTRA_DIST = $(TESTS)
 
