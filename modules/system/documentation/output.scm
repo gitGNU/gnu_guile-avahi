@@ -49,11 +49,15 @@ form, e.g., one with dashed instead of underscores, etc."
                 (if (eq? chr #\_)
                     #\-
                     chr))
-              (if (string-suffix? "_p" str)
-                  (string-append (substring str 0
-                                            (- (string-length str) 2))
-                                 "?")
-                  str)))
+              (cond ((string-suffix? "_p" str)
+                     (string-append (substring str 0
+                                               (- (string-length str) 2))
+                                    "?"))
+                    ((string-suffix? "_x" str)
+                     (string-append (substring str 0
+                                               (- (string-length str) 2))
+                                    "!"))
+                    (else str))))
 
 
 ;;;
@@ -73,7 +77,7 @@ form, e.g., one with dashed instead of underscores, etc."
 and whose signature is defined by @var{required-args}, @var{optional-args}
 and @var{rest-arg?}."
   (string-append "@deffn {Scheme Procedure} " proc-name " "
-                 (string-join (take args required-args) " ")
+                 (string-join (take args required-args))
                  (string-join (take (drop args required-args)
                                     (+ optional-args
                                        (if rest-arg? 1 0)))
