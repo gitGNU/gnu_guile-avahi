@@ -76,8 +76,8 @@ SCM_SMOB_MARK (scm_tc16_avahi_guile_poll, mark_avahi_guile_poll, guile_poll)
 
 SCM_DEFINE (scm_avahi_make_guile_poll, "make-guile-poll",
 	    6, 0, 0,
-	    (SCM new_watch, SCM update_watch, SCM free_watch,
-	     SCM new_timeout, SCM update_timeout, SCM free_timeout),
+	    (SCM new_watch, SCM update_watch_x, SCM free_watch,
+	     SCM new_timeout, SCM update_timeout_x, SCM free_timeout),
 	    "Return a @code{guile-poll} object that can then be used to "
 	    "handle I/O events for Avahi objects such as clients.  All "
 	    "arguments should be procedures:\n\n"
@@ -91,10 +91,10 @@ SCM_DEFINE (scm_avahi_make_guile_poll, "make-guile-poll",
 	    "a number of seconds and nanoseconds representing the absolute "
 	    "date when the timeout expires, or @code{#f} if the newly "
 	    "created timeout is disabled.\n"
-	    "@item @var{update-watch} and @var{update-timeout} are called "
+	    "@item @var{update-watch!} and @var{update-timeout!} are called "
 	    "to modify a previously created watch or timeout.  "
-	    "@var{update-watch} is passed the @code{watch} object and a "
-	    "new list of events; @var{update-timeout} is passed a new "
+	    "@var{update-watch!} is passed the @code{watch} object and a "
+	    "new list of events; @var{update-timeout!} is passed a new "
 	    "expiration time or @code{#f}.\n"
 	    "@item Finally, @var{free-watch} and @var{free-timeout} are "
 	    "called when the poll is asked to to no longer look handle "
@@ -108,8 +108,8 @@ SCM_DEFINE (scm_avahi_make_guile_poll, "make-guile-poll",
 {
   AvahiGuilePoll *c_guile_poll;
 
-  c_guile_poll = avahi_guile_poll_new (new_watch, update_watch, free_watch,
-				       new_timeout, update_timeout,
+  c_guile_poll = avahi_guile_poll_new (new_watch, update_watch_x, free_watch,
+				       new_timeout, update_timeout_x,
 				       free_timeout);
   if (!c_guile_poll)
     scm_avahi_error (AVAHI_ERR_NO_MEMORY, FUNC_NAME);
