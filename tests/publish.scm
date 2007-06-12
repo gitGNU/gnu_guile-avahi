@@ -21,18 +21,8 @@
 
 (use-modules (avahi)
              (avahi client)
-             (avahi client publish))
-
-(define (make-name-constructor prefix)
-  (lambda ()
-    (string-append "guile-avahi-" prefix "-"
-                   (number->string (car (gettimeofday)) 16))))
-
-(define make-service-name
-  (make-name-constructor "service"))
-
-(define make-host-name
-  (make-name-constructor "host"))
+             (avahi client publish)
+             (avahi test))
 
 
 (dynamic-wind
@@ -54,7 +44,7 @@
                   (add-entry-group-service! group interface/unspecified
                                             protocol/unspecified '()
                                             (make-service-name)
-                                            "_guile-avahi._tcp" #f #f
+                                            %service-type #f #f
                                             1234 "scheme=yes" "java=no")
                   (add-entry-group-address! group interface/unspecified
                                             protocol/unspecified '()
