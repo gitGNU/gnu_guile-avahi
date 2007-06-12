@@ -2,6 +2,28 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-12 14:38:46 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-31
+
+    Summary:
+      Small documentation system improvements.
+    Revision:
+      guile-avahi--devo--0--patch-31
+
+    * modules/system/documentation/c-snarf.scm: Don't use `srfi-39'
+      (unneeded).
+    
+    * modules/system/documentation/output.scm (schemify-name): Handle names
+      ending in `_x'.
+      (scheme-procedure-texi-line): Omit last argument of `string-join'.
+
+    modified files:
+     ChangeLog modules/system/documentation/c-snarf.scm
+     modules/system/documentation/output.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-12
+
+
 2007-06-12 10:31:45 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-30
 
     Summary:

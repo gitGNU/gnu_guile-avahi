@@ -23,7 +23,6 @@
 
   :use-module (srfi srfi-13)
   :use-module (srfi srfi-14)
-  :use-module (srfi srfi-39)
 
   :export (run-cpp-and-extract-snarfing
            parse-snarfing
