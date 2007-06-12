@@ -19,9 +19,10 @@ GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules
 
 noinst_HEADERS = watch.h utils.h errors.h
 
-EXTRA_DIST =					\
-  make-enum-map.scm make-smob-types.scm		\
-  make-enum-header.scm make-smob-header.scm
+EXTRA_DIST =							\
+  make-enum-map.scm make-smob-types.scm				\
+  make-enum-header.scm make-smob-header.scm			\
+  make-callback-header.scm make-callback-trampolines.scm
 
 BUILT_SOURCES = common-smobs.h common-enums.h		\
 		client-smobs.h client-enums.h		\
