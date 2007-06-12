@@ -17,11 +17,15 @@
 
 ;;;
 ;;; Excercise the guile-poll and client APIs, assuming the Avahi daemon is
-;;; reachable.
+;;; reachable.  This implementation uses an imperative style (full of
+;;; `set!'s), which is greatly encourage by Avahi's API, unfortunately.
 ;;;
 
 (use-modules (avahi)
              (avahi client)
+             (avahi client lookup)
+             (avahi client publish)
+             (avahi test)
              (srfi srfi-1)
              (srfi srfi-11)
              (srfi srfi-19))
@@ -37,6 +41,7 @@
   (if debug?
       (apply format #t args)))
 
+
 
 ;;;
 ;;; Timeout helper functions.
@@ -49,6 +54,9 @@
   (define timeout-pair
     (cons timeout expiry))
 
+  (debug "inserting timeout ~a (~a)~%"
+         timeout (date->string (time-utc->date expiry)))
+
   (let loop ((remaining lst)
              (previous  '()))
     (if (null? remaining)
@@ -59,25 +67,6 @@
                       (cons timeout-pair remaining))
               (loop (cdr remaining)
                     (cons current previous)))))))
-
-(define (run-timeouts timeouts)
-  ;; Invoke the timeouts from TIMEOUTS (a list of timeout-time pairs) that
-  ;; need to be invoked.
-  (define now
-    (current-time time-utc))
-
-  (debug "running timeouts: ~a~%" (length timeouts))
-
-  (drop-while (lambda (timeout+time)
-                (and (time<=? (cdr timeout+time) now)
-                     (begin
-                       (debug "invoking ~a (~a)~%"
-                              (car timeout+time)
-                              (date->string
-                               (time-utc->date (cdr timeout+time))))
-                       (invoke-timeout (car timeout+time))
-                       #t)))
-              timeouts))
 
 (define (time-before-next-deadline timeouts)
   ;; Return a `time-duration' object indicating the remaining time before the
@@ -110,6 +99,39 @@
   (define write-fds '())
   (define except-fds '())
   (define timeouts '())
+
+  (define (run-timeouts!)
+    ;; Invoke the timeouts from TIMEOUTS (a list of timeout-time pairs) that
+    ;; need to be invoked.
+    (define now
+      (current-time time-utc))
+
+    (define (expired? timeout+time)
+      (let ((deadline (cdr timeout+time)))
+        (time<=? deadline now)))
+
+    (debug "running timeouts: ~a~%" (length timeouts))
+
+    (let-values (((to-run remaining)
+                  (span expired? timeouts)))
+
+      (debug "to-run=~a remaining=~a~%"
+             to-run remaining)
+
+      ;; First update the timeout list.
+      (set! timeouts remaining)
+
+      ;; Then run the timeouts.  They might actually add new timeouts through
+      ;; `update-timeout!' or `new-timeout', hence the need to do things in this
+      ;; order.
+      (for-each (lambda (timeout+time)
+                  (debug "invoking ~a (~a)~%"
+                         (car timeout+time)
+                         (date->string
+                          (time-utc->date (cdr timeout+time))))
+                  (invoke-timeout (car timeout+time)))
+                to-run)))
+
 
   (define (run-watches fd-list event)
     (debug "running watches: ~a ~a~%"
@@ -203,7 +225,7 @@
                             (make-time time-duration 0 exit-delay-sec))))
 
        (let loop ()
-         (set! timeouts (run-timeouts timeouts))
+         (run-timeouts!)
          (if (every null? (list read-fds write-fds except-fds))
              #f
              (let* ((next     (time-before-next-deadline timeouts))
@@ -218,6 +240,7 @@
                (debug "fds: ~a ~a ~a~%"
                       (length read-fds) (length write-fds)
                       (length except-fds))
+               (debug "timeouts: ~a~%" (length timeouts))
 
                (let* ((selected (select read-fds write-fds except-fds
                                         (and delay (time-second delay))
@@ -251,19 +274,62 @@
       (define %client-flags
         (list client-flag/ignore-user-config))
 
+      ;; Prevent them from being prematurely GC'd.
+      (define %group #f)
+      (define %browser #f)
+
+      (define seen-service? #f)
+
+      (define (make-service-browser-callback expected-service-name)
+        (lambda (browser interface protocol event
+                 service-name service-type domain flags)
+          (debug "service-browser: ~a ~a ~a ~a ~a~%"
+                 event service-name service-type domain flags)
+          (set! seen-service?
+                (or seen-service?
+                    (and (eq? event browser-event/new)
+                         (equal? expected-service-name service-name))))))
+
+      (define (make-group-callback service-name)
+        (lambda (group state)
+          (debug "group-state: ~a~%" state)
+          (if (eq? state entry-group-state/established)
+              (let ((callback (make-service-browser-callback service-name)))
+                (set! %browser
+                      (make-service-browser (entry-group-client group)
+                                            interface/unspecified
+                                            protocol/unspecified
+                                            %service-type #f '()
+                                            callback))))))
+
       (define (client-callback client state)
         (debug "client-callback: ~a ~a~%" client state)
         (if (not (and (client? client)
                       (string? (client-state->string state))))
-            (throw 'failure)))
+            (throw 'failure)
+            (let* ((service-name (make-service-name))
+                   (callback     (make-group-callback service-name))
+                   (group        (make-entry-group client callback)))
+              (set! %group group)
+              (add-entry-group-service! group interface/unspecified
+                                        protocol/unspecified '()
+                                        service-name %service-type #f #f
+                                        1234 "scheme=yes" "java=no")
+              (commit-entry-group group))))
+
+      (setvbuf (current-output-port) _IONBF)
 
       (exit (let-values (((client iterate)
                           (make-avahi-client-event-loop %client-flags
                                                         client-callback)))
-              (and (iterate 1)
-                   (string? (client-server-version client))
-                   (eq? (client-state client)
-                        client-state/s-running)))))
+              (let loop ((seconds 0))
+                (if (> seconds %timeout-sec)
+                    #f
+                    (and (iterate 1)
+                         (string? (client-server-version client))
+                         (eq? (client-state client)
+                              client-state/s-running)
+                         (or seen-service? (loop (+ seconds 1)))))))))
 
     (lambda ()
       ;; failure.

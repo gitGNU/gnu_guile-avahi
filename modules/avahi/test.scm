@@ -17,20 +17,39 @@
 
 (define-module (avahi test)
   :use-module (avahi)
-  :export (iterate-simple-poll-until-true))
+  :export (%service-type make-service-name make-host-name
+           %timeout-sec iterate-simple-poll-until-true))
 
 ;;;
 ;;; Facilities for the test suite.
 ;;;
 
+(define %service-type
+  ;; The default service type used for testing.
+  "_guile-avahi._tcp")
+
+(define (make-name-constructor prefix)
+  (lambda ()
+    (string-append "guile-avahi-" prefix "-"
+                   (number->string (car (gettimeofday)) 16))))
+
+(define make-service-name
+  ;; Return a new, hopefully unique service name.
+  (make-name-constructor "service"))
+
+(define make-host-name
+  ;; Return a new, hopefully unique host name.
+  (make-name-constructor "host"))
+
+
+(define %timeout-sec
+  ;; Number of seconds after which the test is considered failed.
+  5)
+
 (define (iterate-simple-poll-until-true poll pred)
   "Iterate @var{poll} until @var{pred} is true or a reasonable deadline has
 been reached.  Returns @var{#t} on success (i.e., if @var{pred} returned
 true) and @var{#f} otherwise."
-
-  (define %timeout-sec
-    ;; Number of seconds after which the test is considered failed.
-    5)
 
   (let ((start (gettimeofday)))
     (let loop ((now (gettimeofday)))
