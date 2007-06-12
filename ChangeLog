@@ -2,6 +2,31 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-12 14:39:21 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-34
+
+    Summary:
+      Factorized common test-suite code.
+    Revision:
+      guile-avahi--devo--0--patch-34
+
+    * tests/publish+browse.scm (%service-type): Removed.
+      (%service-name): Use `make-service-name'.
+    
+    * tests/publish+resolve.scm (%service-type): Removed.
+      (%service-name): Use `make-service-name'.
+    
+    * tests/publish.scm: Use `(avahi test)'.
+      (make-name-constructor, make-service-name, make-host-name): Removed.
+      (main): Use `%service-type'.
+
+    modified files:
+     ChangeLog tests/publish+browse.scm tests/publish+resolve.scm
+     tests/publish.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-15
+
+
 2007-06-12 14:39:10 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-33
 
     Summary:

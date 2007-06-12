@@ -26,11 +26,8 @@
              (avahi client lookup)
              (avahi test))
 
-(define %service-type
-  "_guile-avahi._tcp")
-
 (define %service-name
-  "guile-avahi-service")
+  (make-service-name))
 
 
 
