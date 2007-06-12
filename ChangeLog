@@ -2,6 +2,21 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-12 10:31:29 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-29
+
+    Summary:
+      Documented `{client,publish,lookup}-flag' values.
+    Revision:
+      guile-avahi--devo--0--patch-29
+
+
+    modified files:
+     ChangeLog doc/guile-avahi.texi
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-10
+
+
 2007-06-11 21:03:28 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-28
 
     Summary:
