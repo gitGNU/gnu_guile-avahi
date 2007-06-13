@@ -441,7 +441,7 @@ service_resolver_callback (AvahiServiceResolver *c_resolver,
 			   void *data)
 {
   SCM resolver, callback;
-  SCM interface, protocol;
+  SCM interface, protocol, address, address_type;
 
   resolver = SCM_PACK ((scm_t_bits) data);
   callback = SCM_AVAHI_LOOKUP_CALLBACK (resolver);
@@ -450,6 +450,10 @@ service_resolver_callback (AvahiServiceResolver *c_resolver,
     ? SCM_BOOL_F : scm_from_avahi_interface_index (c_interface);
   protocol  = (c_protocol  < 0)
     ? SCM_BOOL_F : scm_from_avahi_protocol (c_protocol);
+  address = (c_address == NULL)
+    ? SCM_BOOL_F : scm_from_avahi_address (c_address);
+  address_type = (c_address == NULL)
+    ? SCM_BOOL_F : scm_from_avahi_protocol (c_address->proto);
 
   (void) scm_apply (callback,
 		    scm_list_n (resolver, interface, protocol,
@@ -458,8 +462,7 @@ service_resolver_callback (AvahiServiceResolver *c_resolver,
 				scm_from_avahi_service_type (c_type),
 				scm_from_avahi_domain (c_domain),
 				scm_from_avahi_host_name (c_host_name),
-				scm_from_avahi_protocol (c_address->proto),
-				scm_from_avahi_address (c_address),
+				address_type, address,
 				scm_from_ushort (c_port),
 				scm_from_avahi_string_list (c_txt),
 				scm_from_avahi_lookup_result_flags (c_flags),
@@ -551,7 +554,7 @@ host_name_resolver_callback (AvahiHostNameResolver *c_resolver,
 			     void *data)
 {
   SCM resolver, callback;
-  SCM interface, protocol;
+  SCM interface, protocol, address, address_type;;
 
   resolver = SCM_PACK ((scm_t_bits) data);
   callback = SCM_AVAHI_LOOKUP_CALLBACK (resolver);
@@ -560,13 +563,16 @@ host_name_resolver_callback (AvahiHostNameResolver *c_resolver,
     ? SCM_BOOL_F : scm_from_avahi_interface_index (c_interface);
   protocol  = (c_protocol  < 0)
     ? SCM_BOOL_F : scm_from_avahi_protocol (c_protocol);
+  address = (c_address == NULL)
+    ? SCM_BOOL_F : scm_from_avahi_address (c_address);
+  address_type = (c_address == NULL)
+    ? SCM_BOOL_F : scm_from_avahi_protocol (c_address->proto);
 
   (void) scm_apply (callback,
 		    scm_list_n (resolver, interface, protocol,
 				scm_from_avahi_resolver_event (c_event),
 				scm_from_avahi_host_name (c_host_name),
-				scm_from_avahi_protocol (c_address->proto),
-				scm_from_avahi_address (c_address),
+				address_type, address,
 				scm_from_avahi_lookup_result_flags (c_flags),
 				SCM_UNDEFINED),
 		    SCM_EOL);
@@ -646,7 +652,7 @@ address_resolver_callback (AvahiAddressResolver *c_resolver,
 			   void *data)
 {
   SCM resolver, callback;
-  SCM interface, protocol;
+  SCM interface, protocol, address, address_type;
 
   resolver = SCM_PACK ((scm_t_bits) data);
   callback = SCM_AVAHI_LOOKUP_CALLBACK (resolver);
@@ -655,12 +661,15 @@ address_resolver_callback (AvahiAddressResolver *c_resolver,
     ? SCM_BOOL_F : scm_from_avahi_interface_index (c_interface);
   protocol  = (c_protocol  < 0)
     ? SCM_BOOL_F : scm_from_avahi_protocol (c_protocol);
+  address = (c_address == NULL)
+    ? SCM_BOOL_F : scm_from_avahi_address (c_address);
+  address_type = (c_address == NULL)
+    ? SCM_BOOL_F : scm_from_avahi_protocol (c_address->proto);
 
   (void) scm_apply (callback,
 		    scm_list_n (resolver, interface, protocol,
 				scm_from_avahi_resolver_event (c_event),
-				scm_from_avahi_protocol (c_address->proto),
-				scm_from_avahi_address (c_address),
+				address_type, address,
 				scm_from_avahi_host_name (c_host_name),
 				scm_from_avahi_lookup_result_flags (c_flags),
 				SCM_UNDEFINED),
