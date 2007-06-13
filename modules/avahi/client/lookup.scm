@@ -31,6 +31,11 @@
            lookup-flag/use-wide-area lookup-flag/use-multicast
            lookup-flag/no-txt lookup-flag/no-address
 
+           lookup-result-flag/cached
+           lookup-result-flag/wide-area lookup-result-flag/multicast
+           lookup-result-flag/local lookup-result-flag/our-own
+           lookup-result-flag/static
+
            domain-browser-type->string
            domain-browser-type/browse domain-browser-type/browse-default
            domain-browser-type/register domain-browser-type/register-default
