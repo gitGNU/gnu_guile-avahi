@@ -6,7 +6,7 @@ AC_INIT(guile-avahi, 0.0, ludovic.courtes@laas.fr)
 AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_MACRO_DIR(m4)
 
-AM_INIT_AUTOMAKE(guile-avahi, 0.0)
+AM_INIT_AUTOMAKE(guile-avahi, 0.1)
 
 
 AC_CONFIG_SRCDIR([src/common.c])
