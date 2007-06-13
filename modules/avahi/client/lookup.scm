@@ -31,6 +31,7 @@
            lookup-flag/use-wide-area lookup-flag/use-multicast
            lookup-flag/no-txt lookup-flag/no-address
 
+           lookup-result-flag->string
            lookup-result-flag/cached
            lookup-result-flag/wide-area lookup-result-flag/multicast
            lookup-result-flag/local lookup-result-flag/our-own

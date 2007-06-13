@@ -223,7 +223,7 @@ SCM_SMOB_MARK (scm_tc16_avahi_timeout, mark_avahi_timeout, timeout)
 SCM_DEFINE (scm_avahi_invoke_watch, "invoke-watch",
 	    2, 0, 0,
 	    (SCM watch, SCM events),
-	    "Invoke the call-back associate with @var{watch}.  This "
+	    "Invoke the call-back associated with @var{watch}.  This "
 	    "notifies the interested code that the events listed in "
 	    "@var{events} (a list of @code{watch-event/} values) occurred "
 	    "on the file descriptor associated with @var{watch}.  The "
