@@ -56,7 +56,8 @@
         ;;        event service-type domain flags)
         (set! seen-service-type?
               (or seen-service-type?
-                  (equal? %service-type service-type))))
+                  (and (eq? event browser-event/new)
+                       (equal? %service-type service-type)))))
 
       (define (service-browser-callback browser interface protocol event
                                         service-name service-type
@@ -65,7 +66,9 @@
         ;;        event service-name service-type domain flags)
         (set! seen-service?
               (or seen-service?
-                  (equal? %service-name service-name))))
+                  (and (eq? event browser-event/new)
+                       (memq lookup-result-flag/our-own flags)
+                       (equal? %service-name service-name)))))
 
       (define (make-group-callback client)
         (lambda (group state)
