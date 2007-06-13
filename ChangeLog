@@ -2,6 +2,379 @@
 # arch-tag: automatic-ChangeLog--lcourtes@laas.fr--2006-libre/guile-avahi--devo--0
 #
 
+2007-06-12 20:40:20 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	version-0
+
+    Summary:
+      Released version 0.0.
+    Revision:
+      guile-avahi--devo--0--version-0
+
+
+    modified files:
+     ChangeLog
+
+
+2007-06-12 19:04:21 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-35
+
+    Summary:
+      Added missing files.
+    Revision:
+      guile-avahi--devo--0--patch-35
+
+    * src/Makefile.am (EXTRA_DIST): Added `make-callback-header.scm' and
+      `make-callback-trampolines.scm'.
+
+    modified files:
+     ChangeLog src/Makefile.am
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-16
+
+
+2007-06-12 14:39:21 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-34
+
+    Summary:
+      Factorized common test-suite code.
+    Revision:
+      guile-avahi--devo--0--patch-34
+
+    * tests/publish+browse.scm (%service-type): Removed.
+      (%service-name): Use `make-service-name'.
+    
+    * tests/publish+resolve.scm (%service-type): Removed.
+      (%service-name): Use `make-service-name'.
+    
+    * tests/publish.scm: Use `(avahi test)'.
+      (make-name-constructor, make-service-name, make-host-name): Removed.
+      (main): Use `%service-type'.
+
+    modified files:
+     ChangeLog tests/publish+browse.scm tests/publish+resolve.scm
+     tests/publish.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-15
+
+
+2007-06-12 14:39:10 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-33
+
+    Summary:
+      Fixed and augmented the `guile-poll.scm' test.
+    Revision:
+      guile-avahi--devo--0--patch-33
+
+    * modules/avahi/test.scm (%service-type, make-name-constructor,
+      make-service-name, make-host-name, %timeout-sec): New.
+    
+    * tests/Makefile.am (TESTS): Run `guile-poll.scm' as the last test.
+    
+    * tests/guile-poll.scm: Use modules `lookup' and `publish'.
+      (run-timeouts): Removed.
+      (make-avahi-client-event-loop)[run-timeouts!]: New.  This fixes a bug
+      where modification to the TIMEOUTS global from within `invoke-timeout'
+      were annulled by a later `set!'.
+      (main)[%group, %browser, seen-service?, make-service-browser-callback,
+      make-group-callback]: New.
+      [client-callback]: Create a new entry group.
+      Make stdout unbuffered.  Loop until the published service is found,
+      iterate at most %TIMEOUT-SEC seconds.
+
+    modified files:
+     ChangeLog modules/avahi/test.scm tests/Makefile.am
+     tests/guile-poll.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-14
+
+
+2007-06-12 14:39:00 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-32
+
+    Summary:
+      Small doc improvements and fixes.
+    Revision:
+      guile-avahi--devo--0--patch-32
+
+    * src/common.c (scm_avahi_make_guile_poll): Renamed arguments to
+      `update_XXX_x' to denote their mutability aspect.  Updated docstring.
+    
+    * modules/avahi/client/publish.scm: Fixed typo for `entry-group-client'.
+
+    modified files:
+     ChangeLog modules/avahi/client/publish.scm src/common.c
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-13
+
+
+2007-06-12 14:38:46 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-31
+
+    Summary:
+      Small documentation system improvements.
+    Revision:
+      guile-avahi--devo--0--patch-31
+
+    * modules/system/documentation/c-snarf.scm: Don't use `srfi-39'
+      (unneeded).
+    
+    * modules/system/documentation/output.scm (schemify-name): Handle names
+      ending in `_x'.
+      (scheme-procedure-texi-line): Omit last argument of `string-join'.
+
+    modified files:
+     ChangeLog modules/system/documentation/c-snarf.scm
+     modules/system/documentation/output.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-12
+
+
+2007-06-12 10:31:45 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-30
+
+    Summary:
+      Documented `{browser,resolver}-event' values.
+    Revision:
+      guile-avahi--devo--0--patch-30
+
+
+    modified files:
+     ChangeLog doc/guile-avahi.texi
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-11
+
+
+2007-06-12 10:31:29 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-29
+
+    Summary:
+      Documented `{client,publish,lookup}-flag' values.
+    Revision:
+      guile-avahi--devo--0--patch-29
+
+
+    modified files:
+     ChangeLog doc/guile-avahi.texi
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-10
+
+
+2007-06-11 21:03:28 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-28
+
+    Summary:
+      Export missing core bindings.
+    Revision:
+      guile-avahi--devo--0--patch-28
+
+    * modules/avahi.scm (set-watch-user-data!, set-timeout-user-data!):
+      Export them.
+
+    modified files:
+     ChangeLog modules/avahi.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-9
+
+
+2007-06-10 16:12:07 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-27
+
+    Summary:
+      Small doc improvements.
+    Revision:
+      guile-avahi--devo--0--patch-27
+
+    * doc/guile-avahi.texi (Publishing a Service): Nitpick.
+      (Core Interface): Mention what `make-guile-poll' is for.
+    
+    * src/common.c (scm_avahi_make_guile_poll): Improved docstring.
+
+    modified files:
+     ChangeLog doc/guile-avahi.texi src/common.c
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-8
+
+
+2007-06-10 16:11:55 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-26
+
+    Summary:
+      Cleaned up `guile-poll.scm'.
+    Revision:
+      guile-avahi--devo--0--patch-26
+
+    * tests/guile-poll.scm: Cleaned up.
+
+    modified files:
+     ChangeLog tests/guile-poll.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-7
+
+
+2007-06-10 16:11:41 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-25
+
+    Summary:
+      doc: Added examples.
+    Revision:
+      guile-avahi--devo--0--patch-25
+
+    * doc/guile-avahi.texi (Examples)[Publishing a Service, Browsing
+      Published Services, Resolving Services]: New nodes.
+
+    modified files:
+     ChangeLog doc/guile-avahi.texi
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-6
+
+
+2007-06-08 23:08:34 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-24
+
+    Summary:
+      Linted tests.
+    Revision:
+      guile-avahi--devo--0--patch-24
+
+    * tests/publish+browse.scm: Removed unused bindings and modules.
+    
+    * tests/publish.scm: Likewise.
+    
+    * tests/publish+resolve.scm: Likewise.
+
+    modified files:
+     ChangeLog tests/publish+browse.scm tests/publish+resolve.scm
+     tests/publish.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-5
+
+
+2007-06-08 23:08:24 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-23
+
+    Summary:
+      Have tests use `iterate-simple-poll' and eventually time-out.
+    Revision:
+      guile-avahi--devo--0--patch-23
+
+    * modules/Makefile.am (EXTRA_DIST): Added `avahi/test.scm'.
+    
+    * tests/publish+browse.scm: Use `(avahi test)'.
+      (exit-if-done): Removed.
+      (<main>): Use `iterate-simple-poll-until-true'.
+    
+    * tests/publish+resolve.scm: Likewise.
+
+    new files:
+     modules/avahi/test.scm
+
+    modified files:
+     ChangeLog modules/Makefile.am tests/publish+browse.scm
+     tests/publish+resolve.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-4
+
+
+2007-06-08 23:08:08 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-22
+
+    Summary:
+      Have call-backs run in Guile mode.
+    Revision:
+      guile-avahi--devo--0--patch-22
+
+    * modules/Makefile.am (EXTRA_DIST): Added `avahi/build/callbacks.scm'.
+    
+    * src/Makefile.am (BUILT_SOURCES): Added
+      `{client,publish,lookup}-callbacks.{h,i.c}'.
+      (%-callbacks.h, %-callbacks.i.c): New rules.
+    
+    * src/client.c: Include "client-callbacks.h" and "client-callbacks.i.c".
+      (client_trampoline): Renamed to `client_callback'.
+      (scm_avahi_make_client): Use `client_callback_trampoline' instead of
+      `client_callback'.
+    
+    * src/lookup.c: Likewise.
+    
+    * src/publish.c: Likewise.
+
+    new files:
+     modules/avahi/build/callbacks.scm src/make-callback-header.scm
+     src/make-callback-trampolines.scm
+
+    modified files:
+     ChangeLog modules/Makefile.am src/Makefile.am src/client.c
+     src/lookup.c src/publish.c
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-3
+
+
+2007-06-06 21:37:16 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-21
+
+    Summary:
+      Updated documentation snarfing code from GnuTLS.
+    Revision:
+      guile-avahi--devo--0--patch-21
+
+
+    modified files:
+     ChangeLog doc/extract-c-doc.scm
+     modules/system/documentation/c-snarf.scm
+     modules/system/documentation/output.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-2
+
+
+2007-05-26 23:00:12 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-20
+
+    Summary:
+      Added resolvers, which finishes the `lookup' API.
+    Revision:
+      guile-avahi--devo--0--patch-20
+
+    * modules/avahi/build/enums.scm (%resolver-event-enum): New.
+      (%avahi-lookup-enums): Use it.
+    
+    * modules/avahi/client/lookup.scm: Updated.
+    
+    * src/lookup.c (SCM_AVAHI_*BROWSER*): Renamed to `SCM_AVAHI_*LOOKUP*' for
+      generalization.
+      (BROWSER_SMOB_MARK): Renamed to `SMOB_MARKER'.
+      (BROWSER_CLIENT_ACCESSOR): Renamed to `CLIENT_ACCESSOR'.
+      Added new SMOB markers and accessors.
+      (scm_from_avahi_host_name): New macro.
+      (service_resolver_trampoline, scm_avahi_make_service_resolver,
+      host_name_resolver_trampoline, scm_avahi_make_host_name_resolver,
+      address_resolver_trampoline, scm_avahi_make_address_resolver): New.
+    
+    * src/publish.c: Don't include <gmp.h> and <arpa/inet.h>.
+      (scm_avahi_add_entry_group_address_x): Use `scm_to_avahi_address ()'
+      rather than custom code.
+    
+    * src/utils.c: Include <gmp.h> and <arpa/inet.h>.
+      (scm_from_avahi_address, scm_from_avahi_string_list,
+      scm_to_avahi_address): New.
+    
+    * src/utils.h: Updated.
+    
+    * tests/Makefile.am (TESTS): Added `publish+resolve.scm'.
+    
+    * tests/publish+browse.scm: Fixed minor typos.
+
+    new files:
+     tests/publish+resolve.scm
+
+    modified files:
+     ChangeLog modules/avahi/build/enums.scm
+     modules/avahi/client/lookup.scm src/lookup.c src/publish.c
+     src/utils.c src/utils.h tests/Makefile.am
+     tests/publish+browse.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--base-0
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0--patch-1
+
+
 2007-05-24 23:16:30 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-19
 
     Summary:
