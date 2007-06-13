@@ -552,7 +552,7 @@ Update existing records instead of adding new ones.
 @end defvr
 
 @defvr {Scheme Variable} publish-flag/use-wide-area
-Register the record using wide area DNS (i.e.. unicast DNS update).
+Register the record using wide area DNS (i.e., unicast DNS update).
 @end defvr
 
 @defvr {Scheme Variable} publish-flag/use-multicast

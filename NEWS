@@ -1,1 +1,9 @@
-No news.
+* New in Guile-Avahi 0.1
+
+** Export `lookup-result-flag' values (were missing)
+** Documentation and test suite improvements
+
+;; Local Variables:
+;; mode: outline
+;; coding: latin-1
+;; End:
