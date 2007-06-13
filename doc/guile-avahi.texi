@@ -491,8 +491,8 @@ client)} module.
 
 @include client.c.texi
 
-The @var{client-flags} argument expected by @code{make-client} is a
-list containing zero or more values among the following:
+The @var{flags} argument expected by @code{make-client} is a list
+containing zero or more values among the following:
 
 @defvr {Scheme Variable} client-flag/ignore-user-config
 Don't read user configuration.
@@ -626,6 +626,44 @@ RR found, resolving successful.
 
 @defvr {Scheme Variable} resolver-event/failure
 Resolving failed.
+@end defvr
+
+
+In addition, browser and resolver call-backs are passed a list
+@dfn{lookup result flags} which is a list of values among the
+following:
+
+@defvr {Scheme Variable} lookup-result-flag/cached
+This response originates from the cache.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/wide-area
+This response originates from wide area DNS.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/multicast
+This response originates from multicast DNS.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/local
+This record/service resides on and was announced by the local
+host.  Only available in service and record browsers and only on
+@code{browser-event/new} events.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/our-own
+This service belongs to the same local client as the browser object.
+Only available for service browsers and only on
+@code{browser-event/new} events.
+
+This is useful for applications that both publish and browse services
+to distinguish between services published by the application itself
+and services published from other applications.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/static
+The returned data has been defined statically by some configuration
+option.
 @end defvr
 
 
