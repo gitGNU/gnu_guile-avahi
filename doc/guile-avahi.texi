@@ -122,6 +122,7 @@ specificities of the mapping of the C API to Scheme.
 @menu
 * Enumerates and Constants::    Representation of C-side constants.
 * Procedure Names::             Naming conventions.
+* Explicit Finalization::       Most objects must be explicitly freed.
 * Error Handling::              Exceptions.
 @end menu
 
@@ -205,7 +206,7 @@ that these strings may not be sufficient for use in a user interface
 since they are fairly concise and not internationalized.
 
 
-@node Procedure Names, Error Handling, Enumerates and Constants, Conventions
+@node Procedure Names, Explicit Finalization, Enumerates and Constants, Conventions
 @section Procedure Names
 
 Unlike C functions in Avahi, the corresponding Scheme procedures are
@@ -218,7 +219,48 @@ can be achieved using Guile's nifty binding renaming facilities,
 should it be needed (@pxref{Using Guile Modules,,, guile, The GNU
 Guile Reference Manual}).
 
-@node Error Handling,  , Procedure Names, Conventions
+@node Explicit Finalization, Error Handling, Procedure Names, Conventions
+@section Explicit Finalization
+
+Except for @code{client} objects, all objects created by the Avahi
+client API are local representative of objects implemented by the
+system-wide Avahi daemon.  For instance, @code{make-service-browser}
+returns a ``service browser'' object which is actually a proxy to a
+daemon-implemented service browser (@pxref{Service Browsing}).  In
+other words, the Avahi daemon allocates resources (objects) on behalf
+of its clients.
+
+While the Avahi daemon can reclaim resources allocated on behalf of a
+client program when that program exits, it cannot automatically
+determine when such resources become unneeded and reclaimable while
+the program is running.  Thus, clients must @emph{explicitly} tell the
+daemon when an object is no longer needed.
+
+@vindex error/invalid-object
+
+Consequently, except for @code{client} objects, objects manipulated by
+Guile-Avahi programs must be freed using the appropriate @code{free}
+procedure.  For instance, objects created by
+@code{make-service-browser} must eventually be freed by
+@code{free-service-browser!}.  Additional procedures are available to
+determine whether a particular object has already been freed; for
+instance, @code{freed-service-browser?} returns @code{#t} when the
+given service browser has already been freed.  Of course, freed
+objects are no longer usable; procedures that are passed a previously
+freed object will raise an @code{error/invalid-object} exception
+(@pxref{Error Handling}).
+
+Note that all such client-side proxy objects are @emph{not} subject to
+garbage collection until they have been explicitly freed.  Therefore,
+it is important to free them when they are no longer needed!
+
+As an exception, @code{client} objects as returned by
+@code{make-client} are subject to garbage collection and need not be
+explicitly freed.  This is because client programs will usually create
+only one client object whose lifetime is that of the program itself.
+
+
+@node Error Handling,  , Explicit Finalization, Conventions
 @section Error Handling
 
 @cindex exceptions
