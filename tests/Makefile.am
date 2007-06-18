@@ -17,7 +17,7 @@
 
 TESTS = simple-poll.scm publish.scm		\
 	publish+browse.scm publish+resolve.scm	\
-        guile-poll.scm
+        guile-poll.scm errors.scm
 
 EXTRA_DIST = $(TESTS)
 
