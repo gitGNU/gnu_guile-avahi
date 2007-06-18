@@ -122,7 +122,14 @@
                    (iterate-simple-poll-until-true
                     poll
                     (lambda ()
-                      (and seen-service-type? seen-service?)))))))
+                      (and seen-service-type? seen-service?
+                           (begin
+                             (free-service-browser! service-browser)
+                             (free-service-type-browser!
+                              service-type-browser))
+                           (freed-service-browser? service-browser)
+                           (freed-service-type-browser?
+                            service-type-browser))))))))
 
     (lambda ()
       ;; failure.

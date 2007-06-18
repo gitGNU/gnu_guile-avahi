@@ -67,7 +67,7 @@
                    (begin
                      (iterate-simple-poll poll 3000)
                      (run-simple-poll poll)
-                     #t)))))
+                     (not (freed-entry-group? group)))))))
 
     (lambda ()
       ;; failure.
