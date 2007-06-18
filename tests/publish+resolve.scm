@@ -175,7 +175,10 @@
                     (lambda ()
                       (and resolved-host-name?
                            resolved-service?
-                           resolved-address?)))))))
+                           resolved-address?
+                           (begin
+                             (free-service-browser! service-browser)
+                             (freed-service-browser? service-browser)))))))))
 
     (lambda ()
       ;; failure.
