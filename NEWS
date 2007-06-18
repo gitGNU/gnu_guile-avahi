@@ -4,6 +4,9 @@
 ** Bug fixes
 *** Export `lookup-result-flag' values (were missing)
 *** Resolvers now properly handle NULL addresses
+*** Force users to use an explicit finalization API
+See node "Explicit Finalization" in the manual.
+
 
 ;; Local Variables:
 ;; mode: outline

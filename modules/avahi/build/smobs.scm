@@ -120,7 +120,9 @@
         (format port "SCM_DEFINE (~a, \"~a\", 1, 0, 0,~%"
                 c-name scm-name)
         (format port "            (SCM obj),~%")
-        (format port "            \"Explicitly free @var{obj}.\")~%")
+        (format port "            \"Explicitly free @var{obj}, an object ")
+        (format port "of type @code{~a}.\")~%"
+                (smob-type-scheme-name type))
         (format port "#define FUNC_NAME s_~a~%"
                 c-name)
         (format port "{~%")
