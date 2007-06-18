@@ -253,7 +253,8 @@
 
 (define %entry-group-smob
   (make-smob-type "AvahiEntryGroup *" 'entry-group
-                  "scm_avahi_entry_group_free"))
+                  #f
+                  "avahi_entry_group_free"))
 
 (define %avahi-publish-smobs
   (list %entry-group-smob))
@@ -261,27 +262,33 @@
 
 (define %domain-browser-smob
   (make-smob-type "AvahiDomainBrowser *" 'domain-browser
-                  "scm_avahi_domain_browser_free"))
+                  #f
+                  "avahi_domain_browser_free"))
 
 (define %service-browser-smob
   (make-smob-type "AvahiServiceBrowser *" 'service-browser
-                  "scm_avahi_service_browser_free"))
+                  #f
+                  "avahi_service_browser_free"))
 
 (define %service-type-browser-smob
   (make-smob-type "AvahiServiceTypeBrowser *" 'service-type-browser
-                  "scm_avahi_service_type_browser_free"))
+                  #f
+                  "avahi_service_type_browser_free"))
 
 (define %service-resolver-smob
   (make-smob-type "AvahiServiceResolver *" 'service-resolver
-                  "scm_avahi_service_resolver_free"))
+                  #f
+                  "avahi_service_resolver_free"))
 
 (define %host-name-resolver-smob
   (make-smob-type "AvahiHostNameResolver *" 'host-name-resolver
-                  "scm_avahi_host_name_resolver_free"))
+                  #f
+                  "avahi_host_name_resolver_free"))
 
 (define %address-resolver-smob
   (make-smob-type "AvahiAddressResolver *" 'address-resolver
-                  "scm_avahi_address_resolver_free"))
+                  #f
+                  "avahi_address_resolver_free"))
 
 
 (define %avahi-lookup-smobs

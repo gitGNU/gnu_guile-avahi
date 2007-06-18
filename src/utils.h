@@ -61,6 +61,13 @@ do								\
 }								\
 while (0)
 
+
+/* Handling invalid (i.e., already freed) Avahi objects.  */
+
+#define SCM_AVAHI_C_ASSERT_VALID(c_obj)				\
+  if (EXPECT_FALSE (c_obj == NULL))				\
+    scm_avahi_error (AVAHI_ERR_INVALID_OBJECT, FUNC_NAME);
+
 
 
 /* Avahi helpers.  */
