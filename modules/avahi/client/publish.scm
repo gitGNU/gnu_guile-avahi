@@ -18,6 +18,7 @@
 (define-module (avahi client publish)
   :use-module (avahi client)
   :export (entry-group? make-entry-group
+           free-entry-group! freed-entry-group?
            commit-entry-group reset-entry-group! entry-group-state
            empty-group-empty? entry-group-client add-entry-group-service!
            add-entry-group-service-subtype! update-entry-group-service!

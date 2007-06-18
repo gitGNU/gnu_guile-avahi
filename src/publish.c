@@ -121,7 +121,7 @@ SCM_DEFINE (scm_avahi_make_entry_group, "make-entry-group",
 
   SCM_SET_SMOB_DATA (group, (scm_t_bits) c_group);
 
-  return (group);
+  return (scm_gc_protect_object (group));
 }
 #undef FUNC_NAME
 
@@ -136,6 +136,8 @@ SCM_DEFINE (scm_avahi_commit_entry_group, "commit-entry-group",
   AvahiEntryGroup *c_group;
 
   c_group = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  SCM_AVAHI_C_ASSERT_VALID (c_group);
+
   err = avahi_entry_group_commit (c_group);
   if (EXPECT_FALSE (err))
     scm_avahi_error (err, FUNC_NAME);
@@ -154,6 +156,8 @@ SCM_DEFINE (scm_avahi_reset_entry_group_x, "reset-entry-group!",
   AvahiEntryGroup *c_group;
 
   c_group = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  SCM_AVAHI_C_ASSERT_VALID (c_group);
+
   err = avahi_entry_group_reset (c_group);
   if (EXPECT_FALSE (err))
     scm_avahi_error (err, FUNC_NAME);
@@ -173,6 +177,8 @@ SCM_DEFINE (scm_avahi_entry_group_state, "entry-group-state",
   AvahiEntryGroup *c_group;
 
   c_group = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  SCM_AVAHI_C_ASSERT_VALID (c_group);
+
   c_state = avahi_entry_group_get_state (c_group);
   if (c_state < 0)
     scm_avahi_error (c_state, FUNC_NAME);
@@ -190,6 +196,7 @@ SCM_DEFINE (scm_avahi_entry_group_empty_p, "entry-group-empty?",
   AvahiEntryGroup *c_group;
 
   c_group = scm_to_avahi_entry_group (group, 1, FUNC_NAME);
+  SCM_AVAHI_C_ASSERT_VALID (c_group);
 
   return (scm_from_bool (avahi_entry_group_is_empty (c_group)));
 }

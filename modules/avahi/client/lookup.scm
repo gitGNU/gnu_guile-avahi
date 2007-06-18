@@ -17,16 +17,27 @@
 
 (define-module (avahi client lookup)
   :use-module (avahi client)
-  :export (domain-browser? make-domain-browser domain-browser-client
+  :export (;; browsers
+           domain-browser? make-domain-browser domain-browser-client
+           free-domain-browser! freed-domain-browser?
+
            service-browser? make-service-browser service-browser-client
+           free-service-browser! freed-service-browser?
+
            service-type-browser? make-service-type-browser
            service-type-browser-client
+           free-service-type-browser! freed-service-type-browser?
 
+           ;; resolvers
            service-resolver? make-service-resolver service-resolver-client
+           free-service-resolver! freed-service-resolver?
            address-resolver? make-address-resolver address-resolver-client
+           free-address-resolver! freed-address-resolver?
            host-name-resolver? make-host-name-resolver
            host-name-resolver-client
+           free-host-name-resolver! freed-host-name-resolver?
 
+           ;; flags
            lookup-flag->string
            lookup-flag/use-wide-area lookup-flag/use-multicast
            lookup-flag/no-txt lookup-flag/no-address

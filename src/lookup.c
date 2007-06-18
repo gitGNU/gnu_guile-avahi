@@ -38,26 +38,6 @@
 
 /* SMOB and enums type definitions.  */
 
-
-/* Produce a "safe" destructor, i.e., one that can deal with NULL pointers.
-   This is needed because of the two-phase browser SMOB creation.  */
-#define SAFE_DESTRUCTOR(_underscores, _mixedcase)			\
-  static inline void							\
-  scm_avahi_ ## _underscores ## _free (Avahi ## _mixedcase *c_thing)	\
-  {									\
-    if (c_thing)							\
-      avahi_ ## _underscores ## _free (c_thing);			\
-  }
-
-SAFE_DESTRUCTOR (domain_browser, DomainBrowser)
-SAFE_DESTRUCTOR (service_type_browser, ServiceTypeBrowser)
-SAFE_DESTRUCTOR (service_browser, ServiceBrowser)
-SAFE_DESTRUCTOR (service_resolver, ServiceResolver)
-SAFE_DESTRUCTOR (host_name_resolver, HostNameResolver)
-SAFE_DESTRUCTOR (address_resolver, AddressResolver)
-
-#undef SAFE_DESTRUCTOR
-
 #include "lookup-smobs.i.c"
 #include "lookup-enums.i.c"
 
@@ -107,10 +87,12 @@ SMOB_MARKER (address_resolver)
 	      (SCM _underscores),					\
 	      "Return the client associated with @var{" _dashes "}.")	\
   {									\
-    /* Type-check.  */							\
-    (void) scm_to_avahi_ ## _underscores (_underscores, 1,		\
-					  s_scm_avahi_ ## _underscores	\
-					  ## _client);			\
+    void *c_obj;							\
+    c_obj = scm_to_avahi_ ## _underscores (_underscores, 1,		\
+					   s_scm_avahi_ ## _underscores	\
+					   ## _client);			\
+    if (EXPECT_FALSE (c_obj == NULL))					\
+      scm_avahi_error (AVAHI_ERR_INVALID_OBJECT, _dashes "-client");	\
 									\
     return (SCM_AVAHI_LOOKUP_CLIENT (_underscores));			\
   }
@@ -239,7 +221,7 @@ SCM_DEFINE (scm_avahi_make_domain_browser, "make-domain-browser",
 
   SCM_SET_SMOB_DATA (browser, (scm_t_bits) c_browser);
 
-  return (browser);
+  return (scm_gc_protect_object (browser));
 }
 #undef FUNC_NAME
 
@@ -326,7 +308,7 @@ SCM_DEFINE (scm_avahi_make_service_type_browser, "make-service-type-browser",
 
   SCM_SET_SMOB_DATA (browser, (scm_t_bits) c_browser);
 
-  return (browser);
+  return (scm_gc_protect_object (browser));
 }
 #undef FUNC_NAME
 
@@ -417,7 +399,7 @@ SCM_DEFINE (scm_avahi_make_service_browser, "make-service-browser",
 
   SCM_SET_SMOB_DATA (browser, (scm_t_bits) c_browser);
 
-  return (browser);
+  return (scm_gc_protect_object (browser));
 }
 #undef FUNC_NAME
 
@@ -538,7 +520,7 @@ SCM_DEFINE (scm_avahi_make_service_resolver, "make-service-resolver",
 
   SCM_SET_SMOB_DATA (resolver, (scm_t_bits) c_resolver);
 
-  return (resolver);
+  return (scm_gc_protect_object (resolver));
 }
 #undef FUNC_NAME
 
@@ -636,7 +618,7 @@ SCM_DEFINE (scm_avahi_make_host_name_resolver, "make-host-name-resolver",
 
   SCM_SET_SMOB_DATA (resolver, (scm_t_bits) c_resolver);
 
-  return (resolver);
+  return (scm_gc_protect_object (resolver));
 }
 #undef FUNC_NAME
 
@@ -737,7 +719,7 @@ SCM_DEFINE (scm_avahi_make_address_resolver, "make-address-resolver",
 
   SCM_SET_SMOB_DATA (resolver, (scm_t_bits) c_resolver);
 
-  return (resolver);
+  return (scm_gc_protect_object (resolver));
 }
 #undef FUNC_NAME
 
