@@ -21,7 +21,7 @@
   :use-module (srfi srfi-9)
   :use-module (srfi srfi-13)
   :use-module (avahi build utils)
-  :export (make-smob-type smob-type-tag smob-free-function
+  :export (make-smob-type smob-type? smob-type-tag smob-type-free-function
            smob-type-predicate-scheme-name
            smob-type-from-c-function smob-type-to-c-function
 
@@ -38,19 +38,24 @@
 ;;;
 
 (define-record-type <smob-type>
-  (%make-smob-type c-name scm-name free-function)
+  (%make-smob-type c-name scm-name free-function explicit-free)
   smob-type?
   (c-name         smob-type-c-name)
   (scm-name       smob-type-scheme-name)
-  (free-function  smob-type-free-function))
+  (free-function  smob-type-free-function)
+  (explicit-free  smob-type-explicit-free-function))
 
-(define (make-smob-type c-name scm-name . free-function)
-  (%make-smob-type c-name scm-name
-                   (if (null? free-function)
-                       (string-append "avahi_"
-                                      (scheme-symbol->c-name scm-name)
-                                      "_deinit")
-                       (car free-function))))
+(define (make-smob-type c-name scm-name . args)
+  (let ((free-function (if (null? args)
+                           (string-append "avahi_"
+                                          (scheme-symbol->c-name scm-name)
+                                          "_free")
+                           (car args)))
+        (explicit-free (if (or (null? args) (null? (cdr args)))
+                           #f
+                           (cadr args))))
+    (%make-smob-type c-name scm-name
+                     free-function explicit-free)))
 
 (define (smob-type-tag type)
   ;; Return the name of the C variable holding the type tag for TYPE.
@@ -81,17 +86,76 @@
           (smob-type-tag type)
           (smob-type-scheme-name type))
 
-  (format port "SCM_SMOB_FREE (~a, ~a_free, obj)~%{~%"
-          (smob-type-tag type)
-          (scheme-symbol->c-name (smob-type-scheme-name type)))
-  (format port "  ~a c_obj;~%"
-          (smob-type-c-name type))
-  (format port "  c_obj = (~a) SCM_SMOB_DATA (obj);~%"
-          (smob-type-c-name type))
-  (format port "  ~a (c_obj);~%"
-          (smob-type-free-function type))
-  (format port "  return 0;~%")
-  (format port "}~%"))
+  (if (smob-type-free-function type)
+      (begin
+        (format port "SCM_SMOB_FREE (~a, ~a_free, obj)~%{~%"
+                (smob-type-tag type)
+                (scheme-symbol->c-name (smob-type-scheme-name type)))
+        (format port "  ~a c_obj;~%"
+                (smob-type-c-name type))
+        (format port "  c_obj = (~a) SCM_SMOB_DATA (obj);~%"
+                (smob-type-c-name type))
+        (format port "  ~a (c_obj);~%"
+                (smob-type-free-function type))
+        (format port "  return 0;~%")
+        (format port "}~%")))
+
+  (if (smob-type-explicit-free-function type)
+      (let ((scm-name (string-append "free-"
+                                     (symbol->string
+                                      (smob-type-scheme-name type))
+                                     "!"))
+            (c-name   (string-append "scm_avahi_free_"
+                                     (scheme-symbol->c-name
+                                      (smob-type-scheme-name type))
+                                     "_x"))
+            (freed?-scm-name (string-append "freed-"
+                                            (symbol->string
+                                             (smob-type-scheme-name type))
+                                            "?"))
+            (freed?-c-name   (string-append "scm_avahi_freed_"
+                                            (scheme-symbol->c-name
+                                             (smob-type-scheme-name type))
+                                            "_p")))
+        (format port "SCM_DEFINE (~a, \"~a\", 1, 0, 0,~%"
+                c-name scm-name)
+        (format port "            (SCM obj),~%")
+        (format port "            \"Explicitly free @var{obj}.\")~%")
+        (format port "#define FUNC_NAME s_~a~%"
+                c-name)
+        (format port "{~%")
+        (format port "  ~a c_obj;~%"
+                (smob-type-c-name type))
+        (format port "  c_obj = ~a (obj, 1, 0);~%"
+                (smob-type-to-c-function type))
+        (format port "  if (c_obj != NULL)~%")
+        (format port "    {~%")
+        (format port "      (void) ~a (c_obj);~%"
+                (smob-type-explicit-free-function type))
+        (format port "      scm_gc_unprotect_object (obj);~%")
+        (format port "      SCM_SET_SMOB_DATA (obj, (scm_t_bits) NULL);~%")
+        (format port "    }~%")
+        (format port "}~%")
+        (format port "#undef FUNC_NAME~%")
+
+        ;; the `freed?' function
+        (format port "SCM_DEFINE (~a, \"~a\", 1, 0, 0,~%"
+                freed?-c-name freed?-scm-name)
+        (format port "            (SCM obj),~%")
+        (format port "            \"Return @code{#t} if @code{obj} is an ")
+        (format port "object of type @code{~a} that has already "
+                (smob-type-scheme-name type))
+        (format port "been explicitly freed.\")~%")
+        (format port "#define FUNC_NAME s_~a~%"
+                freed?-c-name)
+        (format port "{~%")
+        (format port "  ~a c_obj;~%"
+                (smob-type-c-name type))
+        (format port "  c_obj = ~a (obj, 1, 0);~%"
+                (smob-type-to-c-function type))
+        (format port "  return (scm_from_bool (c_obj == NULL));~%")
+        (format port "}~%")
+        (format port "#undef FUNC_NAME~%"))))
 
 (define (output-smob-type-declaration type port)
   ;; Issue a header file declaration for the SMOB type tag of TYPE.
