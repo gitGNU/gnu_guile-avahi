@@ -87,10 +87,10 @@ last updated in @value{UPDATED-MONTH}.
 @node Introduction, Conventions, Top, Top
 @chapter Introduction
 
-Guile-Avahi provides GNU Guile @dfn{bindings} to the
-@uref{http://avahi.org/, Avahi library}.  In other
-words, it makes it possible to write Scheme programs that use the
-facilities of Avahi.  Avahi is a C library that implements the
+@uref{http://www.nongnu.org/guile-avahi/, Guile-Avahi} provides GNU
+Guile @dfn{bindings} to the @uref{http://avahi.org/, Avahi library}.
+In other words, it makes it possible to write Scheme programs that use
+the facilities of Avahi.  Avahi is a C library that implements the
 @uref{http://dns-sd.org/, DNS-SD} @dfn{service discovery} protocol,
 sometimes also referred to as ``Bonjour''.
 
@@ -108,8 +108,11 @@ Scheme.  Alas, no Scheme-friendly D-Bus implementation was available
 at the time Guile-Avahi was started, hence the approach taken by
 Guile-Avahi.
 
-This document provides an overview of the Scheme API to Avahi.  The
-reader is assumed to have basic knowledge of the protocol and library.
+@cindex bug reports
+This document describes the Scheme API to Avahi offered by
+Guile-Avahi.  The reader is assumed to have basic knowledge of the
+protocol and library.  Please send bug reports and comments to the
+@email{guile-avahi-bugs@@nongnu.org, Guile-Avahi mailing list}.
 
 
 @c *********************************************************************
