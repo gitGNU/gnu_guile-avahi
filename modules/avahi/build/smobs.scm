@@ -144,7 +144,7 @@
         (format port "SCM_DEFINE (~a, \"~a\", 1, 0, 0,~%"
                 freed?-c-name freed?-scm-name)
         (format port "            (SCM obj),~%")
-        (format port "            \"Return @code{#t} if @code{obj} is an ")
+        (format port "            \"Return @code{#t} if @var{obj} is an ")
         (format port "object of type @code{~a} that has already "
                 (smob-type-scheme-name type))
         (format port "been explicitly freed.\")~%")
