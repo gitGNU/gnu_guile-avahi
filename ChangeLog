@@ -2,6 +2,18 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.1
 #
 
+2007-07-17 16:17:46 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	version-0
+
+    Summary:
+      Sealing.
+    Revision:
+      guile-avahi--devo--0.1--version-0
+
+
+    modified files:
+     ChangeLog
+
+
 2007-06-25 19:55:52 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-3
 
     Summary:
