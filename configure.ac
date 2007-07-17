@@ -2,11 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(guile-avahi, 0.0, guile-avahi-bugs@nongnu.org)
+AC_INIT(guile-avahi, 0.2, guile-avahi-bugs@nongnu.org)
 AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_MACRO_DIR(m4)
 
-AM_INIT_AUTOMAKE(guile-avahi, 0.1)
+AM_INIT_AUTOMAKE(guile-avahi, 0.2)
 
 
 AC_CONFIG_SRCDIR([src/common.c])
