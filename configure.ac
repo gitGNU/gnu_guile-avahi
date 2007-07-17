@@ -20,6 +20,10 @@ AC_PROG_LIBTOOL
 # Gnulib
 gl_INIT
 
+if test "x$GCC" = "xyes"; then
+  CFLAGS="-Wall -Werror $CFLAGS"
+fi
+
 GUILE_PROGS
 GUILE_FLAGS
 AC_PATH_PROG([guile_snarf], [guile-snarf], [not-found])
