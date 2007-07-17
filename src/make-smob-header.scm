@@ -26,8 +26,10 @@
 
 (define (main . args)
   (define %smobs
-    `((common . ,%avahi-common-smobs)
-      (client . ,%avahi-client-smobs)))
+    `((common   . ,%avahi-common-smobs)
+      (client   . ,%avahi-client-smobs)
+      (publish  . ,%avahi-publish-smobs)
+      (lookup   . ,%avahi-lookup-smobs)))
 
   (define %module
     (string->symbol (car args)))
@@ -44,6 +46,7 @@
     (format port "#include <avahi-common/simple-watch.h>~%")
     (format port "#include <avahi-client/client.h>~%")
     (format port "#include <libguile.h>~%")
+    (format port "#include \"watch.h\"~%")
 
     (for-each (lambda (type)
                 (output-smob-type-declaration type port)

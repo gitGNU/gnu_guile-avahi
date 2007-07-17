@@ -34,7 +34,8 @@
            %cipher-enum %mac-enum %compression-method-enum %kx-enum
            %protocol-enum %certificate-type-enum
 
-           %avahi-common-enums %avahi-client-enums))
+           %avahi-common-enums %avahi-client-enums
+           %avahi-publish-enums %avahi-lookup-enums))
 
 ;;;
 ;;; This module helps with the creation of bindings for the C enumerate
@@ -293,18 +294,96 @@
 ;;; Actual enumerations.
 ;;;
 
+(define %error-enum
+  (make-enum-type 'error "int"
+                  '(
+ok
+failure
+bad-state
+invalid-host-name
+invalid-domain-name
+no-network
+invalid-ttl
+is-pattern
+collision
+invalid-record
+
+invalid-service-name
+invalid-service-type
+invalid-port
+invalid-key
+invalid-address
+timeout
+too-many-clients
+too-many-objects
+too-many-entries
+os
+
+access-denied
+invalid-operation
+dbus-error
+disconnected
+no-memory
+invalid-object
+no-daemon
+invalid-interface
+invalid-protocol
+invalid-flags
+
+not-found
+invalid-config
+version-mismatch
+invalid-service-subtype
+invalid-packet
+invalid-dns-error
+dns-formerr
+dns-servfail
+dns-nxdomain
+dns-notimp
+
+dns-refused
+dns-yxdomain
+dns-yxrrset
+dns-nxrrset
+dns-notauth
+dns-notzone
+invalid-rdata
+invalid-dns-class
+invalid-dns-type
+not-supported
+
+not-permitted
+invalid-argument
+is-empty
+no-change)
+                  "avahi_strerror"
+                  "AVAHI_ERR_"))
+
+
 (define %watch-event-enum
   (make-enum-type 'watch-event "AvahiWatchEvent"
                   '(in out err hup)
                   #f
                   "AVAHI_WATCH_"))
 
+(define %protocol-enum
+  (make-enum-type 'protocol "AvahiProtocol"
+                  '(inet inet6 unspec)
+                  "avahi_proto_to_string"
+                  "AVAHI_PROTO_"))
+
+(define %interface-enum
+  (make-enum-type 'interface "AvahiIfIndex"
+                  '(unspec)
+                  #f
+                  "AVAHI_IF_"))
+
 
 (define %avahi-common-enums
   ;; All enums.
-  (list %watch-event-enum))
+  (list %error-enum %watch-event-enum %protocol-enum %interface-enum))
 
-
+
 (define %client-state-enum
   (make-enum-type 'client-state "AvahiClientState"
                   '(s-registering s-running s-collision failure connecting)
@@ -312,13 +391,70 @@
                   "AVAHI_CLIENT_"))
 
 (define %client-flags-enum
-  (make-enum-type 'client-flags "AvahiClientFlags"
+  (make-enum-type 'client-flag "AvahiClientFlags"
                   '(ignore-user-config no-fail)
                   #f
                   "AVAHI_CLIENT_"))
 
 (define %avahi-client-enums
-  ;; Nothing so far.
   (list %client-state-enum %client-flags-enum))
+
+
+(define %entry-group-state-enum
+  (make-enum-type 'entry-group-state "AvahiEntryGroupState"
+                  '(uncommited registering established
+                    collision failure)
+                  #f
+                  "AVAHI_ENTRY_GROUP_"))
+
+(define %publish-flag-enum
+  (make-enum-type 'publish-flag "AvahiPublishFlags"
+                  '(unique no-probe no-announce allow-multiple
+                    no-reverse no-cookie update use-wide-area
+                    use-multicast)
+                  #f
+                  "AVAHI_PUBLISH_"))
+
+(define %avahi-publish-enums
+  (list %entry-group-state-enum %publish-flag-enum))
+
+
+(define %domain-browser-type-enum
+  (make-enum-type 'domain-browser-type "AvahiDomainBrowserType"
+                  '(browse browse-default register
+                    register-default browse-legacy)
+                  #f
+                  "AVAHI_DOMAIN_BROWSER_"))
+
+(define %browser-event-enum
+  (make-enum-type 'browser-event "AvahiBrowserEvent"
+                  '(new remove cache-exhausted all-for-now
+                    failure)
+                  #f
+                  "AVAHI_BROWSER_"))
+
+(define %resolver-event-enum
+  (make-enum-type 'resolver-event "AvahiResolverEvent"
+                  '(found failure)
+                  #f
+                  "AVAHI_RESOLVER_"))
+
+(define %lookup-flag-enum
+  (make-enum-type 'lookup-flag "AvahiLookupFlags"
+                  '(use-wide-area use-multicast no-txt no-address)
+                  #f
+                  "AVAHI_LOOKUP_"))
+
+(define %lookup-result-flag-enum
+  (make-enum-type 'lookup-result-flag "AvahiLookupResultFlags"
+                  '(cached wide-area multicast local
+                    our-own static)
+                  #f
+                  "AVAHI_LOOKUP_RESULT_"))
+
+(define %avahi-lookup-enums
+  (list %domain-browser-type-enum %browser-event-enum %resolver-event-enum
+        %lookup-flag-enum %lookup-result-flag-enum))
+
 
 ;;; arch-tag: 9e3eb6bb-61a5-4e85-861f-1914ab9677b0

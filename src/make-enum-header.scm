@@ -26,8 +26,10 @@
 
 (define (main . args)
   (define %enums
-    `((common . ,%avahi-common-enums)
-      (client . ,%avahi-client-enums)))
+    `((common   . ,%avahi-common-enums)
+      (client   . ,%avahi-client-enums)
+      (publish  . ,%avahi-publish-enums)
+      (lookup   . ,%avahi-lookup-enums)))
 
   (define %module
     (string->symbol (car args)))
@@ -41,7 +43,14 @@
             (string-upcase (symbol->string %module)))
 
     (format port "#include \"config.h\"~%")
+    (format port "#include <libguile.h>~%")
+    (format port "#include <avahi-common/error.h>~%")
     (format port "#include <avahi-common/watch.h>~%")
+
+    ;; Tweak so that `error/ok' is properly defined.
+    (format port "#ifndef AVAHI_ERR_OK~%")
+    (format port "# define AVAHI_ERR_OK AVAHI_OK~%")
+    (format port "#endif~%")
 
     (for-each (lambda (enum)
                 (output-enum-declarations enum port)

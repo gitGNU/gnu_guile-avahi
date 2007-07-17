@@ -15,42 +15,37 @@
    License along with Guile-Avahi; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA  */
 
-#ifndef GUILE_AVAHI_WATCH_H
-#define GUILE_AVAHI_WATCH_H
-
-/* Guile-friendly implementation of the `AvahiPoll' and `AvahiWatch'
-   interfaces.  */
-
-#include <avahi-common/watch.h>
-
 #include <libguile.h>
+#include <avahi-common/error.h>
 
-typedef struct AvahiGuilePoll AvahiGuilePoll;
+#include "errors.h"
+#include "common-enums.h"
 
-struct AvahiGuilePoll
+SCM_SYMBOL (avahi_error_key, "avahi-error");
+
+void
+scm_avahi_error (int c_err, const char *c_func)
 {
-  AvahiPoll api;
+  SCM err, func;
 
-  /* Closures.  */
-  SCM new_watch;
-  SCM free_watch;
-  SCM update_watch_x;
-  SCM new_timeout;
-  SCM free_timeout;
-  SCM update_timeout_x;
-};
+  /* Note: If error code C_ERR is unknown, then ERR will be `#f'.  */
+  err = scm_from_avahi_error (c_err);
+  func = scm_from_locale_symbol (c_func);
 
-extern AvahiGuilePoll *avahi_guile_poll_new (SCM new_watch,
-					     SCM update_watch_x,
-					     SCM free_watch,
-					     SCM new_timeout,
-					     SCM update_timeout_x,
-					     SCM free_timeout);
+  (void) scm_throw (avahi_error_key, scm_list_2 (err, func));
 
-extern const AvahiPoll *avahi_guile_poll_get (AvahiGuilePoll *guile_poll);
+  /* XXX: This is actually never reached, but since the Guile headers don't
+     declare `scm_throw ()' as `noreturn', we must add this to avoid GCC's
+     complaints.  */
+  abort ();
+}
 
-extern void avahi_guile_poll_free (AvahiGuilePoll *guile_poll);
+
+void
+scm_avahi_init_error (void)
+{
+#include "errors.c.x"
+}
 
-extern void scm_avahi_init_watch (void);
-
-#endif
+/* arch-tag: 48f07ecf-65c4-480c-b043-a51eab592d6b
+ */

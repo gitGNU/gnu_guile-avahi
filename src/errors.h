@@ -15,42 +15,17 @@
    License along with Guile-Avahi; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA  */
 
-#ifndef GUILE_AVAHI_WATCH_H
-#define GUILE_AVAHI_WATCH_H
-
-/* Guile-friendly implementation of the `AvahiPoll' and `AvahiWatch'
-   interfaces.  */
-
-#include <avahi-common/watch.h>
+#ifndef GUILE_AVAHI_ERRORS_H
+#define GUILE_AVAHI_ERRORS_H
 
 #include <libguile.h>
 
-typedef struct AvahiGuilePoll AvahiGuilePoll;
+#include "utils.h"
 
-struct AvahiGuilePoll
-{
-  AvahiPoll api;
-
-  /* Closures.  */
-  SCM new_watch;
-  SCM free_watch;
-  SCM update_watch_x;
-  SCM new_timeout;
-  SCM free_timeout;
-  SCM update_timeout_x;
-};
-
-extern AvahiGuilePoll *avahi_guile_poll_new (SCM new_watch,
-					     SCM update_watch_x,
-					     SCM free_watch,
-					     SCM new_timeout,
-					     SCM update_timeout_x,
-					     SCM free_timeout);
-
-extern const AvahiPoll *avahi_guile_poll_get (AvahiGuilePoll *guile_poll);
-
-extern void avahi_guile_poll_free (AvahiGuilePoll *guile_poll);
-
-extern void scm_avahi_init_watch (void);
+SCM_API void scm_avahi_error (int, const char *) NO_RETURN;
+SCM_API void scm_avahi_init_error (void);
 
 #endif
+
+/* arch-tag: e7a92e44-b399-4c85-99d4-2dd3564600f7
+ */

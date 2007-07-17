@@ -1,0 +1,737 @@
+\input texinfo  @c -*-texinfo-*-
+
+@c %**start of header
+@setfilename guile-avahi.info
+@settitle Using Avahi in Guile Scheme Programs
+@footnotestyle end
+@setchapternewpage odd
+@c %**end of header
+
+@set EDITION 1
+@include version.texi
+
+
+@ifinfo
+@dircategory The Algorithmic Language Scheme
+@direntry
+* Guile-Avahi: (Guile-Avahi).     Guile bindings for Avahi.
+@end direntry
+
+This file documents Guile-Avahi.
+
+Copyright @copyright{} 2007 Ludovic Court@`es
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the author.
+@end ifinfo
+
+@titlepage
+@title Using Avahi in Guile Scheme Programs
+@subtitle For Guile-Avahi @value{VERSION}
+@author Ludovic Court@`es
+
+@page
+@vskip 0pt plus 1filll
+Edition @value{EDITION} @*
+@c Updated for Guile-Avahi @value{VERSION} @*
+@value{UPDATED} @*
+
+Copyright @copyright{} 2007 Ludovic Court@`es
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the author.
+@end titlepage
+
+@contents
+
+@c *********************************************************************
+@node Top, Introduction, (dir), (dir)
+@top Using Avahi in Guile Scheme Programs
+
+This document describes Guile-Avahi version @value{VERSION}.  It was
+last updated in @value{UPDATED-MONTH}.
+
+@menu
+* Introduction::                What this is about.
+* Conventions::                 Naming conventions and other idiosyncrasies.
+* Examples::                    Quick start.
+* API Reference::               The Scheme Avahi programming interface.
+* Concept Index::               Concepts.
+* Procedure Index::             Scheme Procedures.
+* Variable Index::              Scheme Variables.
+@end menu
+
+@c *********************************************************************
+@node Introduction, Conventions, Top, Top
+@chapter Introduction
+
+@uref{http://www.nongnu.org/guile-avahi/, Guile-Avahi} provides GNU
+Guile @dfn{bindings} to the @uref{http://avahi.org/, Avahi library}.
+In other words, it makes it possible to write Scheme programs that use
+the facilities of Avahi.  Avahi is a C library that implements the
+@uref{http://dns-sd.org/, DNS-SD} @dfn{service discovery} protocol,
+sometimes also referred to as ``Bonjour''.
+
+More precisely, Guile-Avahi provides bindings for the @dfn{client}
+library of Avahi.  The client library allows application to use
+service discovery by transparently connecting them to the Avahi
+@dfn{system-wide daemon} using @uref{http://dbus.freedesktop.org,
+D-Bus}.  This daemon actually implements the DNS-SD protocols and
+handles service discovery and publication on behalf of applications
+running on the same host.
+
+Thus, the functionality of Guile-Avahi could be provided to Guile
+Scheme applications by writing a D-Bus client to the Avahi daemon in
+Scheme.  Alas, no Scheme-friendly D-Bus implementation was available
+at the time Guile-Avahi was started, hence the approach taken by
+Guile-Avahi.
+
+@cindex bug reports
+This document describes the Scheme API to Avahi offered by
+Guile-Avahi.  The reader is assumed to have basic knowledge of the
+protocol and library.  Please send bug reports and comments to the
+@email{guile-avahi-bugs@@nongnu.org, Guile-Avahi mailing list}.
+
+
+@c *********************************************************************
+@node Conventions, Examples, Introduction, Top
+@chapter Conventions
+
+This chapter details the conventions used in Guile-Avahi, as well as
+specificities of the mapping of the C API to Scheme.
+
+@menu
+* Enumerates and Constants::    Representation of C-side constants.
+* Procedure Names::             Naming conventions.
+* Explicit Finalization::       Most objects must be explicitly freed.
+* Error Handling::              Exceptions.
+@end menu
+
+@node Enumerates and Constants, Procedure Names, Conventions, Conventions
+@section Enumerates and Constants
+
+@cindex enumerate
+@cindex constant
+
+Lots of enumerates and constants are used in the Avahi C API.  For
+each C enumerate type, a disjoint Scheme type is used---thus,
+enumerate values and constants are not represented by Scheme symbols
+nor by integers.  This makes it impossible to use an enumerate value
+of the wrong type on the Scheme side: such errors are automatically
+detected by type-checking.
+
+The enumerate values are bound to variables exported by the
+@code{(avahi)} and other modules within the @code{avahi} hierarchy.
+These variables are named according to the following convention:
+
+@itemize
+@item All variable names are lower-case; the underscore @code{_}
+character used in the C API is replaced by hyphen @code{-}.
+@item All variable names are prepended by the name of the enumerate
+type and the slash @code{/} character.
+@item In some cases, the variable name is made more explicit than the
+one of the C API, e.g., by avoid abbreviations.
+@end itemize
+
+Consider for instance this C-side enumerate:
+
+@example
+typedef enum
+@{
+  AVAHI_CLIENT_S_REGISTERING,
+  AVAHI_CLIENT_S_RUNNING,
+  AVAHI_CLIENT_S_COLLISION,
+  AVAHI_CLIENT_FAILURE,
+  AVAHI_CLIENT_CONNECTING
+@} AvahiClientState;
+@end example
+
+The corresponding Scheme values are bound to the following variables
+exported by the @code{(avahi client)} module:
+
+@vindex client-state/s-registering
+
+@example
+client-state/s-registering
+client-state/s-running
+client-state/s-collision
+client-state/failure
+client-state/connecting
+@end example
+
+Hopefully, most variable names can be deduced from this convention.
+
+Scheme-side ``enumerate'' values can be compared using @code{eq?}
+(@pxref{Equality, equality predicates,, guile, The GNU Guile Reference
+Manual}).  Consider the following example:
+
+@example
+(let ((client (make-client ...)))
+
+  ;;
+  ;; ...
+  ;;
+
+  ;; Check the client state.
+  (if (eq? (client-state client) client-state/failure)
+      (format #t "Oh, we failed.")))
+@end example
+
+@vindex watch-event/in
+@findex watch-event->string
+
+In addition, all enumerate values can be converted to a human-readable
+string, in a type-specific way.  For instance,
+@code{(watch-event->string watch-event/in)} yields @code{"in"}.  Note
+that these strings may not be sufficient for use in a user interface
+since they are fairly concise and not internationalized.
+
+
+@node Procedure Names, Explicit Finalization, Enumerates and Constants, Conventions
+@section Procedure Names
+
+Unlike C functions in Avahi, the corresponding Scheme procedures are
+named in a way that is close to natural English.  Abbreviations are
+also avoided.  For instance, the Scheme procedure corresponding to
+@code{avahi_client_get_version} is named
+@code{client-server-version}.  The @code{avahi_}
+prefix is always omitted from variable names since a similar effect
+can be achieved using Guile's nifty binding renaming facilities,
+should it be needed (@pxref{Using Guile Modules,,, guile, The GNU
+Guile Reference Manual}).
+
+@node Explicit Finalization, Error Handling, Procedure Names, Conventions
+@section Explicit Finalization
+
+Except for @code{client} objects, all objects created by the Avahi
+client API are local representative of objects implemented by the
+system-wide Avahi daemon.  For instance, @code{make-service-browser}
+returns a ``service browser'' object which is actually a proxy to a
+daemon-implemented service browser (@pxref{Service Browsing}).  In
+other words, the Avahi daemon allocates resources (objects) on behalf
+of its clients.
+
+While the Avahi daemon can reclaim resources allocated on behalf of a
+client program when that program exits, it cannot automatically
+determine when such resources become unneeded and reclaimable while
+the program is running.  Thus, clients must @emph{explicitly} tell the
+daemon when an object is no longer needed.
+
+@vindex error/invalid-object
+
+Consequently, except for @code{client} objects, objects manipulated by
+Guile-Avahi programs must be freed using the appropriate @code{free}
+procedure.  For instance, objects created by
+@code{make-service-browser} must eventually be freed by
+@code{free-service-browser!}.  Additional procedures are available to
+determine whether a particular object has already been freed; for
+instance, @code{freed-service-browser?} returns @code{#t} when the
+given service browser has already been freed.  Of course, freed
+objects are no longer usable; procedures that are passed a previously
+freed object will raise an @code{error/invalid-object} exception
+(@pxref{Error Handling}).
+
+Note that all such client-side proxy objects are @emph{not} subject to
+garbage collection until they have been explicitly freed.  Therefore,
+it is important to free them when they are no longer needed!
+
+As an exception, @code{client} objects as returned by
+@code{make-client} are subject to garbage collection and need not be
+explicitly freed.  This is because client programs will usually create
+only one client object whose lifetime is that of the program itself.
+
+
+@node Error Handling,  , Explicit Finalization, Conventions
+@section Error Handling
+
+@cindex exceptions
+@cindex errors
+@cindex @code{avahi-error}
+@findex error->string
+
+Avahi errors are implemented as Scheme exceptions (@pxref{Exceptions,
+exceptions in Guile,, guile, The GNU Guile Reference Manual}).  Each
+time a Avahi function returns an error, an exception with key
+@code{avahi-error} is raised.  The additional arguments that are
+thrown include an error code and the name of the Avahi procedure that
+raised the exception.  The error code is pretty much like an enumerate
+value: it is one of the @code{error/} variables exported by the
+@code{(avahi)} module (@pxref{Enumerates and Constants}).  Exceptions
+can be turned into error messages using the @code{error->string}
+procedure.
+
+The following examples illustrates how Avahi exceptions can be
+handled:
+
+@example
+(let ((poll (make-simple-poll)))
+
+  ;;
+  ;; ...
+  ;;
+
+  (catch 'avahi-error
+    (lambda ()
+      (run-simple-poll (simple-poll poll)))
+    (lambda (key err function . currently-unused)
+      (format (current-error-port)
+              "an Avahi error was raised by `~a': ~a~%"
+              function (error->string err)))))
+@end example
+
+Again, error values can be compared using @code{eq?}:
+
+@vindex error/no-daemon
+
+@example
+    ;; `avahi-error' handler.
+    (lambda (key err function . currently-unused)
+      (if (eq? err error/no-daemon)
+          (format (current-error-port)
+                  "~a: the Avahi daemon is not running~%"
+                  function)))
+@end example
+
+Note that the @code{catch} handler is currently passed only 3
+arguments but future versions might provide it with additional
+arguments.  Thus, it must be prepared to handle more than 3 arguments,
+as in this example.
+
+
+@c *********************************************************************
+@node Examples, API Reference, Conventions, Top
+@chapter Examples
+
+This chapter lists examples that illustrate common use cases.
+
+@menu
+* Publishing a Service::        Advertising a service.
+* Browsing Published Services:: Looking for services.
+* Resolving Services::          Finding a service's IP address and port.
+@end menu
+
+@node Publishing a Service, Browsing Published Services, Examples, Examples
+@section Publishing a Service
+
+The following example shows the simplest way to publish a service.
+There are several stages:
+
+@itemize
+@item Create an Avahi client using @code{make-client}.  This will
+actually connect the application to the Avahi daemon that will
+eventually perform operations on behalf of the application.
+@item When the client switches to the running state (i.e.,
+@code{client-state/s-running}), create an @dfn{entry group} with
+@code{make-entry-group} and add a service (or several services,
+addresses, etc.) to it.
+@item Commit the entry group using @code{commit-entry-group}.
+@item When all entries in the group have been successfully published,
+the group's call-back is invoked and passed the
+@code{entry-group-state/established} state.  The application must keep
+running so that the service remains published.
+@end itemize
+
+Here is the complete example:
+
+@example
+(use-modules (avahi)
+             (avahi client)
+             (avahi client publish))
+
+(define (group-callback group state)
+  (if (eq? state entry-group-state/established)
+      (format #t "service is now published!~%")))
+
+(define client-callback
+  (let ((group #f))
+    (lambda (client state)
+      (if (eq? state client-state/s-running)
+          (begin
+            ;; The client is now running so we can create an entry
+            ;; group and publish a service.
+            (set! group (make-entry-group client group-callback))
+            (add-entry-group-service! group interface/unspecified
+                                      protocol/unspecified '()
+                                      "my-avahi-service"
+                                      "_some-service-type._tcp"
+                                      #f #f ;; any domain and host
+                                      1234  ;; the port number
+
+                                      ;; additional `txt' properties
+                                      "scheme=yes" "java=no")
+
+            ;; Commit the entry group, i.e., actually publish
+            ;; the service.
+            (commit-entry-group group))))))
+
+;; The main loop.
+(let* ((poll (make-simple-poll))
+       (client (make-client (simple-poll poll)
+                            '() ;; no flags
+                            client-callback)))
+  (and (client? client)
+
+       ;; Run forever.
+       (run-simple-poll poll)))
+@end example
+
+Of course, publishing a host address or service subtype works
+similarly.
+
+
+@node Browsing Published Services, Resolving Services, Publishing a Service, Examples
+@section Browsing Published Services
+
+Browsing advertised services requires a number of stages.  First, an
+Avahi daemon client must be created, as usual (@pxref{Publishing a
+Service}).
+
+@example
+(use-modules (avahi)
+             (avahi client)
+             (avahi client lookup))
+
+(define %service-type
+  ;; The type of services we are looking for.
+  "_workstation._tcp")
+
+(define (service-browser-callback browser interface protocol event
+                                  service-name service-type
+                                  domain flags)
+  (if (eq? event browser-event/new)
+      (format #t "found service `~a' of type `~a'~%"
+              service-name service-type)))
+
+(define client-callback
+  (let ((browser #f))
+    (lambda (client state)
+      (if (eq? state client-state/s-running)
+          ;; Now that the client is up and running, create a service
+          ;; browser looking for services of type `%service-type' on
+          ;; any network interface and using any protocol.
+          (set! browser
+                (make-service-browser client
+                                      interface/unspecified
+                                      protocol/unspecified
+                                      %service-type #f '()
+                                      service-browser-callback))))))
+
+
+(let* ((poll (make-simple-poll))
+       (client (make-client (simple-poll poll)
+                            '() ;; no flags
+                            client-callback)))
+  (and (client? client)
+       (run-simple-poll poll)))
+@end example
+
+In this example, the service type being looked for is
+@code{"_workstation._tcp"}.  It is used to advertise the presence of
+computers on a local area network, rather than an actual service.
+
+@node Resolving Services,  , Browsing Published Services, Examples
+@section Resolving Services
+
+The previous example allowed us to @emph{find} services of a given
+type, but did not provide us with information such as the IP address
+of the host providing the service and the port number where the
+service can be found.  To obtain this information, a @dfn{service
+resolver} must be launched, e.g., by augmenting the service browser
+call-back as follows:
+
+@example
+(define (service-browser-callback browser interface protocol event
+                                  service-name service-type
+                                  domain flags)
+
+  (define (service-resolver-callback resolver interface protocol event
+                                     service-name service-type domain
+                                     host-name address-type address port
+                                     txt flags)
+    ;; Handle service resolution events.
+    (cond ((eq? event resolver-event/found)
+           (format #t "resolved service `~a' at `~a:~a'~%"
+                   service-name host-name port))
+          ((eq? event resolver-event/failure)
+           (format #t "failed to resolve service `~a'~%"
+                   service-name))))
+
+  (if (eq? event browser-event/new)
+      (begin
+        (format #t "found service `~a' of type `~a'~%"
+                service-name service-type)
+
+        ;; Launch a service resolver for the service we just found.
+        (make-service-resolver (service-browser-client browser)
+                               interface protocol
+                               service-name service-type domain
+                               protocol/unspecified '()
+                               service-resolver-callback))))
+@end example
+
+Now you know all the important things you need to know to benefit from
+Avahi!
+
+
+
+@c *********************************************************************
+@node API Reference, Concept Index, Examples, Top
+@chapter API Reference
+
+This chapter documents Guile-Avahi Scheme procedures.  Note that
+further details can be found in the @uref{http://avahi.org/, Avahi C
+API reference}.
+
+@menu
+* Core Interface::              Common Avahi facilities.
+* Client Interface::            Client-related facilities.
+* Service Publication::         Publishing services.
+* Service Browsing::            Discovering published services.
+@end menu
+
+@node Core Interface, Client Interface, API Reference, API Reference
+@section Core Interface
+
+This section lists the Scheme procedures exported by the
+@code{(avahi)} module.
+
+@include common.c.texi
+
+The low-level API for watches, timeouts, and ``polls'', all of which
+serve as building blocks for the creation of event loops (using
+@code{make-guile-poll}) are described below.  In practice, you should
+only need it in applications where the Avahi event loop needs to be
+integrated in some other event loop; in other cases, the ``simple
+poll'' should be enough.
+
+@include watch.c.texi
+
+@node Client Interface, Service Publication, Core Interface, API Reference
+@section Client Interface
+
+This section lists the Scheme procedures exported by the @code{(avahi
+client)} module.
+
+@include client.c.texi
+
+The @var{flags} argument expected by @code{make-client} is a list
+containing zero or more values among the following:
+
+@defvr {Scheme Variable} client-flag/ignore-user-config
+Don't read user configuration.
+@end defvr
+
+@defvr {Scheme Variable} client-flag/no-fail
+Don't fail if the daemon is not available when @code{make-client} is
+called; instead enter @code{client-state/connecting} state and wait
+for the daemon to appear.
+@end defvr
+
+
+@node Service Publication, Service Browsing, Client Interface, API Reference
+@section Service Publication
+
+@cindex publication
+
+The service publication API is provided by the @code{(avahi client
+publish)}.  To publish services, one must first create a client for
+the Avahi daemon (@pxref{Client Interface}).
+
+@include publish.c.texi
+
+The @var{publish-flags} argument expected by
+@code{add-entry-group-service!} and similar procedures is a list
+containing zero or more values among the following:
+
+@defvr {Scheme Variable} publish-flag/unique
+For raw records: The RRset is intended to be unique.
+@end defvr
+
+@defvr {Scheme Variable} publish-flag/no-probe
+For raw records: Though the RRset is intended to be unique no probes
+shall be sent.
+@end defvr
+
+@defvr {Scheme Variable} publish-flag/no-announce
+For raw records: Do not announce this RR to other hosts.
+@end defvr
+
+@defvr {Scheme Variable} publish-flag/allow-multiple
+For raw records: Allow multiple local records of this type, even if
+they are intended to be unique.
+@end defvr
+
+@defvr {Scheme Variable} publish-flag/no-reverse
+For address records: don't create a reverse (PTR) entry.
+@end defvr
+
+@defvr {Scheme Variable} publish-flag/no-cookie
+For service records: do not implicitly add the local service cookie to
+TXT data.
+@end defvr
+
+@defvr {Scheme Variable} publish-flag/update
+Update existing records instead of adding new ones.
+@end defvr
+
+@defvr {Scheme Variable} publish-flag/use-wide-area
+Register the record using wide area DNS (i.e., unicast DNS update).
+@end defvr
+
+@defvr {Scheme Variable} publish-flag/use-multicast
+Register the record using multicast DNS.
+@end defvr
+
+
+@node Service Browsing,  , Service Publication, API Reference
+@section Service Browsing
+
+@cindex browsing
+@cindex resolution
+
+The service discovery API is provided by the @code{(avahi client
+lookup)} module.  Service discovery typically consists of two phases:
+@dfn{browsing} where one can find, e.g., available services, and
+@dfn{resolution} where one can, e.g., get detailed information about a
+discovered service such as its IP address.
+
+All browsers and resolvers support the following @dfn{lookup flags}:
+
+@defvr {Scheme Variable} lookup-flag/use-wide-area
+Force lookup via wide-area DNS.
+@end defvr
+
+@defvr {Scheme Variable} lookup-flag/use-multicast
+Force lookup via multicast DNS.
+@end defvr
+
+@defvr {Scheme Variable} lookup-flag/no-txt
+When doing service resolving, don't lookup TXT record.
+@end defvr
+
+@defvr {Scheme Variable} lookup-flag/no-address
+When doing service resolving, don't lookup A/AAAA record.
+@end defvr
+
+Procedures to create browsers and resolvers are described below.
+
+@include lookup.c.texi
+
+Browser and resolver call-backs are usually passed a browser event or
+resolver event value, respectively, among the following:
+
+@defvr {Scheme Variable} browser-event/new
+The object is new on the network.
+@end defvr
+
+@defvr {Scheme Variable} browser-event/remove
+The object has been removed from the network.
+@end defvr
+
+@defvr {Scheme Variable} browser-event/cache-exhausted
+One-time event, to notify the user that all entries from the caches
+have been sent.
+@end defvr
+
+@defvr {Scheme Variable} browser-event/all-for-now
+One-time event, to notify the user that more records will probably not
+show up in the near future, i.e., all cache entries have been read and
+all static servers been queried.
+@end defvr
+
+@defvr {Scheme Variable} browser-event/failure
+Browsing failed.
+@end defvr
+
+@defvr {Scheme Variable} resolver-event/found
+RR found, resolving successful.
+@end defvr
+
+@defvr {Scheme Variable} resolver-event/failure
+Resolving failed.
+@end defvr
+
+
+In addition, browser and resolver call-backs are passed a list
+@dfn{lookup result flags} which is a list of values among the
+following:
+
+@defvr {Scheme Variable} lookup-result-flag/cached
+This response originates from the cache.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/wide-area
+This response originates from wide area DNS.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/multicast
+This response originates from multicast DNS.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/local
+This record/service resides on and was announced by the local
+host.  Only available in service and record browsers and only on
+@code{browser-event/new} events.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/our-own
+This service belongs to the same local client as the browser object.
+Only available for service browsers and only on
+@code{browser-event/new} events.
+
+This is useful for applications that both publish and browse services
+to distinguish between services published by the application itself
+and services published from other applications.
+@end defvr
+
+@defvr {Scheme Variable} lookup-result-flag/static
+The returned data has been defined statically by some configuration
+option.
+@end defvr
+
+
+@c *********************************************************************
+@node Concept Index, Procedure Index, API Reference, Top
+@unnumbered Concept Index
+@printindex cp
+
+@node Procedure Index, Variable Index, Concept Index, Top
+@unnumbered Procedure Index
+@printindex fn
+
+@node Variable Index,  , Procedure Index, Top
+@unnumbered Variable Index
+@printindex vr
+
+
+@bye
+
+@ignore
+;;; arch-tag: ee5f2081-9153-48fc-b4ee-2024381c65d7
+@end ignore
+
+@c Local Variables:
+@c ispell-local-dictionary: "american"
+@c End:
