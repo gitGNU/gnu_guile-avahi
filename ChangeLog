@@ -2,6 +2,22 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-17 20:12:38 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-4
+
+    Summary:
+      Correctly use the `alloca' Gnulib module.
+    Revision:
+      guile-avahi--devo--0.2--patch-4
+
+    * src/client.c: Include <alloca.h>.
+
+    modified files:
+     ChangeLog src/client.c
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-4
+
+
 2007-07-17 20:12:20 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-3
 
     Summary:
