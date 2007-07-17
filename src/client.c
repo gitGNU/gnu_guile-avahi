@@ -19,6 +19,8 @@
 # include "config.h"
 #endif
 
+#include <alloca.h>
+
 #include <avahi-common/watch.h>
 #include <avahi-common/simple-watch.h>
 #include <libguile.h>
