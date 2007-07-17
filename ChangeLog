@@ -2,6 +2,31 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-17 20:11:39 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-2
+
+    Summary:
+      Implemented a custom memory allocator.
+    Revision:
+      guile-avahi--devo--0.2--patch-2
+
+    * NEWS: Updated.
+    
+    * src/common.c (alloc_header_t): New type.
+      (scm_avahi_gc_hint, scm_avahi_malloc, scm_avahi_free,
+      scm_avahi_realloc, scm_avahi_calloc, scm_avahi_allocator): New.
+      (scm_avahi_common_init): Invoke `avahi_set_allocator ()'.
+
+    modified files:
+     ChangeLog NEWS src/common.c
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.1--patch-14
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.1--version-0
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--base-0
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-1
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-2
+
+
 2007-07-17 16:22:26 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-1
 
     Summary:

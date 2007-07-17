@@ -21,7 +21,14 @@
 
 #include <avahi-common/watch.h>
 #include <avahi-common/simple-watch.h>
+#include <avahi-common/malloc.h>
 #include <libguile.h>
+
+#include <string.h>
+
+#ifdef DEBUG
+# include <stdio.h>
+#endif
 
 #include "watch.h"
 #include "errors.h"
@@ -273,10 +280,109 @@ SCM_DEFINE (scm_avahi_run_simple_poll, "run-simple-poll",
 #undef FUNC_NAME
 
 
+/* Custom memory allocator.  */
+
+/* Using our custom allocator allows to provide Guile's GC with more accurate
+   information as to how much memory is being used.  Consequently, it can
+   make smarter decisions as to when to run the GC.  */
+
+
+/* We end up rolling our own allocator data structure to keep track of buffer
+   sizes.  */
+typedef struct
+{
+  size_t size;
+  char   data[0];
+} alloc_header_t;
+
+
+/* GC hint for all Guile-Avahi-related allocations.  */
+static const char scm_avahi_gc_hint[] = "guile-avahi";
+
+static void *
+scm_avahi_malloc (size_t size)
+{
+  alloc_header_t *header;
+
+  header = scm_gc_malloc (size + sizeof (size_t), scm_avahi_gc_hint);
+  header->size = size;
+
+#ifdef DEBUG
+  printf ("allocated %u bytes at %p [header %p]\n",
+	  size, &header->data[0], header);
+#endif
+
+  return (&header->data[0]);
+}
+
+static void
+scm_avahi_free (void *p)
+{
+  alloc_header_t *header;
+
+  header = (alloc_header_t *) (p - sizeof (size_t));
+
+#ifdef DEBUG
+  printf ("freeing %u bytes at %p [header %p]\n",
+	  header->size, p, header);
+#endif
+
+  scm_gc_free (header, header->size, scm_avahi_gc_hint);
+}
+
+static void *
+scm_avahi_realloc (void *p, size_t size)
+{
+  alloc_header_t *header;
+
+  if (p == NULL)
+    return (scm_avahi_malloc (size));
+
+  header = (alloc_header_t *) (p - sizeof (size_t));
+
+  header = scm_gc_realloc (header,
+			   header->size + sizeof (size_t),
+			   size + sizeof (size_t),
+			   scm_avahi_gc_hint);
+#ifdef DEBUG
+  printf ("reallocated %u -> %u bytes at %p [header %p]\n",
+	  header->size, size, p, header);
+#endif
+
+  header->size = size;
+
+  return (&header->data[0]);
+}
+
+static void *
+scm_avahi_calloc (size_t count, size_t element_size)
+{
+  void *p;
+  size_t total = count * element_size;
+
+  p = scm_avahi_malloc (total);
+  if (EXPECT_TRUE (p != NULL))
+    memset (p, 0, total);
+
+  return p;
+}
+
+static const AvahiAllocator scm_avahi_allocator =
+  {
+    scm_avahi_malloc,
+    scm_avahi_free,
+    scm_avahi_realloc,
+    scm_avahi_calloc
+  };
+
+
+
 /* Initialization.  */
 void
 scm_avahi_common_init (void)
 {
+  avahi_set_allocator (&scm_avahi_allocator);
+
 #include "common.c.x"
 
   scm_avahi_define_enums ();

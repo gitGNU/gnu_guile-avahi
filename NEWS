@@ -1,3 +1,9 @@
+* New in Guile-Avahi 0.2
+
+** Use a custom memory allocator
+This allows Guile's GC to make more informed decisions, thereby slightly
+reducing average memory usage.
+
 * New in Guile-Avahi 0.1
 
 ** Documentation and test suite improvements
