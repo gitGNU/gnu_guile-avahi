@@ -14,7 +14,11 @@ AC_CONFIG_HEADER([src/config.h])
 
 # Checks for programs.
 AC_PROG_CC
+gl_EARLY
 AC_PROG_LIBTOOL
+
+# Gnulib
+gl_INIT
 
 GUILE_PROGS
 GUILE_FLAGS
@@ -43,6 +47,7 @@ AC_CHECK_LIB([gmp], [__gmpz_init], [LIBS="$LIBS -lgmp"],
 AC_CONFIG_FILES([Makefile
 	         modules/Makefile
 		 doc/Makefile
+		 lib/Makefile
 	         src/Makefile
 		 tests/Makefile
 		 pre-inst-guile])
