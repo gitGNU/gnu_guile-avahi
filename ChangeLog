@@ -2,6 +2,22 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-17 20:13:20 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-6
+
+    Summary:
+      Enable warnings-as-errors by default when GCC is used.
+    Revision:
+      guile-avahi--devo--0.2--patch-6
+
+    * configure.ac (CFLAGS): Add `-Wall -Werror' when GCC is used.
+
+    modified files:
+     ChangeLog configure.ac
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-6
+
+
 2007-07-17 20:13:01 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-5
 
     Summary:
