@@ -16,5 +16,6 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 AUTOMAKE_OPTIONS = foreign
+ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = modules src doc tests
+SUBDIRS = modules lib src doc tests

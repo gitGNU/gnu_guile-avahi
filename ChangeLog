@@ -2,6 +2,36 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-17 20:12:20 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-3
+
+    Summary:
+      Use Gnulib.
+    Revision:
+      guile-avahi--devo--0.2--patch-3
+
+    * Makefile.am (ACLOCAL_AMFLAGS): New.
+      (SUBDIRS): Added `lib'.
+    
+    * configure.ac: Invoke `gl_EARLY' and `gl_INIT'.  Produce
+      `lib/Makefile'.
+    
+    * src/Makefile.am (libguile avahi_v_0_la_LIBADD): Added `libgnu.la'.
+      (AM_CPPFLAGS): Added `lib'.
+
+    new files:
+     m4/.arch-ids/=id m4/.arch-ids/gnulib-cache.m4.id
+     m4/.arch-inventory m4/gnulib-cache.m4
+
+    modified files:
+     ChangeLog Makefile.am configure.ac src/Makefile.am
+
+    new directories:
+     m4 m4/.arch-ids
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-3
+
+
 2007-07-17 20:11:39 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-2
 
     Summary:
