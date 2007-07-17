@@ -137,6 +137,7 @@
         (format port "      scm_gc_unprotect_object (obj);~%")
         (format port "      SCM_SET_SMOB_DATA (obj, (scm_t_bits) NULL);~%")
         (format port "    }~%")
+        (format port "  return SCM_UNSPECIFIED;~%")
         (format port "}~%")
         (format port "#undef FUNC_NAME~%")
 
