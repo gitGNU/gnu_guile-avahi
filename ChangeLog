@@ -2,6 +2,29 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-24 17:56:48 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-9
+
+    Summary:
+      Defer invocation of `avahi_client_free ()'.
+    Revision:
+      guile-avahi--devo--0.2--patch-9
+
+    * src/client.c: Include <avahi-common/malloc.h>.
+      (client_zombie_t): New type.
+      (zombie_pool, client_zombies, allocate_client_zombie,
+      mark_client_as_zombie, free_client_zombies): New.
+      (scm_avahi_client_free): Use `mark_client_as_zombie ()' instead of
+      `avahi_client_free ()'.
+      (scm_avahi_make_client): Invoke `allocate_client_zombie ()'.
+      (scm_avahi_client_init): Add `free_client_zombies' to SCM_AFTER_GC_C_HOOK.
+
+    modified files:
+     ChangeLog src/client.c
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-9
+
+
 2007-07-24 17:56:25 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-8
 
     Summary:

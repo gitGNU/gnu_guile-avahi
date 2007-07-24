@@ -23,6 +23,7 @@
 
 #include <avahi-common/watch.h>
 #include <avahi-common/simple-watch.h>
+#include <avahi-common/malloc.h>
 #include <libguile.h>
 
 #include "common-smobs.h"
@@ -37,13 +38,86 @@
 
 /* SMOB and enums type definitions.  */
 
+
+/* Structure to keep track of zombie clients.  See `scm_avahi_client_free ()'
+   for details.  */
+typedef struct client_zombie
+{
+  AvahiClient          *client;
+  struct client_zombie *next;
+} client_zombie_t;
+
+/* Pool of `client_zombie_t' data structures.  */
+static client_zombie_t *zombie_pool = NULL;
+
+/* List of clients to be freed.  */
+static client_zombie_t *client_zombies = NULL;
+
+
+/* Allocate a client zombie, which will allow a client to eventually die in
+   good conditions.  */
+static inline void
+allocate_client_zombie (void)
+{
+  /* XXX: We might want a bit of synchronization here, in case multiple Guile
+     threads are used.  OTOH, it's unlikely that dozens of clients will be
+     allocated concurrently from different threads.  */
+  client_zombie_t *zombie;
+
+  zombie = avahi_malloc (sizeof (* zombie));
+  zombie->client = NULL;
+  zombie->next = zombie_pool;
+  zombie_pool = zombie;
+}
+
+/* Move CLIENT to the list of zombie clients so that it can be actually freed
+   as soon as it is safe to do so.  */
+static inline void
+mark_client_as_zombie (AvahiClient *client)
+{
+  client_zombie_t *zombie;
+
+  zombie = zombie_pool;
+
+  if (EXPECT_FALSE (zombie == NULL))
+    /* This probably means that we forgot to allocate one zombie per
+       client.  */
+    abort ();
+
+  zombie_pool = zombie->next;
+
+  zombie->client = client;
+  zombie->next = client_zombies;
+  client_zombies = zombie;
+}
+
 static inline void
 scm_avahi_client_free (AvahiClient *client)
 {
   /* Since client SMOBs are temporarily created from a NULL pointer, we must
      make sure we don't mess things up.  */
   if (client != NULL)
-    avahi_client_free (client);
+    /* `scm_avahi_client_free ()' frees a client's watches, which may involve
+       calling Scheme code if the poll being used is a "Guile poll" (returned
+       by `make-guile-poll').  Thus, `scm_avahi_client_free ()' cannot be
+       called from here.  Instead we use a form of guardian (the
+       CLIENT_ZOMBIES list above) that is traversed after GC.  */
+    mark_client_as_zombie (client);
+}
+
+static void *
+free_client_zombies (void *hook_data, void *func_data, void *data)
+{
+  client_zombie_t *zombie;
+
+  for (zombie = client_zombies;
+       zombie != NULL;
+       zombie = zombie->next)
+    avahi_client_free (zombie->client);
+
+  client_zombies = NULL;
+
+  return NULL;
 }
 
 #include "client-enums.i.c"
@@ -150,6 +224,8 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
       if (SCM_SMOB_DATA (client) != (scm_t_bits) c_client)
 	abort ();
     }
+
+  allocate_client_zombie ();
 
   return (client);
 }
@@ -262,6 +338,10 @@ scm_avahi_client_init (void)
 #include "client.c.x"
 
   scm_avahi_define_enums ();
+
+  /* Add our "guardian" hook that handles actual destruction of clients when
+     it is safe to do so.  */
+  scm_c_hook_add (&scm_after_gc_c_hook, free_client_zombies, NULL, 0);
 }
 
 /* arch-tag: bfed1cab-478e-4272-9cd3-884f47ce3506
