@@ -2,6 +2,21 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-24 17:57:55 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-12
+
+    Summary:
+      Fixed `NEWS'.
+    Revision:
+      guile-avahi--devo--0.2--patch-12
+
+
+    modified files:
+     ChangeLog NEWS
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-12
+
+
 2007-07-24 17:57:33 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-11
 
     Summary:
