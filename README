@@ -41,3 +41,13 @@ Optional:
     http://www.gnu.org/software/gmp/ .
 
 
+
+Copyright 2007  Ludovic Courtès <ludo@gnu.org>
+
+Copying and distribution of this file, with or without modification, are
+permitted in any medium without royalty provided the copyright notice
+and this notice are preserved.
+
+;; Local Variables:
+;; coding: utf-8
+;; End:
