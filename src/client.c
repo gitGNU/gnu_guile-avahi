@@ -151,7 +151,7 @@ SCM_DEFINE (scm_avahi_make_client, "make-client",
 	abort ();
     }
 
-  return (scm_gc_protect_object (client));
+  return (client);
 }
 #undef FUNC_NAME
 
