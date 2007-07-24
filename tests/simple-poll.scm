@@ -61,10 +61,7 @@
                                           client-host-fqdn)
                                     (make-list 3 (list client))))
                         (eq? (client-state client)
-                             client-state/s-running)
-                        (begin
-                          (free-client! client)
-                          (freed-client? client)))))))
+                             client-state/s-running))))))
 
     (lambda ()
       ;; failure.

@@ -247,7 +247,6 @@
 
 (define %client-smob
   (make-smob-type "AvahiClient *" 'client
-                  #f
                   "scm_avahi_client_free"))
 
 (define %avahi-client-smobs

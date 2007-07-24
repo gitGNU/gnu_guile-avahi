@@ -2,6 +2,27 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-24 17:56:25 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-8
+
+    Summary:
+      Undoed previous patch (explicit client finalization).
+    Revision:
+      guile-avahi--devo--0.2--patch-8
+
+    Explicit client finalization was hazardous because (i) it creates
+    invalid client SMOBs so all procedures that take a client SMOB must
+    check its validity, and (ii) users could free a client that is still
+    being actually used and referenced (by a browser, etc.).  Reason (ii) is
+    clearly a show-stopper.
+
+    modified files:
+     ChangeLog modules/avahi/build/smobs.scm
+     modules/avahi/client.scm src/client.c tests/simple-poll.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-8
+
+
 2007-07-24 17:55:57 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-7
 
     Summary:
