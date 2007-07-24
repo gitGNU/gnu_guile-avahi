@@ -2,6 +2,26 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-24 17:57:11 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-10
+
+    Summary:
+      Fixed GC interaction between watches and guile polls.
+    Revision:
+      guile-avahi--devo--0.2--patch-10
+
+    * src/common.c (scm_avahi_make_guile_poll): Initialize
+      `c_guile_poll->poll_smob'.
+      (mark_avahi_watch): Mark `c_watch->guile_poll->poll_smob'.
+      (mark_avahi_timeout): Likewise.
+      (avahi_guile_poll_new): Initialize `guile_poll->poll_smob'.
+
+    modified files:
+     ChangeLog src/common.c src/watch.c src/watch.h
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-10
+
+
 2007-07-24 17:56:48 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-9
 
     Summary:

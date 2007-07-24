@@ -38,6 +38,9 @@ struct AvahiGuilePoll
   SCM new_timeout;
   SCM free_timeout;
   SCM update_timeout_x;
+
+  /* The corresponding SMOB, if any.  */
+  SCM poll_smob;
 };
 
 extern AvahiGuilePoll *avahi_guile_poll_new (SCM new_watch,

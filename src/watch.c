@@ -206,7 +206,9 @@ SCM_SMOB_MARK (scm_tc16_avahi_watch, mark_avahi_watch, watch)
 
   c_watch = scm_to_avahi_watch (watch, 1, __FUNCTION__);
 
-  return (c_watch->stuff);
+  scm_gc_mark (c_watch->stuff);
+
+  return (c_watch->guile_poll->poll_smob);
 }
 
 /* Mark the user data associated with TIMEOUT.  */
@@ -216,7 +218,9 @@ SCM_SMOB_MARK (scm_tc16_avahi_timeout, mark_avahi_timeout, timeout)
 
   c_timeout = scm_to_avahi_timeout (timeout, 1, __FUNCTION__);
 
-  return (c_timeout->stuff);
+  scm_gc_mark (c_timeout->stuff);
+
+  return (c_timeout->guile_poll->poll_smob);
 }
 
 
@@ -420,6 +424,8 @@ avahi_guile_poll_new (SCM new_watch, SCM update_watch_x, SCM free_watch,
   guile_poll->new_timeout = new_timeout;
   guile_poll->free_timeout = free_timeout;
   guile_poll->update_timeout_x = update_timeout_x;
+
+  guile_poll->poll_smob = SCM_BOOL_F;
 
   return (guile_poll);
 }

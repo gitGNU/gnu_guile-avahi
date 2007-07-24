@@ -113,6 +113,7 @@ SCM_DEFINE (scm_avahi_make_guile_poll, "make-guile-poll",
 	    "detailed example.")
 #define FUNC_NAME s_scm_avahi_make_guile_poll
 {
+  SCM guile_poll;
   AvahiGuilePoll *c_guile_poll;
 
   c_guile_poll = avahi_guile_poll_new (new_watch, update_watch_x, free_watch,
@@ -121,7 +122,14 @@ SCM_DEFINE (scm_avahi_make_guile_poll, "make-guile-poll",
   if (!c_guile_poll)
     scm_avahi_error (AVAHI_ERR_NO_MEMORY, FUNC_NAME);
 
-  return (scm_from_avahi_guile_poll (c_guile_poll));
+  guile_poll = scm_from_avahi_guile_poll (c_guile_poll);
+
+  /* Store a reference to our SMOB so that other SMOBs (e.g., watches) that
+     keep a reference to the poll can mark its SMOB, thereby protecting the
+     whole poll from GC.  */
+  c_guile_poll->poll_smob = guile_poll;
+
+  return (guile_poll);
 }
 #undef FUNC_NAME
 
