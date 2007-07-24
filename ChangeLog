@@ -2,6 +2,35 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-24 17:55:57 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-7
+
+    Summary:
+      Use an explicit finalizer for clients.
+    Revision:
+      guile-avahi--devo--0.2--patch-7
+
+    * modules/avahi/build/smobs.scm (%client-smob): Use an explicit
+      finalizer.  This is because `avahi_client_free ()' frees its watches,
+      which in turn invokes our Scheme-level `free-watch!' procedure, which
+      obviously cannot be done from within the SMOB's finalizer.
+    
+    * modules/avahi/client.scm: Export `free-client!' and `freed-client?'.
+    
+    * src/client.c (scm_avahi_make_client): Call `scm_gc_protect_object ()'.
+    
+    * tests/simple-poll.scm: Use `free-client!' and `freed-client?'.
+    
+    * modules/avahi/client/publish.scm: Fixed typo.
+
+    modified files:
+     ChangeLog modules/avahi/build/smobs.scm
+     modules/avahi/client.scm modules/avahi/client/publish.scm
+     src/client.c tests/simple-poll.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-7
+
+
 2007-07-17 20:13:20 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-6
 
     Summary:
