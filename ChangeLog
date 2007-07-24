@@ -2,6 +2,26 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-24 17:57:33 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-11
+
+    Summary:
+      Updated `NEWS'.
+    Revision:
+      guile-avahi--devo--0.2--patch-11
+
+    * AUTHORS: Switched to UTF-8.
+    
+    * NEWS: Updated, added copyright notice.
+    
+    * README: Added copyright notice.
+
+    modified files:
+     AUTHORS ChangeLog NEWS README
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-11
+
+
 2007-07-24 17:57:11 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-10
 
     Summary:

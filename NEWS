@@ -1,5 +1,7 @@
 * New in Guile-Avahi 0.2
 
+** Fixed garbage collection of clients when a Guile poll is used
+** Fixed garbage collection of Guile polls vs. watches
 ** Use a custom memory allocator
 This allows Guile's GC to make more informed decisions, thereby slightly
 reducing average memory usage.
@@ -14,7 +16,14 @@ reducing average memory usage.
 See node "Explicit Finalization" in the manual.
 
 
+
+Copyright 2007  Ludovic Courtès <ludo@gnu.org>
+
+Copying and distribution of this file, with or without modification, are
+permitted in any medium without royalty provided the copyright notice
+and this notice are preserved.
+
 ;; Local Variables:
 ;; mode: outline
-;; coding: latin-1
+;; coding: utf-8
 ;; End:
