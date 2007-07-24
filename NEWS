@@ -1,10 +1,11 @@
 * New in Guile-Avahi 0.2
 
-** Fixed garbage collection of clients when a Guile poll is used
-** Fixed garbage collection of Guile polls vs. watches
 ** Use a custom memory allocator
 This allows Guile's GC to make more informed decisions, thereby slightly
 reducing average memory usage.
+** Bug fixes
+*** Fixed garbage collection of clients when a Guile poll is used
+*** Fixed garbage collection of Guile polls vs. watches
 
 * New in Guile-Avahi 0.1
 
