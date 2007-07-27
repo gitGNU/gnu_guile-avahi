@@ -6,11 +6,11 @@ Avahi bindings for GNU Guile 1.8.
   http://www.nongnu.org/guile-avahi/
 
 Guile-Avahi is a set of Avahi bindings for GNU Guile 1.8, released under
-the LGPL v2.1 or later. It allows programmers to use functionalities of
+the LGPL v3 or later.  It allows programmers to use functionalities of
 the Avahi client library from Guile Scheme programs.
 
 Avahi itself is an implementation of multicast DNS (mDNS) and DNS
-Service Discovery (DNS-SD). Together, these protocols provide support
+Service Discovery (DNS-SD).  Together, these protocols provide support
 for fully decentralized host naming and service publication and
 discovery.
 
