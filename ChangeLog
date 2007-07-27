@@ -2,6 +2,35 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-27 16:12:11 GMT	Ludovic Courtes <ludo@gnu.org>	patch-13
+
+    Summary:
+      Switched to LGPLv3.
+    Revision:
+      guile-avahi--devo--0.2--patch-13
+
+
+    new files:
+     .arch-ids/COPYING.LESSER.id COPYING.LESSER
+
+    modified files:
+     COPYING ChangeLog NEWS README modules/avahi.scm
+     modules/avahi/build/callbacks.scm
+     modules/avahi/build/enums.scm modules/avahi/build/smobs.scm
+     modules/avahi/build/utils.scm modules/avahi/client.scm
+     modules/avahi/client/lookup.scm
+     modules/avahi/client/publish.scm modules/avahi/test.scm
+     src/make-callback-header.scm src/make-callback-trampolines.scm
+     src/make-enum-header.scm src/make-enum-map.scm
+     src/make-smob-header.scm src/make-smob-types.scm
+     tests/errors.scm tests/guile-poll.scm tests/publish+browse.scm
+     tests/publish+resolve.scm tests/publish.scm
+     tests/simple-poll.scm
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-13
+
+
 2007-07-24 17:57:55 GMT	Ludovic Courtes <ludovic.courtes@laas.fr>	patch-12
 
     Summary:
