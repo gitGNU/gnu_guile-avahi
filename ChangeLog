@@ -2,6 +2,23 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-28 11:35:36 GMT	Ludovic Courtes <ludo@gnu.org>	patch-15
+
+    Summary:
+      Manual: Improved the introduction.
+    Revision:
+      guile-avahi--devo--0.2--patch-15
+
+    * doc/guile-avahi.texi (Introduction): Properly mention mDNS, DNS-SD,
+      Zeroconf and their purpose.
+
+    modified files:
+     ChangeLog doc/guile-avahi.texi
+
+    new patches:
+     lcourtes@laas.fr--2005-mobile/guile-avahi--devo--0.2--patch-15
+
+
 2007-07-27 17:08:41 GMT	Ludovic Courtes <ludo@gnu.org>	patch-14
 
     Summary:
