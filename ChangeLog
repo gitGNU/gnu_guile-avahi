@@ -2,6 +2,18 @@
 # arch-tag: automatic-ChangeLog--guile-avahi@sv.gnu.org--2007/guile-avahi--devo--0.2
 #
 
+2007-07-28 14:36:50 GMT	Ludovic Courtes <ludo@gnu.org>	version-0
+
+    Summary:
+      Releasing 0.2.
+    Revision:
+      guile-avahi--devo--0.2--version-0
+
+
+    modified files:
+     ChangeLog
+
+
 2007-07-28 11:35:36 GMT	Ludovic Courtes <ludo@gnu.org>	patch-15
 
     Summary:
