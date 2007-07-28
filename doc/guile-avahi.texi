@@ -87,18 +87,27 @@ last updated in @value{UPDATED-MONTH}.
 @node Introduction, Conventions, Top, Top
 @chapter Introduction
 
+@cindex mDNS
+@cindex DNS-SD
+@cindex Zeroconf
+
 @uref{http://www.nongnu.org/guile-avahi/, Guile-Avahi} provides GNU
-Guile @dfn{bindings} to the @uref{http://avahi.org/, Avahi library}.
-In other words, it makes it possible to write Scheme programs that use
-the facilities of Avahi.  Avahi is a C library that implements the
-@uref{http://dns-sd.org/, DNS-SD} @dfn{service discovery} protocol,
-sometimes also referred to as ``Bonjour''.
+Guile @dfn{bindings} to the @uref{http://avahi.org/, Avahi library}.  In
+other words, it makes it possible to write Scheme programs that use the
+facilities of Avahi.  Avahi itself is a C library that implements the
+@uref{http://multicastdns.org/, multicast DNS} (mDNS) and
+@uref{http://dns-sd.org/, DNS Service Discovery} (DNS-SD) protocols,
+sometimes erroneously referred to as ``Bonjour''.  Together, these
+protocols provide support for fully decentralized host naming and
+service publication and discovery.  They are key components of the
+so-called @uref{http://www.zeroconf.org/, Zero-Configuration Networking
+Stack} (@dfn{Zeroconf}).
 
 More precisely, Guile-Avahi provides bindings for the @dfn{client}
 library of Avahi.  The client library allows application to use
 service discovery by transparently connecting them to the Avahi
 @dfn{system-wide daemon} using @uref{http://dbus.freedesktop.org,
-D-Bus}.  This daemon actually implements the DNS-SD protocols and
+D-Bus}.  This daemon actually implements the DNS-SD protocol and
 handles service discovery and publication on behalf of applications
 running on the same host.
 
