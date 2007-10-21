@@ -41,6 +41,16 @@ Optional:
     http://www.gnu.org/software/gmp/ .
 
 
+Development
+...........
+
+A local copy of the source code repository can be otained using Git:
+
+  $ git-clone git://git.sv.gnu.org/guile-avahi.git
+
+More information about Git is available at http://git.or.cz .
+
+
 
 Copyright 2007  Ludovic Courtès <ludo@gnu.org>
 
