@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-guilemoduledir = $(GUILE_SITE)
-
 nobase_dist_guilemodule_DATA =			\
   avahi.scm avahi/client.scm			\
   avahi/client/lookup.scm			\
