@@ -1,5 +1,0 @@
-# Generated files.
-
-precious ^(version\.texi|.*\.c\.texi|stamp-vti|guile-avahi\.(info|ps|pdf|dvi))$
-
-# arch-tag: 268372ea-0c60-4dc4-830e-c30f252ccaf8
