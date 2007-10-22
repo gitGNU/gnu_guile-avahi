@@ -31,8 +31,15 @@ AC_PROG_LIBTOOL
 gl_INIT
 
 if test "x$GCC" = "xyes"; then
-  CFLAGS="-Wall -Werror $CFLAGS"
+  # Enable useful GCC compilation flags.
+  GCC_CFLAGS="-Wall -Werror"
+  GCC_CFLAGS="-Wcast-align -Wpointer-arith $GCC_CFLAGS"
+  GCC_CFLAGS="-Winline -Wdeclaration-after-statement $GCC_CFLAGS"
+else
+  GCC_CFLAGS=""
 fi
+AC_SUBST([GCC_CFLAGS])
+
 
 GUILE_PROGS
 GUILE_FLAGS
@@ -48,7 +55,7 @@ PKG_CHECK_MODULES([AVAHI], [avahi-client], [],
    [AC_MSG_ERROR([Avahi could not be found, please install it first.])])
 
 # Checks for header files.
-AC_CHECK_HEADERS([net/if.h arpa/inet.h gmp.h])
+AC_CHECK_HEADERS([net/if.h gmp.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 
