@@ -1,0 +1,4 @@
+*.c.texi
+guile-avahi.info*
+version.texi
+stamp-vti
