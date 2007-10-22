@@ -12,6 +12,16 @@ AM_INIT_AUTOMAKE(guile-avahi, 0.2)
 AC_CONFIG_SRCDIR([src/common.c])
 AC_CONFIG_HEADER([src/config.h])
 
+
+AC_ARG_WITH([guilemoduledir],
+  [use the specified installation path for Guile modules],
+  [case "x$withval" in
+     xyes|xno) guilemoduledir="";;
+     *)        guilemoduledir="$withval";;
+   esac],
+  [guilemoduledir=""])
+   
+
 # Checks for programs.
 AC_PROG_CC
 gl_EARLY
@@ -47,6 +57,20 @@ AC_CHECK_FUNCS([if_nametoindex if_indextoname])
 AC_CHECK_LIB([gmp], [__gmpz_init], [LIBS="$LIBS -lgmp"],
   [AC_MSG_WARN([GNU MP not found, see README])])
 
+
+pkgdatadir="$datadir/$PACKAGE_NAME"
+if test "x$guilemoduledir" = "x"; then
+  guilemoduledir="$pkgdatadir"
+fi
+AC_SUBST([guilemoduledir])
+
+if test "$guilemoduledir" != "$GUILE_SITE"; then
+   # Guile won't be able to locate the module "out of the box", so
+   # warn the user.
+   AC_MSG_WARN([`guilemoduledir' ($guilemoduledir) is different from `GUILE_SITE' ($GUILE_SITE).])
+   AC_MSG_WARN([Make sure to adjust the `GUILE_LOAD_PATH' environment variable accordingly,])
+   AC_MSG_WARN([or re-run `configure' with `--with-guilemoduledir=$GUILE_SITE'.])
+fi
 
 AC_CONFIG_FILES([Makefile
 	         modules/Makefile

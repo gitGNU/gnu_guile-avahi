@@ -1,6 +1,11 @@
+* New in Guile-Avahi 0.3
+
+** New `--with-guilemoduledir' configure flag
+** Switch from GNU Arch to Git for version control
+
 * New in Guile-Avahi 0.2
 
-** Switched to LGPLv3.
+** Switched to LGPLv3
 ** Use a custom memory allocator
 This allows Guile's GC to make more informed decisions, thereby slightly
 reducing average memory usage.
