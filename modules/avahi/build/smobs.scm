@@ -191,7 +191,7 @@
     (format port "}~%#undef FUNC_NAME~%")))
 
 (define (output-c->smob-converter type port)
-  (format port "static inline SCM~%~a (~a c_obj)~%{~%"
+  (format port "static inline SCM~%~a (const ~a c_obj)~%{~%"
           (smob-type-from-c-function type)
           (smob-type-c-name type))
   (format port "  SCM_RETURN_NEWSMOB3 (~a, (scm_t_bits) c_obj, "
