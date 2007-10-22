@@ -1,6 +1,7 @@
 * New in Guile-Avahi 0.3
 
 ** New `--with-guilemoduledir' configure flag
+** New procedures: `make-threaded-poll', `threaded-poll', etc.
 ** Switch from GNU Arch to Git for version control
 
 * New in Guile-Avahi 0.2
