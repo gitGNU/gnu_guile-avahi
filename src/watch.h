@@ -23,6 +23,7 @@
    interfaces.  */
 
 #include <avahi-common/watch.h>
+#include <avahi-common/thread-watch.h>
 
 #include <libguile.h>
 

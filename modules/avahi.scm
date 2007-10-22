@@ -26,6 +26,9 @@
 
            make-guile-poll guile-poll
            make-simple-poll simple-poll iterate-simple-poll run-simple-poll
+           make-threaded-poll threaded-poll
+           start-threaded-poll stop-threaded-poll quit-threaded-poll
+           lock-threaded-poll unlock-threaded-poll
 
            watch-event->string
            watch-event/in watch-event/out watch-event/err watch-event/hup

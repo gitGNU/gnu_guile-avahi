@@ -56,6 +56,8 @@ PKG_CHECK_MODULES([AVAHI], [avahi-client], [],
 
 # Checks for header files.
 AC_CHECK_HEADERS([net/if.h gmp.h])
+AC_CHECK_HEADER([avahi-common/thread-watch.h], [:],
+   [AC_MSG_ERROR([Avahi >= 0.6.4 (with `AvahiThreadedPoll') is needed.])])
 
 # Checks for typedefs, structures, and compiler characteristics.
 

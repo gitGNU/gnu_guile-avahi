@@ -288,6 +288,148 @@ SCM_DEFINE (scm_avahi_run_simple_poll, "run-simple-poll",
 }
 #undef FUNC_NAME
 
+
+
+/* The `AvahiThreadedPoll' appeared in Avahi 0.6.4.  */
+
+SCM_DEFINE (scm_avahi_make_threaded_poll, "make-threaded-poll",
+	    0, 0, 0,
+	    (void),
+	    "Return a @code{threaded-poll} object.  A threaded poll is "
+	    "essentially an event loop that processes events from the "
+	    "Avahi daemon in its own thread.")
+#define FUNC_NAME s_scm_avahi_make_threaded_poll
+{
+  AvahiThreadedPoll *c_threaded_poll;
+
+  c_threaded_poll = avahi_threaded_poll_new ();
+  if (!c_threaded_poll)
+    scm_avahi_error (AVAHI_ERR_NO_MEMORY, FUNC_NAME);
+
+  return (scm_from_avahi_threaded_poll (c_threaded_poll));
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_threaded_poll, "threaded-poll",
+	    1, 0, 0,
+	    (SCM threaded_poll),
+	    "Return the @code{poll} object associated with "
+	    "@var{threaded-poll}.")
+#define FUNC_NAME s_scm_avahi_threaded_poll
+{
+  SCM poll;
+  AvahiThreadedPoll *c_threaded_poll;
+  const AvahiPoll *c_poll;
+
+  c_threaded_poll = scm_to_avahi_threaded_poll (threaded_poll, 1, FUNC_NAME);
+
+  c_poll = avahi_threaded_poll_get (c_threaded_poll);
+  poll = scm_from_avahi_poll ((AvahiPoll *) c_poll);
+
+  SCM_AVAHI_SET_POLL_PARENT_POLL (poll, threaded_poll);
+
+  return (poll);
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_start_threaded_poll, "start-threaded-poll",
+	    1, 0, 0,
+	    (SCM threaded_poll),
+	    "Start the helper thread associated with @var{threaded-poll}, "
+	    "which is responsible for running the event loop.  Callbacks "
+	    "are called from the helper thread.  Thus, synchronization may "
+	    "be required among threads.")
+#define FUNC_NAME s_scm_avahi_start_threaded_poll
+{
+  int err;
+  AvahiThreadedPoll *c_threaded_poll;
+
+  c_threaded_poll = scm_to_avahi_threaded_poll (threaded_poll, 1, FUNC_NAME);
+
+  err = avahi_threaded_poll_start (c_threaded_poll);
+  if (EXPECT_FALSE (err != 0))
+    scm_avahi_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_stop_threaded_poll, "stop-threaded-poll",
+	    1, 0, 0,
+	    (SCM threaded_poll),
+	    "Stop the helper thread associated with @var{threaded-poll} "
+	    "responsible for running the event loop.  It must be called "
+	    "from outside said thread (i.e., not from callbacks).")
+#define FUNC_NAME s_scm_avahi_stop_threaded_poll
+{
+  int err;
+  AvahiThreadedPoll *c_threaded_poll;
+
+  c_threaded_poll = scm_to_avahi_threaded_poll (threaded_poll, 1, FUNC_NAME);
+
+  err = avahi_threaded_poll_stop (c_threaded_poll);
+  if (EXPECT_FALSE (err != 0))
+    scm_avahi_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_quit_threaded_poll, "quit-threaded-poll",
+	    1, 0, 0,
+	    (SCM threaded_poll),
+	    "Quit the event loop associated with @var{threaded-poll} "
+	    "responsible for running the event loop.  It must be called "
+	    "from outside said thread (i.e., not from callbacks).")
+#define FUNC_NAME s_scm_avahi_quit_threaded_poll
+{
+  AvahiThreadedPoll *c_threaded_poll;
+
+  c_threaded_poll = scm_to_avahi_threaded_poll (threaded_poll, 1, FUNC_NAME);
+
+  avahi_threaded_poll_quit (c_threaded_poll);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_lock_threaded_poll, "lock-threaded-poll",
+	    1, 0, 0,
+	    (SCM threaded_poll),
+	    "Lock the event loop associated with @var{threaded-poll}.  "
+	    "Use this if you want to access the event loop object "
+	    "(e.g., creating a new event source) from anything but "
+	    "the event loop helper thread, i.e. not from callbacks.")
+#define FUNC_NAME s_scm_avahi_lock_threaded_poll
+{
+  AvahiThreadedPoll *c_threaded_poll;
+
+  c_threaded_poll = scm_to_avahi_threaded_poll (threaded_poll, 1, FUNC_NAME);
+
+  avahi_threaded_poll_lock (c_threaded_poll);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_avahi_unlock_threaded_poll, "unlock-threaded-poll",
+	    1, 0, 0,
+	    (SCM threaded_poll),
+	    "Unlock the event look object associated with "
+	    "@var{threaded-poll}.")
+#define FUNC_NAME s_scm_avahi_unlock_threaded_poll
+{
+  AvahiThreadedPoll *c_threaded_poll;
+
+  c_threaded_poll = scm_to_avahi_threaded_poll (threaded_poll, 1, FUNC_NAME);
+
+  avahi_threaded_poll_unlock (c_threaded_poll);
+
+  return SCM_UNSPECIFIED;
+}
+#undef FUNC_NAME
+
+
 
 /* Custom memory allocator.  */
 

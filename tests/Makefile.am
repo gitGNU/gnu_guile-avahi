@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-TESTS = simple-poll.scm publish.scm		\
-	publish+browse.scm publish+resolve.scm	\
+TESTS = simple-poll.scm threaded-poll.scm publish.scm	\
+	publish+browse.scm publish+resolve.scm		\
         guile-poll.scm errors.scm
 
 EXTRA_DIST = $(TESTS)

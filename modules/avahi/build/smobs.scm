@@ -231,6 +231,10 @@
   (make-smob-type "AvahiGuilePoll *" 'guile-poll
                   "avahi_guile_poll_free"))
 
+(define %threaded-poll-smob
+  (make-smob-type "AvahiThreadedPoll *" 'threaded-poll
+                  "avahi_threaded_poll_free"))
+
 (define %watch-smob
   (make-smob-type "AvahiWatch *" 'watch
                   "free"))
@@ -240,7 +244,7 @@
                   "free"))
 
 (define %avahi-common-smobs
-  (list %poll-smob %simple-poll-smob %guile-poll-smob
+  (list %poll-smob %simple-poll-smob %guile-poll-smob %threaded-poll-smob
         %watch-smob %timeout-smob))
 
 
