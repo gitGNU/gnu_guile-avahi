@@ -28,8 +28,9 @@ Dependencies
 
 Requirements:
 
-  Avahi     >= 0.6.0
+  Avahi     >= 0.6.4
   GNU Guile >= 1.8.0
+  GNU Make
 
 Optional:
 
