@@ -471,7 +471,7 @@ scm_avahi_free (void *p)
 {
   alloc_header_t *header;
 
-  header = (alloc_header_t *) ((char *) p - sizeof (size_t));
+  header = (alloc_header_t *) (void *) ((char *) p - sizeof (size_t));
 
 #ifdef DEBUG
   printf ("freeing %u bytes at %p [header %p]\n",
@@ -489,7 +489,7 @@ scm_avahi_realloc (void *p, size_t size)
   if (p == NULL)
     return (scm_avahi_malloc (size));
 
-  header = (alloc_header_t *) ((char *) p - sizeof (size_t));
+  header = (alloc_header_t *) (void *) ((char *) p - sizeof (size_t));
 
   header = scm_gc_realloc (header,
 			   header->size + sizeof (size_t),
