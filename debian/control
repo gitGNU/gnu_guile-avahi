@@ -1,0 +1,15 @@
+Source: guile-avahi
+Section: libs
+Priority: extra
+Maintainer: Ludovic Courtès <ludo@gnu.org>
+Build-Depends: debhelper (>= 4), libavahi-client-dev (>= 0.6.4), avahi-daemon
+Standards-Version: 3.7.2
+
+Package: guile-avahi
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: GNU Guile 1.8 bindings for the Avahi library
+ Guile-Avahi provides bindings for GNU Guile 1.8 of the Avahi client
+ library.  Avahi itself is a mDNS/DNS-SD implementation that provides,
+ among other things, service discovery and publication facilities.
+ .
