@@ -48,9 +48,10 @@ lib_LTLIBRARIES = libguile-avahi-v-0.la
 libguile_avahi_v_0_la_SOURCES =			\
   utils.c errors.c watch.c common.c client.c	\
   publish.c lookup.c
-libguile_avahi_v_0_la_CFLAGS = $(AVAHI_CFLAGS) $(AM_CFLAGS)
+libguile_avahi_v_0_la_CFLAGS =			\
+  $(AVAHI_CFLAGS) $(GUILE_CFLAGS) $(AM_CFLAGS)
 libguile_avahi_v_0_la_LIBADD =			\
-  $(top_builddir)/lib/libgnu.la $(AVAHI_LIBS)
+  $(top_builddir)/lib/libgnu.la $(AVAHI_LIBS) $(GUILE_LDFLAGS)
 
 AM_CFLAGS   = $(GCC_CFLAGS)
 AM_CPPFLAGS = -I$(builddir) -I$(srcdir)			\
