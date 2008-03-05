@@ -1,5 +1,5 @@
 ;;; Guile-Avahi --- Guile bindings for Avahi.
-;;; Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+;;; Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of Guile-Avahi.
 ;;;
@@ -20,6 +20,7 @@
   :use-module (srfi srfi-1)
   :use-module (srfi srfi-9)
   :use-module (avahi build utils)
+  :use-module (avahi build config)
 
   :export (make-enum-type enum-type-subsystem enum-type-value-alist
            enum-type-c-type enum-type-get-name-function
@@ -297,7 +298,7 @@
 
 (define %error-enum
   (make-enum-type 'error "int"
-                  '(
+                  (append '(
 ok
 failure
 bad-state
@@ -355,8 +356,11 @@ not-supported
 
 not-permitted
 invalid-argument
-is-empty
-no-change)
+is-empty)
+                          ;; `AVAHI_ERR_NO_CHANGE' appeared in Avahi 0.6.13.
+                          (if %have-err-no-change?
+                              (list 'no-change)
+                              '()))
                   "avahi_strerror"
                   "AVAHI_ERR_"))
 

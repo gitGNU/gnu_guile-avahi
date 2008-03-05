@@ -24,3 +24,4 @@ lib/*
 *.i.c
 pre-inst-guile
 stamp-h[0-9]
+modules/avahi/build/config.scm

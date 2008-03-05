@@ -1,5 +1,5 @@
 # Guile-Avahi --- Guile bindings for Avahi.
-# Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
+# Copyright (C) 2008  Ludovic Courtès <ludo@gnu.org>
 #
 # This file is part of Guile-Avahi.
 #
@@ -16,20 +16,30 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules
 
-SNARF_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src \
-		 $(GUILE_CFLAGS) $(AVAHI_CPPFLAGS)
+# Autoconf snippets
 
 
-BUILT_SOURCES = common.c.texi watch.c.texi client.c.texi	\
-		publish.c.texi lookup.c.texi
-CLEANFILES    = $(BUILT_SOURCES)
-info_TEXINFOS = guile-avahi.texi
-EXTRA_DIST    = extract-c-doc.scm
+# GA_CHECK_ENUM_VALUE(INCLUDES VALUE ACTION-IF-DEFINED ACTION-OTHERWISE)
+#
+# Check whether VALUE is already defined in some `enum'.  If it's
+# already defined, ACTION-IF-DEFINED is executed, otherwise
+# ACTION-OTHERWISE.
+AC_DEFUN([GA_CHECK_ENUM_VALUE],
+  [AC_MSG_CHECKING([whether the `$2' enum is defined])
+   AC_COMPILE_IFELSE(
+     [AC_LANG_PROGRAM(
+       [[$1
+         /* Try to redefine the enum value.  It will fail
+	    if it's already defined.  */
+	 enum ga_check_enum_test { $2 };]],
+       [[return $2;]])],
+     [AC_MSG_RESULT([no])
+      $4],
+     [AC_MSG_RESULT([yes])
+      $3])])
 
-%.c.texi: $(top_srcdir)/src/%.c
-	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-c-doc.scm"	\
-	   -e '(apply main (cdr (command-line)))'		\
-	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS)"			\
-	   > "$@"
+# Local Variables:
+# mode: autoconf
+# coding: latin-1
+# End:

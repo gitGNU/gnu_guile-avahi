@@ -24,6 +24,7 @@ AC_ARG_WITH([guilemoduledir],
 
 # Checks for programs.
 AC_PROG_CC
+AC_LANG_C
 gl_EARLY
 AC_PROG_LIBTOOL
 
@@ -49,15 +50,29 @@ if test "x$guile_snarf" = "xnot-found"; then
 fi
 GUILE_SITE_DIR
 
+AC_CACHE_SAVE
+
+
 # Avahi.
 AC_MSG_CHECKING([whether Avahi is available])
 PKG_CHECK_MODULES([AVAHI], [avahi-client], [],
    [AC_MSG_ERROR([Avahi could not be found, please install it first.])])
+AVAHI_CPPFLAGS="`$PKG_CONFIG avahi-client --cflags-only-I`"
+AC_SUBST([AVAHI_CPPFLAGS])
 
 # Checks for header files.
 AC_CHECK_HEADERS([net/if.h gmp.h])
 AC_CHECK_HEADER([avahi-common/thread-watch.h], [:],
    [AC_MSG_ERROR([Avahi >= 0.6.4 (with `AvahiThreadedPoll') is needed.])])
+
+# `AVAHI_ERR_NO_CHANGE' was added in Avahi 0.6.13 (svn rev. 1266).
+old_CFLAGS="$CFLAGS"
+CFLAGS="$AVAHI_CFLAGS $CFLAGS"
+GA_CHECK_ENUM_VALUE([#include <avahi-common/error.h>], [AVAHI_ERR_NO_CHANGE],
+  [have_err_no_change=yes], [have_err_no_change=no])
+AM_CONDITIONAL([HAVE_AVAHI_ERR_NO_CHANGE], test "x$have_err_no_change" = "xyes")
+CFLAGS="$old_CFLAGS"
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 

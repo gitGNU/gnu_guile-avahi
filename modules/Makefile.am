@@ -1,5 +1,5 @@
 # Guile-Avahi --- Guile bindings for Avahi.
-# Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+# Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
 #
 # This file is part of Guile-Avahi.
 #
@@ -29,3 +29,23 @@ EXTRA_DIST = avahi/build/enums.scm avahi/build/smobs.scm	\
 	     avahi/build/callbacks.scm avahi/build/utils.scm	\
 	     avahi/test.scm					\
              $(documentation_modules)
+
+config_module = avahi/build/config.scm
+
+BUILT_SOURCES = $(config_module)
+
+if HAVE_AVAHI_ERR_NO_CHANGE
+avahi/build/config.scm:
+	-mkdir -p avahi/build
+	echo '(define-module (avahi build config))' > "$@" && \
+	echo '(define-public %have-err-no-change? (= 0 0))' >> "$@"
+else
+avahi/build/config.scm:
+	-mkdir -p avahi/build
+	echo '(define-module (avahi build config))' > "$@" && \
+	echo '(define-public %have-err-no-change? (= 0 1))' >> "$@"
+endif
+
+clean-local:
+	if test "$(top_builddir)" != "$(top_srcdir)";	\
+	then rm -rf "avahi" ; else rm -f "$(config_module)" ; fi

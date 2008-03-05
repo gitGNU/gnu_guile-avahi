@@ -1,5 +1,5 @@
 # Guile-Avahi --- Guile bindings for Avahi.
-# Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+# Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
 #
 # This file is part of Guile-Avahi.
 #
@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules
+GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules -L $(top_builddir)/modules
 
 noinst_HEADERS = watch.h utils.h errors.h
 
@@ -79,8 +79,9 @@ AM_CPPFLAGS = -I$(builddir) -I$(srcdir)			\
 
 # C file snarfing.
 
-snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	       $(CFLAGS) $(AM_CFLAGS)
+snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS)	\
+	       $(CFLAGS) $(AM_CFLAGS) $(GUILE_CFLAGS)		\
+	       $(AVAHI_CPPFLAGS)
 
 SUFFIXES = .x
 %.c.x: %.c
