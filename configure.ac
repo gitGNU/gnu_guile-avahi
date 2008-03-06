@@ -35,7 +35,7 @@ if test "x$GCC" = "xyes"; then
   # Enable useful GCC compilation flags.
   GCC_CFLAGS="-Wall -Werror"
   GCC_CFLAGS="-Wcast-align -Wpointer-arith $GCC_CFLAGS"
-  GCC_CFLAGS="-Winline -Wdeclaration-after-statement $GCC_CFLAGS"
+  GCC_CFLAGS="-Wdeclaration-after-statement $GCC_CFLAGS"
 else
   GCC_CFLAGS=""
 fi
