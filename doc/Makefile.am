@@ -18,8 +18,9 @@
 
 GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules
 
-SNARF_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src \
-		 $(GUILE_CFLAGS) $(AVAHI_CPPFLAGS)
+SNARF_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src	\
+		 $(GUILE_CFLAGS) $(AVAHI_CPPFLAGS) $(CPPFLAGS)	\
+		 $(AM_CPPFLAGS)
 
 
 BUILT_SOURCES = common.c.texi watch.c.texi client.c.texi	\
