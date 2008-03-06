@@ -1,5 +1,5 @@
 ;;; Guile-Avahi --- Guile bindings for Avahi.
-;;; Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+;;; Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of Guile-Avahi.
 ;;;
@@ -93,10 +93,12 @@
            error/not-supported
            error/not-permitted
            error/invalid-argument
-           error/is-empty
-           error/no-change))
+           error/is-empty))
 
 (load-extension "libguile-avahi-v-0" "scm_avahi_common_init")
+
+;; Optional bindings, depending on the configuration.
+(if (defined? 'error/no-change) (export error/no-change))
 
 ;; Aliases.
 (define protocol/unspecified    protocol/unspec)
