@@ -1,5 +1,5 @@
 ;;; Guile-Avahi --- Guile bindings for Avahi.
-;;; Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+;;; Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of Guile-Avahi.
 ;;;
@@ -20,7 +20,6 @@
   :use-module (avahi)
   :export (client? make-client client-server-version
            client-host-name client-host-fqdn client-state
-           set-client-host-name!
 
            client-state->string
            client-state/s-registering client-state/s-running
@@ -31,5 +30,9 @@
            client-flag/ignore-user-config client-flag/no-fail))
 
 (load-extension "libguile-avahi-v-0" "scm_avahi_client_init")
+
+;; Optional bindings, depending on the configuration.
+(if (defined? 'set-client-host-name!) (export set-client-host-name!))
+
 
 ;;; arch-tag: 9dc3916b-12a3-4fde-aa91-95ee0969d8bf

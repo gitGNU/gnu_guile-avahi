@@ -1,5 +1,5 @@
 /* Guile-Avahi --- Guile bindings for Avahi.
-   Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+   Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
 
    This file is part of Guile-Avahi.
 
@@ -266,6 +266,8 @@ SCM_DEFINE (scm_avahi_client_host_name, "client-host-name",
 }
 #undef FUNC_NAME
 
+#ifdef HAVE_AVAHI_CLIENT_SET_HOST_NAME
+
 SCM_DEFINE (scm_avahi_set_client_host_name_x, "set-client-host-name!",
 	    2, 0, 0,
 	    (SCM client, SCM name),
@@ -290,6 +292,8 @@ SCM_DEFINE (scm_avahi_set_client_host_name_x, "set-client-host-name!",
   return SCM_UNSPECIFIED;
 }
 #undef FUNC_NAME
+
+#endif /* HAVE_AVAHI_CLIENT_SET_HOST_NAME */
 
 SCM_DEFINE (scm_avahi_client_host_fqdn, "client-host-fqdn",
 	    1, 0, 0,

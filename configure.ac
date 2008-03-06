@@ -73,6 +73,11 @@ GA_CHECK_ENUM_VALUE([#include <avahi-common/error.h>], [AVAHI_ERR_NO_CHANGE],
 AM_CONDITIONAL([HAVE_AVAHI_ERR_NO_CHANGE], test "x$have_err_no_change" = "xyes")
 CFLAGS="$old_CFLAGS"
 
+# `avahi_client_set_host_name ()' was added in Avahi 0.6.13.
+old_LIBS="$LIBS"
+LIBS="$AVAHI_LIBS $LIBS"
+AC_CHECK_FUNCS([avahi_client_set_host_name])
+LIBS="$old_LIBS"
 
 # Checks for typedefs, structures, and compiler characteristics.
 
