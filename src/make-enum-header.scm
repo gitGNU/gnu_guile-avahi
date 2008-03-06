@@ -1,5 +1,5 @@
 ;;; Guile-Avahi --- Guile bindings for Avahi.
-;;; Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+;;; Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify it
 ;;; under the terms of the GNU General Public License as published by the
@@ -39,7 +39,10 @@
     (format port "#define GUILE_AVAHI_~a_ENUMS_H~%"
             (string-upcase (symbol->string %module)))
 
-    (format port "#include \"config.h\"~%")
+    (format port "#ifdef HAVE_CONFIG_H~%")
+    (format port "# include <config.h>~%")
+    (format port "#endif~%")
+
     (format port "#include <libguile.h>~%")
     (format port "#include <avahi-common/error.h>~%")
     (format port "#include <avahi-common/watch.h>~%")

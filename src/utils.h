@@ -1,5 +1,5 @@
 /* Guile-Avahi --- Guile bindings for Avahi.
-   Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+   Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
 
    This file is part of Guile-Avahi.
 
@@ -20,7 +20,7 @@
 #define GUILE_AVAHI_UTILS_H
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+# include <config.h>
 #endif
 
 #include <libguile.h>
