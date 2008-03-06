@@ -7,6 +7,7 @@
 In particular, `error/no-change' and `set-client-host-name!' are conditional.
 ** New features
 *** New procedures: `make-threaded-poll', `threaded-poll', etc.
+** Improved documentation
 ** Packaging
 *** New `--with-guilemoduledir' configure flag
 *** Switch from GNU Arch to Git for version control

@@ -19,7 +19,7 @@
 
 This file documents Guile-Avahi.
 
-Copyright @copyright{} 2007 Ludovic Court@`es
+Copyright @copyright{} 2007, 2008 Ludovic Court@`es
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -47,7 +47,7 @@ Edition @value{EDITION} @*
 @c Updated for Guile-Avahi @value{VERSION} @*
 @value{UPDATED} @*
 
-Copyright @copyright{} 2007 Ludovic Court@`es
+Copyright @copyright{} 2007, 2008 Ludovic Court@`es
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -78,6 +78,7 @@ last updated in @value{UPDATED-MONTH}.
 * Conventions::                 Naming conventions and other idiosyncrasies.
 * Examples::                    Quick start.
 * API Reference::               The Scheme Avahi programming interface.
+
 * Concept Index::               Concepts.
 * Procedure Index::             Scheme Procedures.
 * Variable Index::              Scheme Variables.
@@ -523,17 +524,35 @@ API reference}.
 @node Core Interface, Client Interface, API Reference, API Reference
 @section Core Interface
 
-This section lists the Scheme procedures exported by the
-@code{(avahi)} module.
+@cindex poll
+@cindex event loop
+This section lists the Scheme procedures exported by the @code{(avahi)}
+module.  These procedures are mainly related to @dfn{polls}, the
+building block of event loops in Avahi programs.  Polls come in three
+flavors:
+
+@itemize
+@item The @dfn{simple poll} provides simple, single-threaded event
+dispatching.  It essentially hangs on @code{select()}, processes D-Bus
+I/O events, and invokes the relevant client call-backs when appropriate.
+@item The @dfn{threaded poll} processes events similarly but in a
+separate thread of execution.
+@item Finally, the @dfn{guile poll} allows you to create customized
+event loops.  This is useful, for instance, in single-threaded programs
+that process events coming not only from Avahi but also from other
+sources (e.g., GTK+ events, networking events, etc.).
+@end itemize
+
+Creating and manipulating polls is achieved using the procedures below.
 
 @include common.c.texi
 
-The low-level API for watches, timeouts, and ``polls'', all of which
-serve as building blocks for the creation of event loops (using
-@code{make-guile-poll}) are described below.  In practice, you should
-only need it in applications where the Avahi event loop needs to be
-integrated in some other event loop; in other cases, the ``simple
-poll'' should be enough.
+The low-level API for watches, timeouts, and ``guile polls'', all of
+which serve as the basic for the creation of customized event loops
+(using @code{make-guile-poll}) is described below.  In practice, you
+should only need it in applications where the Avahi event loop needs to
+be integrated in some other event loop; in other cases, the ``simple
+poll'' or ``threaded poll'' should be enough.
 
 @include watch.c.texi
 
