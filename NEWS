@@ -2,6 +2,9 @@
 
 ** Incompatible changes
 *** Require Avahi >= 0.6.4
+** Bug fixes
+*** Allow use of Avahi <= 0.6.13 by making features conditional
+In particular, `error/no-change' and `set-client-host-name!' are conditional.
 ** New features
 *** New procedures: `make-threaded-poll', `threaded-poll', etc.
 ** Packaging
@@ -29,7 +32,7 @@ See node "Explicit Finalization" in the manual.
 
 
 
-Copyright 2007  Ludovic Courtès <ludo@gnu.org>
+Copyright 2007, 2008  Ludovic Courtès <ludo@gnu.org>
 
 Copying and distribution of this file, with or without modification, are
 permitted in any medium without royalty provided the copyright notice
