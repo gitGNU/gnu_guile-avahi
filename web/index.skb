@@ -1,0 +1,134 @@
+;;;
+;;; Guile-Avahi's Wonderful Website.
+;;;
+
+(use-modules (skribilo package html-navtabs)
+	     (skribilo engine)
+	     (skribilo ast))
+
+(define (html-tabs n e)
+  ;; Create one "navigation tab" for each chapter.
+  (let ((doc (ast-document n)))
+    (map handle
+         (container-search-down (lambda (n)
+                                  (is-markup? n 'chapter))
+                                doc))))
+
+
+(let ((html (find-engine 'html)))
+  (if (engine? html)
+      (begin
+        ;; Customizing the HTML output...
+	(engine-custom-set! html 'css "guile-avahi.css")
+        (engine-custom-set! html 'html-navtabs-produce-css? #f)
+        (engine-custom-set! html 'html-navtabs html-tabs))))
+
+
+
+
+;;;
+;;; List of useful URLs.
+;;;
+
+
+(define (scheme . body)
+  (ref :url "http://schemers.org/" :text body))
+
+(define (guile . body)
+  (ref :url "http://www.gnu.org/software/guile/guile.html" :text body))
+
+(define (freedom . body)
+  (ref :url "http://www.gnu.org/philosophy/free-sw.html" :text body))
+
+(define (lgpl . body)
+  (ref :url "http://www.gnu.org/licenses/lgpl.html" :text body))
+
+(define (avahi . body)
+  (ref :url "http://avahi.org/" :text body))
+
+(define (dns-sd . body)
+  (ref :url "http://dns-sd.org/" :text body))
+
+(define (mdns . body)
+  (ref :url "http://multicastdns.org/" :text body))
+
+(define (guile-avahi-ml . body)
+  (ref :url "http://lists.nongnu.org/mailman/listinfo/guile-avahi-bugs"
+     :text body))
+
+(define (git . body)
+  (ref :url "http://git.or.cz/" :text body))
+
+
+;;;
+;;; The website.
+;;;
+
+(document :title [Guile-Avahi: Avahi for GNU Guile Programs]
+   :html-title "Guile-Avahi"
+   :author #f
+   :keywords '("Scheme" "Guile" "Avahi" "DNS-SD" "mDNS")
+
+   (mark "intro")
+
+   (p [Guile-Avahi is a set of ,(avahi [Avahi]) bindings for ,(guile
+[GNU,(~)Guile]) 1.8, released under the ,(lgpl [LGPL,(~)v3 or later]).
+It allows programmers to use functionalities of the Avahi client library
+from Guile ,(scheme [Scheme]) programs.])
+
+   (p [,(avahi [Avahi]) itself is an implementation of ,(mdns [multicast
+DNS]) (mDNS) and ,(dns-sd [DNS Service Discovery]) (DNS-SD).  Together,
+these protocols provide support for fully decentralized host naming and
+service publication and discovery.  More information is available from
+,(avahi [http://avahi.org]).])
+
+
+   (chapter :title [Availability] :number #f :file #f
+
+      (p [Guile-Avahi is ,(freedom [free software]), distributed under
+the terms of the ,(lgpl [GNU Lesser General Public License]), version 3
+or (at your option) any later version.  Releases are ,(ref
+:text [available from here] :url
+"http://download.savannah.nongnu.org/releases/guile-avahi/").])
+
+      (p [It requires ,(guile [GNU Guile 1.8.x]) and ,(avahi [Avahi])
+0.6.x.]))
+
+   (chapter :title [Documentation] :number #f :file #f ;; FIXME: Do it!
+
+      (p [The user manual is ,(ref :text [available here] :url
+"doc/guile-avahi.html") (,(ref :text [PDF] :url
+"doc/guile-avahi.pdf")).]))
+
+   (chapter :title [Mailing List] :number #f :file #f
+      :ident "mailing-list"
+
+      (p [Development questions, issues and bug reports should all go to
+,(guile-avahi-ml [the mailing-list.])]))
+
+   (chapter :title [Development] :number #f :file #f
+
+      (p [General information is available on the ,(ref :text [Savannah
+project page] :url "http://savannah.nongnu.org/projects/guile-avahi/").])
+
+      (p [Development is managed using the ,(git [Git]) distributed
+revision control system.  You can fetch a copy of the source code
+repository using the following incantation:
+
+,(frame :class "code-excerpt" :border #f :margin #f
+    (code [git-clone git://git.sv.gnu.org/guile-avahi.git]))
+
+You can then happily hack on your side and eventually promote your
+changes ,(ref :ident "mailing-list" :text [on the mailing-list]).])
+      
+      (p [The repository can also be ,(ref :url
+"http://git.sv.gnu.org/gitweb/?p=guile-avahi.git;a=summary" :text
+[browsed on-line]).])))
+
+
+;;; Local Variables:
+;;; coding: latin-1
+;;; ispell-local-dictionary: "american"
+;;; End:
+
+;;; arch-tag: 0708867f-78df-46d1-ac81-963c30c2d381
