@@ -1,5 +1,5 @@
 ;;; Guile-Avahi --- Guile bindings for Avahi.
-;;; Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+;;; Copyright (C) 2007, 2009  Ludovic Courtès <ludo@gnu.org>
 ;;;
 ;;; This file is part of Guile-Avahi.
 ;;;
@@ -39,16 +39,14 @@
                       (string? (client-state->string state))))
             (throw 'failure)))
 
-      (exit (and (defined? 'make-threaded-poll))
-                 (provided? 'threads)
-                 (let* ((poll   (make-threaded-poll))
-                        (client (make-client (threaded-poll poll)
-                                             (list
-                                              client-flag/ignore-user-config)
-                                             client-callback)))
-                   (and (client? client)
-                        (eq? (client-state client)
-                             client-state/s-running)))))
+      (exit (let* ((poll   (make-threaded-poll))
+                   (client (make-client (threaded-poll poll)
+                                        (list
+                                         client-flag/ignore-user-config)
+                                        client-callback)))
+              (and (client? client)
+                   (eq? (client-state client)
+                        client-state/s-running)))))
 
     (lambda ()
       ;; failure.
