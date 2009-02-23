@@ -6,7 +6,7 @@ AC_INIT(guile-avahi, 0.3, guile-avahi-bugs@nongnu.org)
 AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_MACRO_DIR(m4)
 
-AM_INIT_AUTOMAKE(guile-avahi, 0.3)
+AM_INIT_AUTOMAKE([gnu check-news -Wall -Wno-portability])
 
 
 AC_CONFIG_SRCDIR([src/common.c])
