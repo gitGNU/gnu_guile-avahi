@@ -1,5 +1,5 @@
 # Guile-Avahi --- Guile bindings for Avahi.
-# Copyright (C) 2007  Ludovic Courtès <ludo@gnu.org>
+# Copyright (C) 2007, 2009  Ludovic Courtès <ludo@gnu.org>
 #
 # This file is part of Guile-Avahi.
 #
@@ -22,4 +22,4 @@ TESTS = simple-poll.scm threaded-poll.scm publish.scm	\
 
 EXTRA_DIST = $(TESTS)
 
-TESTS_ENVIRONMENT = $(top_builddir)/pre-inst-guile
+TESTS_ENVIRONMENT = GUILE_AUTO_COMPILE=0 $(top_builddir)/pre-inst-guile

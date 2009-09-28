@@ -1,5 +1,5 @@
 # Guile-Avahi --- Guile bindings for Avahi.
-# Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
+# Copyright (C) 2007, 2008, 2009  Ludovic Courtès <ludo@gnu.org>
 #
 # This file is part of Guile-Avahi.
 #
@@ -16,7 +16,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules -L $(top_builddir)/modules
+GUILE_FOR_BUILD =						\
+  GUILE_AUTO_COMPILE=0						\
+  $(GUILE) -L $(top_srcdir)/modules -L $(top_builddir)/modules
 
 noinst_HEADERS = watch.h utils.h errors.h
 
