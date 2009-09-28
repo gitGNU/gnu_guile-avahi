@@ -1,5 +1,5 @@
 /* Guile-Avahi --- Guile bindings for Avahi.
-   Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
+   Copyright (C) 2007, 2008, 2009  Ludovic Courtès <ludo@gnu.org>
 
    This file is part of Guile-Avahi.
 
@@ -210,7 +210,7 @@ do_iterate (void *data)
   err = avahi_simple_poll_iterate (args->c_simple_poll,
 				   args->c_sleep_time);
 
-  return ((void *) err);
+  return ((void *) (long) err);
 }
 
 static void *
@@ -220,7 +220,7 @@ do_loop (void *data)
 
   err = avahi_simple_poll_loop ((AvahiSimplePoll *) data);
 
-  return ((void *) err);
+  return ((void *) (long) err);
 }
 
 SCM_DEFINE (scm_avahi_iterate_simple_poll, "iterate-simple-poll",
@@ -247,7 +247,7 @@ SCM_DEFINE (scm_avahi_iterate_simple_poll, "iterate-simple-poll",
 
   args.c_simple_poll = c_simple_poll;
   args.c_sleep_time  = c_sleep_time;
-  err = (int) scm_without_guile (do_iterate, &args);
+  err = (long) scm_without_guile (do_iterate, &args);
 
   if (err == 0)
     result = SCM_BOOL_T;
@@ -276,7 +276,7 @@ SCM_DEFINE (scm_avahi_run_simple_poll, "run-simple-poll",
 
   c_simple_poll = scm_to_avahi_simple_poll (simple_poll, 1, FUNC_NAME);
 
-  err = (int) scm_without_guile (do_loop, c_simple_poll);
+  err = (long) scm_without_guile (do_loop, c_simple_poll);
   if (err == 0)
     result = SCM_BOOL_T;
   else if (err > 0)
