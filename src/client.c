@@ -1,5 +1,5 @@
 /* Guile-Avahi --- Guile bindings for Avahi.
-   Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
+   Copyright (C) 2007, 2008, 2009  Ludovic Courtès <ludo@gnu.org>
 
    This file is part of Guile-Avahi.
 
@@ -142,6 +142,8 @@ free_client_zombies (void *hook_data, void *func_data, void *data)
 #define SCM_AVAHI_CLIENT_POLL(client)		\
   SCM_SMOB_OBJECT_3 (client)
 
+#if SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8
+
 /* Mark the poll and closure associated with CLIENT.  */
 SCM_SMOB_MARK (scm_tc16_avahi_client, mark_avahi_client, client)
 {
@@ -150,6 +152,7 @@ SCM_SMOB_MARK (scm_tc16_avahi_client, mark_avahi_client, client)
   return (SCM_AVAHI_CLIENT_CALLBACK (client));
 }
 
+#endif /* SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8 */
 
 /* The client callback.  Note: it may be called at client creation time with
    C_CLIENT == NULL.  */

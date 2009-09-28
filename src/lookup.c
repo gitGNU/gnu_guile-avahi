@@ -1,5 +1,5 @@
 /* Guile-Avahi --- Guile bindings for Avahi.
-   Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
+   Copyright (C) 2007, 2008, 2009  Ludovic Courtès <ludo@gnu.org>
 
    This file is part of Guile-Avahi.
 
@@ -58,6 +58,8 @@
   SCM_SMOB_OBJECT_3 (group)
 
 
+#if SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8
+
 /* Mark the client and closure associated with the given lookup SMOB.  */
 
 #define SMOB_MARKER(_underscores)			\
@@ -78,6 +80,8 @@ SMOB_MARKER (host_name_resolver)
 SMOB_MARKER (address_resolver)
 
 #undef SMOB_MARKER
+
+#endif /* SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8 */
 
 
 /* Produce a Scheme procedure that returns the client associated with the

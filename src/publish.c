@@ -1,5 +1,5 @@
 /* Guile-Avahi --- Guile bindings for Avahi.
-   Copyright (C) 2007, 2008  Ludovic Courtès <ludo@gnu.org>
+   Copyright (C) 2007, 2008, 2009  Ludovic Courtès <ludo@gnu.org>
 
    This file is part of Guile-Avahi.
 
@@ -70,6 +70,8 @@ scm_avahi_entry_group_free (AvahiEntryGroup *c_group)
   SCM_SMOB_OBJECT_3 (group)
 
 
+#if SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8
+
 /* Mark the client and closure associated with GROUP.  */
 SCM_SMOB_MARK (scm_tc16_avahi_entry_group, mark_entry_group, group)
 {
@@ -77,6 +79,8 @@ SCM_SMOB_MARK (scm_tc16_avahi_entry_group, mark_entry_group, group)
 
   return (SCM_AVAHI_ENTRY_GROUP_CALLBACK (group));
 }
+
+#endif /* SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8 */
 
 static void
 entry_group_callback (AvahiEntryGroup *c_group,

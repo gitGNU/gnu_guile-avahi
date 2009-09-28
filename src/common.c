@@ -58,6 +58,8 @@ scm_avahi_nop (void *something)
 #define SCM_AVAHI_POLL_PARENT_POLL(poll)	\
   SCM_SMOB_OBJECT_3 (poll)
 
+#if SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8
+
 SCM_SMOB_MARK (scm_tc16_avahi_poll, mark_avahi_poll, poll)
 {
   /* This trick allows `AvahiPoll' SMOBs to be kept alive as long as their
@@ -66,6 +68,8 @@ SCM_SMOB_MARK (scm_tc16_avahi_poll, mark_avahi_poll, poll)
      by their parent poll.  */
   return (SCM_AVAHI_POLL_PARENT_POLL (poll));
 }
+
+#endif
 
 /* Mark the closures associated with GUILE_POLL.  */
 SCM_SMOB_MARK (scm_tc16_avahi_guile_poll, mark_avahi_guile_poll, guile_poll)
